@@ -55,6 +55,8 @@ const EXTREME_B_CONDITIONS = [
 interface ResultInfo {
   category: string;
   ldlGoal: string;
+  nonHdlGoal: string;
+  apoBGoal: string;
   color: string;
   icon: React.ReactNode;
   treatment: string[];
