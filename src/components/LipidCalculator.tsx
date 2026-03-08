@@ -55,6 +55,8 @@ const EXTREME_B_CONDITIONS = [
 interface ResultInfo {
   category: string;
   ldlGoal: string;
+  nonHdlGoal: string;
+  apoBGoal: string;
   color: string;
   icon: React.ReactNode;
   treatment: string[];
@@ -64,6 +66,8 @@ const RESULTS: Record<string, ResultInfo> = {
   vhrg: {
     category: "Very High-Risk Group (VHRG)",
     ldlGoal: "< 50 mg/dL",
+    nonHdlGoal: "< 80 mg/dL",
+    apoBGoal: "< 65 mg/dL",
     color: "warning",
     icon: <AlertTriangle className="h-6 w-6" />,
     treatment: [
@@ -76,6 +80,8 @@ const RESULTS: Record<string, ResultInfo> = {
   "extreme-a": {
     category: "Extreme Risk — Category A",
     ldlGoal: "< 50 mg/dL (indispensable)\n≤ 30 mg/dL (optional)*",
+    nonHdlGoal: "< 80 mg/dL (indispensable)\n≤ 60 mg/dL (optional)*",
+    apoBGoal: "< 55 mg/dL",
     color: "danger",
     icon: <AlertTriangle className="h-6 w-6" />,
     treatment: [
@@ -89,6 +95,8 @@ const RESULTS: Record<string, ResultInfo> = {
   "extreme-b": {
     category: "Extreme Risk — Category B",
     ldlGoal: "≤ 30 mg/dL",
+    nonHdlGoal: "≤ 60 mg/dL",
+    apoBGoal: "< 45 mg/dL",
     color: "danger",
     icon: <AlertTriangle className="h-6 w-6" />,
     treatment: [
@@ -340,11 +348,25 @@ export default function LipidCalculator() {
                   </div>
                 </div>
                 <div className="p-5 space-y-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">LDL-C Target</p>
-                    <p className="mt-1 font-display text-2xl font-bold text-foreground whitespace-pre-line">
-                      {resultInfo.ldlGoal}
-                    </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">LDL-C Target</p>
+                      <p className="mt-1 font-display text-lg font-bold text-foreground whitespace-pre-line">
+                        {resultInfo.ldlGoal}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Non-HDL-C Target</p>
+                      <p className="mt-1 font-display text-lg font-bold text-foreground whitespace-pre-line">
+                        {resultInfo.nonHdlGoal}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">ApoB Target</p>
+                      <p className="mt-1 font-display text-lg font-bold text-foreground whitespace-pre-line">
+                        {resultInfo.apoBGoal}
+                      </p>
+                    </div>
                   </div>
 
                   {atGoal !== null && (
