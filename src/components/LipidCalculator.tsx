@@ -154,6 +154,18 @@ export default function LipidCalculator() {
       });
     }
   }, [ascvdRFCount]);
+
+  // Auto-check "CAD with Lp(a) ≥50 mg/dL" (Extreme A index 5) when Lp(a) ≥50
+  const lpaNum = parseFloat(currentLpa);
+  useEffect(() => {
+    const isElevated = !isNaN(lpaNum) && lpaNum >= 50;
+    setSelectedExtA((prev) => {
+      if (prev[5] === isElevated) return prev;
+      const copy = [...prev];
+      copy[5] = isElevated;
+      return copy;
+    });
+  }, [lpaNum]);
   const toggleItem = (
     arr: boolean[],
     setter: React.Dispatch<React.SetStateAction<boolean[]>>,
