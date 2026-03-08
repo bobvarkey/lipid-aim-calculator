@@ -16,6 +16,17 @@ const SMURFS = [
   { key: "hscrp", label: "hsCRP elevated (≥2 mg/L)", letter: "S*", isNew: true },
 ];
 
+const MAJOR_ASCVD_RF = [
+  "Age (Men ≥45 y, Women ≥55 y)",
+  "Current cigarette smoking",
+  "Hypertension (BP ≥140/90 mmHg or on treatment)",
+  "Low HDL-C (<40 mg/dL in men, <50 mg/dL in women)",
+  "Family history of premature CHD (1st degree: male <55 y, female <65 y)",
+  "Diabetes mellitus",
+  "Chronic kidney disease (eGFR <60 mL/min)",
+  "Obesity (BMI ≥30 or waist circumference elevated)",
+];
+
 const VHRG_CONDITIONS = [
   "ASCVD (CAD/PAD/TIA or stroke)",
   "Homozygous familial hypercholesterolemia",
@@ -91,15 +102,15 @@ const RESULTS: Record<string, ResultInfo> = {
 
 export default function LipidCalculator() {
   const [currentLDL, setCurrentLDL] = useState("");
+  const [selectedAscvdRF, setSelectedAscvdRF] = useState<boolean[]>(new Array(MAJOR_ASCVD_RF.length).fill(false));
   const [selectedSmurfs, setSelectedSmurfs] = useState<boolean[]>(new Array(SMURFS.length).fill(false));
   const [selectedVHRG, setSelectedVHRG] = useState<boolean[]>(new Array(VHRG_CONDITIONS.length).fill(false));
   const [selectedExtA, setSelectedExtA] = useState<boolean[]>(new Array(EXTREME_A_CONDITIONS.length).fill(false));
   const [selectedExtB, setSelectedExtB] = useState<boolean[]>(new Array(EXTREME_B_CONDITIONS.length).fill(false));
   const [result, setResult] = useState<RiskCategory>(null);
   const [showResult, setShowResult] = useState(false);
-
   const smurfCount = selectedSmurfs.filter(Boolean).length;
-
+  const ascvdRFCount = selectedAscvdRF.filter(Boolean).length;
   const toggleItem = (
     arr: boolean[],
     setter: React.Dispatch<React.SetStateAction<boolean[]>>,
@@ -125,6 +136,7 @@ export default function LipidCalculator() {
 
   const reset = () => {
     setCurrentLDL("");
+    setSelectedAscvdRF(new Array(MAJOR_ASCVD_RF.length).fill(false));
     setSelectedSmurfs(new Array(SMURFS.length).fill(false));
     setSelectedVHRG(new Array(VHRG_CONDITIONS.length).fill(false));
     setSelectedExtA(new Array(EXTREME_A_CONDITIONS.length).fill(false));
@@ -153,7 +165,7 @@ export default function LipidCalculator() {
             LDL-C Target Calculator
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Based on ILA (Lipid Association of India) Guidelines 2020
+            Lipid Association of India 2023 Update on Cardiovascular Risk Assessment and Lipid Management in Indian Patients: Consensus Statement IV
           </p>
         </div>
 
@@ -205,6 +217,37 @@ export default function LipidCalculator() {
             <div className="mt-3 flex items-center gap-2 rounded-lg bg-warning/10 px-3 py-2 text-xs font-medium text-warning">
               <AlertTriangle className="h-4 w-4 shrink-0" />
               ≥3 major ASCVD risk factors identified — qualifies for higher risk stratification
+            </div>
+          )}
+        </Card>
+
+        {/* Major ASCVD Risk Factors Checklist */}
+        <Card className="mb-4 border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <Heart className="h-4 w-4 text-danger" />
+            <h2 className="font-display text-sm font-bold text-foreground">
+              Major ASCVD Risk Factors
+            </h2>
+          </div>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Helps determine risk stratification. Count: <span className="font-bold text-foreground">{ascvdRFCount}/{MAJOR_ASCVD_RF.length}</span>
+          </p>
+          <div className="space-y-3">
+            {MAJOR_ASCVD_RF.map((rf, i) => (
+              <label key={i} className="flex cursor-pointer items-start gap-3">
+                <Checkbox
+                  checked={selectedAscvdRF[i]}
+                  onCheckedChange={() => toggleItem(selectedAscvdRF, setSelectedAscvdRF, i)}
+                  className="mt-0.5"
+                />
+                <span className="text-sm leading-snug text-foreground">{rf}</span>
+              </label>
+            ))}
+          </div>
+          {ascvdRFCount >= 3 && (
+            <div className="mt-3 flex items-center gap-2 rounded-lg bg-danger/10 px-3 py-2 text-xs font-medium text-danger">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              ≥3 major ASCVD risk factors — consider Extreme Risk or VHRG classification
             </div>
           )}
         </Card>
@@ -318,7 +361,7 @@ export default function LipidCalculator() {
         )}
 
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          Reference: Journal of Clinical Lipidology, Vol 14, No 2, April 2020 — Lipid Association of India
+          Reference: Lipid Association of India 2023 Update — Consensus Statement IV on Cardiovascular Risk Assessment and Lipid Management in Indian Patients
         </p>
       </div>
     </div>
