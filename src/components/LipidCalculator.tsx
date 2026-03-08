@@ -110,6 +110,7 @@ const RESULTS: Record<string, ResultInfo> = {
 
 export default function LipidCalculator() {
   const [currentLDL, setCurrentLDL] = useState("");
+  const [currentLpa, setCurrentLpa] = useState("");
   const [selectedAscvdRF, setSelectedAscvdRF] = useState<boolean[]>(new Array(MAJOR_ASCVD_RF.length).fill(false));
   const [selectedSmurfs, setSelectedSmurfs] = useState<boolean[]>(new Array(SMURFS.length).fill(false));
   const [selectedVHRG, setSelectedVHRG] = useState<boolean[]>(new Array(VHRG_CONDITIONS.length).fill(false));
