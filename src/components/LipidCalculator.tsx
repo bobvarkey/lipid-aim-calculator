@@ -110,6 +110,7 @@ const RESULTS: Record<string, ResultInfo> = {
 
 export default function LipidCalculator() {
   const [currentLDL, setCurrentLDL] = useState("");
+  const [currentLpa, setCurrentLpa] = useState("");
   const [selectedAscvdRF, setSelectedAscvdRF] = useState<boolean[]>(new Array(MAJOR_ASCVD_RF.length).fill(false));
   const [selectedSmurfs, setSelectedSmurfs] = useState<boolean[]>(new Array(SMURFS.length).fill(false));
   const [selectedVHRG, setSelectedVHRG] = useState<boolean[]>(new Array(VHRG_CONDITIONS.length).fill(false));
@@ -153,6 +154,18 @@ export default function LipidCalculator() {
       });
     }
   }, [ascvdRFCount]);
+
+  // Auto-check "CAD with Lp(a) ≥50 mg/dL" (Extreme A index 5) when Lp(a) ≥50
+  const lpaNum = parseFloat(currentLpa);
+  useEffect(() => {
+    const isElevated = !isNaN(lpaNum) && lpaNum >= 50;
+    setSelectedExtA((prev) => {
+      if (prev[5] === isElevated) return prev;
+      const copy = [...prev];
+      copy[5] = isElevated;
+      return copy;
+    });
+  }, [lpaNum]);
   const toggleItem = (
     arr: boolean[],
     setter: React.Dispatch<React.SetStateAction<boolean[]>>,
@@ -178,6 +191,7 @@ export default function LipidCalculator() {
 
   const reset = () => {
     setCurrentLDL("");
+    setCurrentLpa("");
     setSelectedAscvdRF(new Array(MAJOR_ASCVD_RF.length).fill(false));
     setSelectedSmurfs(new Array(SMURFS.length).fill(false));
     setSelectedVHRG(new Array(VHRG_CONDITIONS.length).fill(false));
@@ -211,18 +225,40 @@ export default function LipidCalculator() {
           </p>
         </div>
 
-        {/* Current LDL Input */}
+        {/* Current LDL & Lp(a) Inputs */}
         <Card className="mb-4 border-border bg-card p-5">
-          <label className="mb-2 block font-display text-sm font-semibold text-foreground">
-            Current LDL-C Level (mg/dL)
-          </label>
-          <Input
-            type="number"
-            placeholder="e.g. 85"
-            value={currentLDL}
-            onChange={(e) => setCurrentLDL(e.target.value)}
-            className="text-lg"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="mb-2 block font-display text-sm font-semibold text-foreground">
+                Current LDL-C (mg/dL)
+              </label>
+              <Input
+                type="number"
+                placeholder="e.g. 85"
+                value={currentLDL}
+                onChange={(e) => setCurrentLDL(e.target.value)}
+                className="text-lg"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block font-display text-sm font-semibold text-foreground">
+                Lp(a) Level (mg/dL)
+              </label>
+              <Input
+                type="number"
+                placeholder="e.g. 45"
+                value={currentLpa}
+                onChange={(e) => setCurrentLpa(e.target.value)}
+                className="text-lg"
+              />
+              {!isNaN(lpaNum) && lpaNum >= 50 && (
+                <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-danger">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  Lp(a) ≥50 mg/dL — auto-classified as Extreme Risk A
+                </div>
+              )}
+            </div>
+          </div>
         </Card>
 
         {/* SMuRFS Section */}
@@ -365,8 +401,12 @@ export default function LipidCalculator() {
                   <p className="text-xs text-muted-foreground">
                     Generated on {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })} • Based on LAI 2023 Consensus Statement IV
                   </p>
-                  {currentLDL && (
-                    <p className="mt-1 text-sm text-foreground">Current LDL-C: <span className="font-bold">{currentLDL} mg/dL</span></p>
+                  {(currentLDL || currentLpa) && (
+                    <p className="mt-1 text-sm text-foreground">
+                      {currentLDL && <>Current LDL-C: <span className="font-bold">{currentLDL} mg/dL</span></>}
+                      {currentLDL && currentLpa && <> • </>}
+                      {currentLpa && <>Lp(a): <span className="font-bold">{currentLpa} mg/dL</span></>}
+                    </p>
                   )}
                 </div>
 
