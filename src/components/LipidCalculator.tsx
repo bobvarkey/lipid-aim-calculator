@@ -361,7 +361,7 @@ export default function LipidCalculator() {
         )}
 
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          Reference: Journal of Clinical Lipidology, Vol 14, No 2, April 2020 — Lipid Association of India
+          Reference: Lipid Association of India 2023 Update — Consensus Statement IV on Cardiovascular Risk Assessment and Lipid Management in Indian Patients
         </p>
       </div>
     </div>
