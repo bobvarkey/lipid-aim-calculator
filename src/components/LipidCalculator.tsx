@@ -165,7 +165,7 @@ export default function LipidCalculator() {
             LDL-C Target Calculator
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Based on ILA (Lipid Association of India) Guidelines 2020
+            Lipid Association of India 2023 Update on Cardiovascular Risk Assessment and Lipid Management in Indian Patients: Consensus Statement IV
           </p>
         </div>
 
