@@ -334,7 +334,7 @@ export default function LipidCalculator() {
 
         {/* Result */}
         {showResult && (
-          <Card className="mt-6 overflow-hidden border-border bg-card">
+          <Card className="mt-6 overflow-hidden border-border bg-card" id="lipid-report">
             {resultInfo ? (
               <>
                 <div className={`px-5 py-4 ${
@@ -342,13 +342,36 @@ export default function LipidCalculator() {
                     ? "bg-warning/10 text-warning"
                     : "bg-danger/10 text-danger"
                 }`}>
-                  <div className="flex items-center gap-2 font-display font-bold">
-                    {resultInfo.icon}
-                    {resultInfo.category}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 font-display font-bold">
+                      {resultInfo.icon}
+                      {resultInfo.category}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="no-print"
+                      onClick={() => window.print()}
+                    >
+                      <Printer className="h-4 w-4 mr-1" />
+                      Print Report
+                    </Button>
                   </div>
                 </div>
+
+                {/* Print-only header */}
+                <div className="hidden print-only px-5 pt-4">
+                  <h2 className="font-display text-lg font-bold text-foreground">LDL-C Target Calculator — Patient Report</h2>
+                  <p className="text-xs text-muted-foreground">
+                    Generated on {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })} • Based on LAI 2023 Consensus Statement IV
+                  </p>
+                  {currentLDL && (
+                    <p className="mt-1 text-sm text-foreground">Current LDL-C: <span className="font-bold">{currentLDL} mg/dL</span></p>
+                  )}
+                </div>
+
                 <div className="p-5 space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 print-break-inside-avoid">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">LDL-C Target</p>
                       <p className="mt-1 font-display text-lg font-bold text-foreground whitespace-pre-line">
@@ -370,7 +393,7 @@ export default function LipidCalculator() {
                   </div>
 
                   {atGoal !== null && (
-                    <div className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium ${
+                    <div className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium print-break-inside-avoid ${
                       atGoal
                         ? "bg-success/10 text-success"
                         : "bg-danger/10 text-danger"
@@ -383,7 +406,7 @@ export default function LipidCalculator() {
                     </div>
                   )}
 
-                  <div>
+                  <div className="print-break-inside-avoid">
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Treatment Algorithm</p>
                     <ul className="space-y-2">
                       {resultInfo.treatment.map((step, i) => (
@@ -404,7 +427,7 @@ export default function LipidCalculator() {
                   )}
 
                   {/* Stroke-Specific Guidance */}
-                  <div className="rounded-lg border border-border bg-muted/50 p-4">
+                  <div className="rounded-lg border border-border bg-muted/50 p-4 print-break-inside-avoid">
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                       Stroke-Specific Guidance
                     </p>
@@ -413,6 +436,13 @@ export default function LipidCalculator() {
                     </p>
                     <p className="mt-2 text-sm text-foreground leading-relaxed">
                       CSI/LAI suggest LDL-C <span className="font-semibold">&lt;55 mg/dL</span> with <span className="font-semibold">≥50% reduction</span> from baseline.
+                    </p>
+                  </div>
+
+                  {/* Print-only footer */}
+                  <div className="hidden print-only border-t border-border pt-3 mt-4">
+                    <p className="text-[10px] text-muted-foreground">
+                      This report is generated for informational purposes only and does not replace professional medical advice. Reference: Lipid Association of India 2023 Update — Consensus Statement IV.
                     </p>
                   </div>
                 </div>
