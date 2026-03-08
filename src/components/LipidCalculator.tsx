@@ -3,9 +3,18 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Heart, AlertTriangle, ShieldCheck, RotateCcw } from "lucide-react";
+import { Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity } from "lucide-react";
 
 type RiskCategory = null | "vhrg" | "extreme-a" | "extreme-b";
+
+const SMURFS = [
+  { key: "smoking", label: "Smoking", letter: "S" },
+  { key: "male", label: "Male sex (age ≥45 years)", letter: "M" },
+  { key: "uncontrolled_dm", label: "Uncontrolled Diabetes Mellitus (HbA1c >7%)", letter: "u" },
+  { key: "renal", label: "Reduced renal function (eGFR <60)", letter: "R" },
+  { key: "familial", label: "Familial hypercholesterolemia / Strong family history of premature CAD", letter: "F" },
+  { key: "hscrp", label: "hsCRP elevated (≥2 mg/L)", letter: "S*", isNew: true },
+];
 
 const VHRG_CONDITIONS = [
   "ASCVD (CAD/PAD/TIA or stroke)",
@@ -82,11 +91,14 @@ const RESULTS: Record<string, ResultInfo> = {
 
 export default function LipidCalculator() {
   const [currentLDL, setCurrentLDL] = useState("");
+  const [selectedSmurfs, setSelectedSmurfs] = useState<boolean[]>(new Array(SMURFS.length).fill(false));
   const [selectedVHRG, setSelectedVHRG] = useState<boolean[]>(new Array(VHRG_CONDITIONS.length).fill(false));
   const [selectedExtA, setSelectedExtA] = useState<boolean[]>(new Array(EXTREME_A_CONDITIONS.length).fill(false));
   const [selectedExtB, setSelectedExtB] = useState<boolean[]>(new Array(EXTREME_B_CONDITIONS.length).fill(false));
   const [result, setResult] = useState<RiskCategory>(null);
   const [showResult, setShowResult] = useState(false);
+
+  const smurfCount = selectedSmurfs.filter(Boolean).length;
 
   const toggleItem = (
     arr: boolean[],
@@ -113,6 +125,7 @@ export default function LipidCalculator() {
 
   const reset = () => {
     setCurrentLDL("");
+    setSelectedSmurfs(new Array(SMURFS.length).fill(false));
     setSelectedVHRG(new Array(VHRG_CONDITIONS.length).fill(false));
     setSelectedExtA(new Array(EXTREME_A_CONDITIONS.length).fill(false));
     setSelectedExtB(new Array(EXTREME_B_CONDITIONS.length).fill(false));
@@ -156,6 +169,44 @@ export default function LipidCalculator() {
             onChange={(e) => setCurrentLDL(e.target.value)}
             className="text-lg"
           />
+        </Card>
+
+        {/* SMuRFS Section */}
+        <Card className="mb-4 border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <Activity className="h-4 w-4 text-primary" />
+            <h2 className="font-display text-sm font-bold text-foreground">
+              SMuRFS — Major ASCVD Risk Factors
+            </h2>
+          </div>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Standard Modifiable Risk Factors + hsCRP (5th SMuRF). Count: <span className="font-bold text-foreground">{smurfCount}/6</span>
+          </p>
+          <div className="space-y-3">
+            {SMURFS.map((s, i) => (
+              <label key={s.key} className="flex cursor-pointer items-start gap-3">
+                <Checkbox
+                  checked={selectedSmurfs[i]}
+                  onCheckedChange={() => toggleItem(selectedSmurfs, setSelectedSmurfs, i)}
+                  className="mt-0.5"
+                />
+                <span className="text-sm leading-snug text-foreground">
+                  <span className="font-bold text-primary">{s.letter}</span> — {s.label}
+                  {s.isNew && (
+                    <span className="ml-1.5 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase text-primary">
+                      New 5th SMuRF
+                    </span>
+                  )}
+                </span>
+              </label>
+            ))}
+          </div>
+          {smurfCount >= 3 && (
+            <div className="mt-3 flex items-center gap-2 rounded-lg bg-warning/10 px-3 py-2 text-xs font-medium text-warning">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              ≥3 major ASCVD risk factors identified — qualifies for higher risk stratification
+            </div>
+          )}
         </Card>
 
         {/* Risk Sections */}
