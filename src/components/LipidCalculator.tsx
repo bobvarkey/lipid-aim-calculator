@@ -221,6 +221,37 @@ export default function LipidCalculator() {
           )}
         </Card>
 
+        {/* Major ASCVD Risk Factors Checklist */}
+        <Card className="mb-4 border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <Heart className="h-4 w-4 text-danger" />
+            <h2 className="font-display text-sm font-bold text-foreground">
+              Major ASCVD Risk Factors
+            </h2>
+          </div>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Helps determine risk stratification. Count: <span className="font-bold text-foreground">{ascvdRFCount}/{MAJOR_ASCVD_RF.length}</span>
+          </p>
+          <div className="space-y-3">
+            {MAJOR_ASCVD_RF.map((rf, i) => (
+              <label key={i} className="flex cursor-pointer items-start gap-3">
+                <Checkbox
+                  checked={selectedAscvdRF[i]}
+                  onCheckedChange={() => toggleItem(selectedAscvdRF, setSelectedAscvdRF, i)}
+                  className="mt-0.5"
+                />
+                <span className="text-sm leading-snug text-foreground">{rf}</span>
+              </label>
+            ))}
+          </div>
+          {ascvdRFCount >= 3 && (
+            <div className="mt-3 flex items-center gap-2 rounded-lg bg-danger/10 px-3 py-2 text-xs font-medium text-danger">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              ≥3 major ASCVD risk factors — consider Extreme Risk or VHRG classification
+            </div>
+          )}
+        </Card>
+
         {/* Risk Sections */}
         <RiskSection
           title="Very High-Risk Group (VHRG)"
