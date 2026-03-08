@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -111,6 +111,40 @@ export default function LipidCalculator() {
   const [showResult, setShowResult] = useState(false);
   const smurfCount = selectedSmurfs.filter(Boolean).length;
   const ascvdRFCount = selectedAscvdRF.filter(Boolean).length;
+
+  // Auto-check "≥3 major ASCVD risk factors" conditions when ≥3 are selected
+  useEffect(() => {
+    if (ascvdRFCount >= 3) {
+      // VHRG index 2: "Diabetes with ≥3 major ASCVD risk factors / target organ damage"
+      setSelectedVHRG((prev) => {
+        if (prev[2]) return prev;
+        const copy = [...prev];
+        copy[2] = true;
+        return copy;
+      });
+      // Extreme A index 2: "CAD with ≥3 major ASCVD risk factors"
+      setSelectedExtA((prev) => {
+        if (prev[2]) return prev;
+        const copy = [...prev];
+        copy[2] = true;
+        return copy;
+      });
+    } else {
+      // Uncheck the auto-checked items when < 3
+      setSelectedVHRG((prev) => {
+        if (!prev[2]) return prev;
+        const copy = [...prev];
+        copy[2] = false;
+        return copy;
+      });
+      setSelectedExtA((prev) => {
+        if (!prev[2]) return prev;
+        const copy = [...prev];
+        copy[2] = false;
+        return copy;
+      });
+    }
+  }, [ascvdRFCount]);
   const toggleItem = (
     arr: boolean[],
     setter: React.Dispatch<React.SetStateAction<boolean[]>>,
