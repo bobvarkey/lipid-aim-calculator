@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity } from "lucide-react";
+import { Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity, Printer } from "lucide-react";
 
 type RiskCategory = null | "vhrg" | "extreme-a" | "extreme-b";
 
