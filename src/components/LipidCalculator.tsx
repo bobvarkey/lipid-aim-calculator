@@ -401,8 +401,12 @@ export default function LipidCalculator() {
                   <p className="text-xs text-muted-foreground">
                     Generated on {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })} • Based on LAI 2023 Consensus Statement IV
                   </p>
-                  {currentLDL && (
-                    <p className="mt-1 text-sm text-foreground">Current LDL-C: <span className="font-bold">{currentLDL} mg/dL</span></p>
+                  {(currentLDL || currentLpa) && (
+                    <p className="mt-1 text-sm text-foreground">
+                      {currentLDL && <>Current LDL-C: <span className="font-bold">{currentLDL} mg/dL</span></>}
+                      {currentLDL && currentLpa && <> • </>}
+                      {currentLpa && <>Lp(a): <span className="font-bold">{currentLpa} mg/dL</span></>}
+                    </p>
                   )}
                 </div>
 
