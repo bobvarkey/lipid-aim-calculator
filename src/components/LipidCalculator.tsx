@@ -66,6 +66,8 @@ const RESULTS: Record<string, ResultInfo> = {
   vhrg: {
     category: "Very High-Risk Group (VHRG)",
     ldlGoal: "< 50 mg/dL",
+    nonHdlGoal: "< 80 mg/dL",
+    apoBGoal: "< 65 mg/dL",
     color: "warning",
     icon: <AlertTriangle className="h-6 w-6" />,
     treatment: [
@@ -78,6 +80,8 @@ const RESULTS: Record<string, ResultInfo> = {
   "extreme-a": {
     category: "Extreme Risk — Category A",
     ldlGoal: "< 50 mg/dL (indispensable)\n≤ 30 mg/dL (optional)*",
+    nonHdlGoal: "< 80 mg/dL (indispensable)\n≤ 60 mg/dL (optional)*",
+    apoBGoal: "< 55 mg/dL",
     color: "danger",
     icon: <AlertTriangle className="h-6 w-6" />,
     treatment: [
@@ -91,6 +95,8 @@ const RESULTS: Record<string, ResultInfo> = {
   "extreme-b": {
     category: "Extreme Risk — Category B",
     ldlGoal: "≤ 30 mg/dL",
+    nonHdlGoal: "≤ 60 mg/dL",
+    apoBGoal: "< 45 mg/dL",
     color: "danger",
     icon: <AlertTriangle className="h-6 w-6" />,
     treatment: [
