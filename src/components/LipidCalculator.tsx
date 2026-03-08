@@ -3,9 +3,18 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Heart, AlertTriangle, ShieldCheck, RotateCcw } from "lucide-react";
+import { Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity } from "lucide-react";
 
 type RiskCategory = null | "vhrg" | "extreme-a" | "extreme-b";
+
+const SMURFS = [
+  { key: "smoking", label: "Smoking", letter: "S" },
+  { key: "male", label: "Male sex (age ≥45 years)", letter: "M" },
+  { key: "uncontrolled_dm", label: "Uncontrolled Diabetes Mellitus (HbA1c >7%)", letter: "u" },
+  { key: "renal", label: "Reduced renal function (eGFR <60)", letter: "R" },
+  { key: "familial", label: "Familial hypercholesterolemia / Strong family history of premature CAD", letter: "F" },
+  { key: "hscrp", label: "hsCRP elevated (≥2 mg/L)", letter: "S*", isNew: true },
+];
 
 const VHRG_CONDITIONS = [
   "ASCVD (CAD/PAD/TIA or stroke)",
