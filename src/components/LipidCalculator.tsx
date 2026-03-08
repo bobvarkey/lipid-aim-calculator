@@ -225,18 +225,40 @@ export default function LipidCalculator() {
           </p>
         </div>
 
-        {/* Current LDL Input */}
+        {/* Current LDL & Lp(a) Inputs */}
         <Card className="mb-4 border-border bg-card p-5">
-          <label className="mb-2 block font-display text-sm font-semibold text-foreground">
-            Current LDL-C Level (mg/dL)
-          </label>
-          <Input
-            type="number"
-            placeholder="e.g. 85"
-            value={currentLDL}
-            onChange={(e) => setCurrentLDL(e.target.value)}
-            className="text-lg"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="mb-2 block font-display text-sm font-semibold text-foreground">
+                Current LDL-C (mg/dL)
+              </label>
+              <Input
+                type="number"
+                placeholder="e.g. 85"
+                value={currentLDL}
+                onChange={(e) => setCurrentLDL(e.target.value)}
+                className="text-lg"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block font-display text-sm font-semibold text-foreground">
+                Lp(a) Level (mg/dL)
+              </label>
+              <Input
+                type="number"
+                placeholder="e.g. 45"
+                value={currentLpa}
+                onChange={(e) => setCurrentLpa(e.target.value)}
+                className="text-lg"
+              />
+              {!isNaN(lpaNum) && lpaNum >= 50 && (
+                <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-danger">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  Lp(a) ≥50 mg/dL — auto-classified as Extreme Risk A
+                </div>
+              )}
+            </div>
+          </div>
         </Card>
 
         {/* SMuRFS Section */}
