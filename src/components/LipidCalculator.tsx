@@ -111,6 +111,8 @@ const RESULTS: Record<string, ResultInfo> = {
 export default function LipidCalculator() {
   const [currentLDL, setCurrentLDL] = useState("");
   const [currentLpa, setCurrentLpa] = useState("");
+  const [currentNonHDL, setCurrentNonHDL] = useState("");
+  const [currentApoB, setCurrentApoB] = useState("");
   const [selectedAscvdRF, setSelectedAscvdRF] = useState<boolean[]>(new Array(MAJOR_ASCVD_RF.length).fill(false));
   const [selectedSmurfs, setSelectedSmurfs] = useState<boolean[]>(new Array(SMURFS.length).fill(false));
   const [selectedVHRG, setSelectedVHRG] = useState<boolean[]>(new Array(VHRG_CONDITIONS.length).fill(false));
@@ -192,6 +194,8 @@ export default function LipidCalculator() {
   const reset = () => {
     setCurrentLDL("");
     setCurrentLpa("");
+    setCurrentNonHDL("");
+    setCurrentApoB("");
     setSelectedAscvdRF(new Array(MAJOR_ASCVD_RF.length).fill(false));
     setSelectedSmurfs(new Array(SMURFS.length).fill(false));
     setSelectedVHRG(new Array(VHRG_CONDITIONS.length).fill(false));
@@ -203,10 +207,19 @@ export default function LipidCalculator() {
 
   const resultInfo = result ? RESULTS[result] : null;
   const ldlNum = parseFloat(currentLDL);
-  const atGoal = resultInfo && !isNaN(ldlNum)
-    ? result === "extreme-b"
-      ? ldlNum <= 30
-      : ldlNum < 50
+  const nonHdlNum = parseFloat(currentNonHDL);
+  const apoBNum = parseFloat(currentApoB);
+
+  const ldlAtGoal = resultInfo && !isNaN(ldlNum)
+    ? result === "extreme-b" ? ldlNum <= 30 : ldlNum < 50
+    : null;
+  const nonHdlAtGoal = resultInfo && !isNaN(nonHdlNum)
+    ? result === "extreme-b" ? nonHdlNum <= 60 : nonHdlNum < 80
+    : null;
+  const apoBAtGoal = resultInfo && !isNaN(apoBNum)
+    ? result === "extreme-b" ? apoBNum < 45
+      : result === "extreme-a" ? apoBNum < 55
+      : apoBNum < 65
     : null;
 
   return (
@@ -227,34 +240,54 @@ export default function LipidCalculator() {
 
         {/* Current LDL & Lp(a) Inputs */}
         <Card className="mb-4 border-border bg-card p-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
               <label className="mb-2 block font-display text-sm font-semibold text-foreground">
-                Current LDL-C (mg/dL)
+                LDL-C (mg/dL)
               </label>
               <Input
                 type="number"
                 placeholder="e.g. 85"
                 value={currentLDL}
                 onChange={(e) => setCurrentLDL(e.target.value)}
-                className="text-lg"
               />
             </div>
             <div>
               <label className="mb-2 block font-display text-sm font-semibold text-foreground">
-                Lp(a) Level (mg/dL)
+                Non-HDL-C (mg/dL)
+              </label>
+              <Input
+                type="number"
+                placeholder="e.g. 110"
+                value={currentNonHDL}
+                onChange={(e) => setCurrentNonHDL(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="mb-2 block font-display text-sm font-semibold text-foreground">
+                ApoB (mg/dL)
+              </label>
+              <Input
+                type="number"
+                placeholder="e.g. 70"
+                value={currentApoB}
+                onChange={(e) => setCurrentApoB(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="mb-2 block font-display text-sm font-semibold text-foreground">
+                Lp(a) (mg/dL)
               </label>
               <Input
                 type="number"
                 placeholder="e.g. 45"
                 value={currentLpa}
                 onChange={(e) => setCurrentLpa(e.target.value)}
-                className="text-lg"
               />
               {!isNaN(lpaNum) && lpaNum >= 50 && (
-                <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-danger">
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                  Lp(a) ≥50 mg/dL — auto-classified as Extreme Risk A
+                <div className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-danger">
+                  <AlertTriangle className="h-3 w-3" />
+                  ≥50 → Extreme A
                 </div>
               )}
             </div>
@@ -401,11 +434,13 @@ export default function LipidCalculator() {
                   <p className="text-xs text-muted-foreground">
                     Generated on {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })} • Based on LAI 2023 Consensus Statement IV
                   </p>
-                  {(currentLDL || currentLpa) && (
+                  {(currentLDL || currentNonHDL || currentApoB || currentLpa) && (
                     <p className="mt-1 text-sm text-foreground">
-                      {currentLDL && <>Current LDL-C: <span className="font-bold">{currentLDL} mg/dL</span></>}
-                      {currentLDL && currentLpa && <> • </>}
-                      {currentLpa && <>Lp(a): <span className="font-bold">{currentLpa} mg/dL</span></>}
+                      {currentLDL && <>LDL-C: <span className="font-bold">{currentLDL}</span></>}
+                      {currentNonHDL && <>{currentLDL ? " • " : ""}Non-HDL-C: <span className="font-bold">{currentNonHDL}</span></>}
+                      {currentApoB && <>{(currentLDL || currentNonHDL) ? " • " : ""}ApoB: <span className="font-bold">{currentApoB}</span></>}
+                      {currentLpa && <>{(currentLDL || currentNonHDL || currentApoB) ? " • " : ""}Lp(a): <span className="font-bold">{currentLpa}</span></>}
+                      <span className="text-muted-foreground"> mg/dL</span>
                     </p>
                   )}
                 </div>
@@ -432,16 +467,32 @@ export default function LipidCalculator() {
                     </div>
                   </div>
 
-                  {atGoal !== null && (
-                    <div className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium print-break-inside-avoid ${
-                      atGoal
-                        ? "bg-success/10 text-success"
-                        : "bg-danger/10 text-danger"
-                    }`}>
-                      {atGoal ? (
-                        <><ShieldCheck className="h-5 w-5" /> Current LDL-C ({currentLDL} mg/dL) is at goal</>
-                      ) : (
-                        <><AlertTriangle className="h-5 w-5" /> Current LDL-C ({currentLDL} mg/dL) is above target</>
+                  {/* At-goal indicators for all three markers */}
+                  {(ldlAtGoal !== null || nonHdlAtGoal !== null || apoBAtGoal !== null) && (
+                    <div className="space-y-2 print-break-inside-avoid">
+                      {ldlAtGoal !== null && (
+                        <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${
+                          ldlAtGoal ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+                        }`}>
+                          {ldlAtGoal ? <ShieldCheck className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                          LDL-C ({currentLDL} mg/dL) — {ldlAtGoal ? "At goal" : "Above target"}
+                        </div>
+                      )}
+                      {nonHdlAtGoal !== null && (
+                        <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${
+                          nonHdlAtGoal ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+                        }`}>
+                          {nonHdlAtGoal ? <ShieldCheck className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                          Non-HDL-C ({currentNonHDL} mg/dL) — {nonHdlAtGoal ? "At goal" : "Above target"}
+                        </div>
+                      )}
+                      {apoBAtGoal !== null && (
+                        <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${
+                          apoBAtGoal ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+                        }`}>
+                          {apoBAtGoal ? <ShieldCheck className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                          ApoB ({currentApoB} mg/dL) — {apoBAtGoal ? "At goal" : "Above target"}
+                        </div>
                       )}
                     </div>
                   )}
