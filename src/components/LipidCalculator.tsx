@@ -91,11 +91,14 @@ const RESULTS: Record<string, ResultInfo> = {
 
 export default function LipidCalculator() {
   const [currentLDL, setCurrentLDL] = useState("");
+  const [selectedSmurfs, setSelectedSmurfs] = useState<boolean[]>(new Array(SMURFS.length).fill(false));
   const [selectedVHRG, setSelectedVHRG] = useState<boolean[]>(new Array(VHRG_CONDITIONS.length).fill(false));
   const [selectedExtA, setSelectedExtA] = useState<boolean[]>(new Array(EXTREME_A_CONDITIONS.length).fill(false));
   const [selectedExtB, setSelectedExtB] = useState<boolean[]>(new Array(EXTREME_B_CONDITIONS.length).fill(false));
   const [result, setResult] = useState<RiskCategory>(null);
   const [showResult, setShowResult] = useState(false);
+
+  const smurfCount = selectedSmurfs.filter(Boolean).length;
 
   const toggleItem = (
     arr: boolean[],
