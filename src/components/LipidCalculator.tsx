@@ -191,6 +191,7 @@ export default function LipidCalculator() {
 
   const reset = () => {
     setCurrentLDL("");
+    setCurrentLpa("");
     setSelectedAscvdRF(new Array(MAJOR_ASCVD_RF.length).fill(false));
     setSelectedSmurfs(new Array(SMURFS.length).fill(false));
     setSelectedVHRG(new Array(VHRG_CONDITIONS.length).fill(false));
