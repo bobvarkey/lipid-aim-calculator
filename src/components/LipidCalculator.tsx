@@ -171,6 +171,44 @@ export default function LipidCalculator() {
           />
         </Card>
 
+        {/* SMuRFS Section */}
+        <Card className="mb-4 border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <Activity className="h-4 w-4 text-primary" />
+            <h2 className="font-display text-sm font-bold text-foreground">
+              SMuRFS — Major ASCVD Risk Factors
+            </h2>
+          </div>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Standard Modifiable Risk Factors + hsCRP (5th SMuRF). Count: <span className="font-bold text-foreground">{smurfCount}/6</span>
+          </p>
+          <div className="space-y-3">
+            {SMURFS.map((s, i) => (
+              <label key={s.key} className="flex cursor-pointer items-start gap-3">
+                <Checkbox
+                  checked={selectedSmurfs[i]}
+                  onCheckedChange={() => toggleItem(selectedSmurfs, setSelectedSmurfs, i)}
+                  className="mt-0.5"
+                />
+                <span className="text-sm leading-snug text-foreground">
+                  <span className="font-bold text-primary">{s.letter}</span> — {s.label}
+                  {s.isNew && (
+                    <span className="ml-1.5 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase text-primary">
+                      New 5th SMuRF
+                    </span>
+                  )}
+                </span>
+              </label>
+            ))}
+          </div>
+          {smurfCount >= 3 && (
+            <div className="mt-3 flex items-center gap-2 rounded-lg bg-warning/10 px-3 py-2 text-xs font-medium text-warning">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              ≥3 major ASCVD risk factors identified — qualifies for higher risk stratification
+            </div>
+          )}
+        </Card>
+
         {/* Risk Sections */}
         <RiskSection
           title="Very High-Risk Group (VHRG)"
