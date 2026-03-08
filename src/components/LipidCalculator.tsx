@@ -109,9 +109,8 @@ export default function LipidCalculator() {
   const [selectedExtB, setSelectedExtB] = useState<boolean[]>(new Array(EXTREME_B_CONDITIONS.length).fill(false));
   const [result, setResult] = useState<RiskCategory>(null);
   const [showResult, setShowResult] = useState(false);
-
   const smurfCount = selectedSmurfs.filter(Boolean).length;
-
+  const ascvdRFCount = selectedAscvdRF.filter(Boolean).length;
   const toggleItem = (
     arr: boolean[],
     setter: React.Dispatch<React.SetStateAction<boolean[]>>,
