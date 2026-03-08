@@ -16,6 +16,17 @@ const SMURFS = [
   { key: "hscrp", label: "hsCRP elevated (≥2 mg/L)", letter: "S*", isNew: true },
 ];
 
+const MAJOR_ASCVD_RF = [
+  "Age (Men ≥45 y, Women ≥55 y)",
+  "Current cigarette smoking",
+  "Hypertension (BP ≥140/90 mmHg or on treatment)",
+  "Low HDL-C (<40 mg/dL in men, <50 mg/dL in women)",
+  "Family history of premature CHD (1st degree: male <55 y, female <65 y)",
+  "Diabetes mellitus",
+  "Chronic kidney disease (eGFR <60 mL/min)",
+  "Obesity (BMI ≥30 or waist circumference elevated)",
+];
+
 const VHRG_CONDITIONS = [
   "ASCVD (CAD/PAD/TIA or stroke)",
   "Homozygous familial hypercholesterolemia",
