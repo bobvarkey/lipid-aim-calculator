@@ -323,7 +323,7 @@ export default function LipidCalculator() {
         />
 
         {/* Actions */}
-        <div className="mt-6 flex gap-3">
+        <div className="mt-6 flex gap-3 no-print">
           <Button onClick={calculate} className="flex-1 font-display text-base font-semibold" size="lg">
             Calculate Target
           </Button>
