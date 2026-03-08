@@ -402,6 +402,19 @@ export default function LipidCalculator() {
                       *The LDL-C goal of ≤30 mg/dL must be pursued after detailed risk–benefit discussion between physician and patient.
                     </p>
                   )}
+
+                  {/* Stroke-Specific Guidance */}
+                  <div className="rounded-lg border border-border bg-muted/50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                      Stroke-Specific Guidance
+                    </p>
+                    <p className="text-sm text-foreground leading-relaxed">
+                      Ischemic stroke patients are classified as <span className="font-semibold">very high-risk</span> (LDL-C &lt;50 mg/dL) or <span className="font-semibold">extreme risk</span> (≤30 mg/dL for Category B), aligning with ASCVD targets.
+                    </p>
+                    <p className="mt-2 text-sm text-foreground leading-relaxed">
+                      CSI/LAI suggest LDL-C <span className="font-semibold">&lt;55 mg/dL</span> with <span className="font-semibold">≥50% reduction</span> from baseline.
+                    </p>
+                  </div>
                 </div>
               </>
             ) : (
