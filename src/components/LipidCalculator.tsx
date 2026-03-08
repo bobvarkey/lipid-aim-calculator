@@ -467,16 +467,32 @@ export default function LipidCalculator() {
                     </div>
                   </div>
 
-                  {atGoal !== null && (
-                    <div className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium print-break-inside-avoid ${
-                      atGoal
-                        ? "bg-success/10 text-success"
-                        : "bg-danger/10 text-danger"
-                    }`}>
-                      {atGoal ? (
-                        <><ShieldCheck className="h-5 w-5" /> Current LDL-C ({currentLDL} mg/dL) is at goal</>
-                      ) : (
-                        <><AlertTriangle className="h-5 w-5" /> Current LDL-C ({currentLDL} mg/dL) is above target</>
+                  {/* At-goal indicators for all three markers */}
+                  {(ldlAtGoal !== null || nonHdlAtGoal !== null || apoBAtGoal !== null) && (
+                    <div className="space-y-2 print-break-inside-avoid">
+                      {ldlAtGoal !== null && (
+                        <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${
+                          ldlAtGoal ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+                        }`}>
+                          {ldlAtGoal ? <ShieldCheck className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                          LDL-C ({currentLDL} mg/dL) — {ldlAtGoal ? "At goal" : "Above target"}
+                        </div>
+                      )}
+                      {nonHdlAtGoal !== null && (
+                        <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${
+                          nonHdlAtGoal ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+                        }`}>
+                          {nonHdlAtGoal ? <ShieldCheck className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                          Non-HDL-C ({currentNonHDL} mg/dL) — {nonHdlAtGoal ? "At goal" : "Above target"}
+                        </div>
+                      )}
+                      {apoBAtGoal !== null && (
+                        <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${
+                          apoBAtGoal ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+                        }`}>
+                          {apoBAtGoal ? <ShieldCheck className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                          ApoB ({currentApoB} mg/dL) — {apoBAtGoal ? "At goal" : "Above target"}
+                        </div>
                       )}
                     </div>
                   )}
