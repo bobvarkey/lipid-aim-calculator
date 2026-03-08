@@ -240,34 +240,54 @@ export default function LipidCalculator() {
 
         {/* Current LDL & Lp(a) Inputs */}
         <Card className="mb-4 border-border bg-card p-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
               <label className="mb-2 block font-display text-sm font-semibold text-foreground">
-                Current LDL-C (mg/dL)
+                LDL-C (mg/dL)
               </label>
               <Input
                 type="number"
                 placeholder="e.g. 85"
                 value={currentLDL}
                 onChange={(e) => setCurrentLDL(e.target.value)}
-                className="text-lg"
               />
             </div>
             <div>
               <label className="mb-2 block font-display text-sm font-semibold text-foreground">
-                Lp(a) Level (mg/dL)
+                Non-HDL-C (mg/dL)
+              </label>
+              <Input
+                type="number"
+                placeholder="e.g. 110"
+                value={currentNonHDL}
+                onChange={(e) => setCurrentNonHDL(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="mb-2 block font-display text-sm font-semibold text-foreground">
+                ApoB (mg/dL)
+              </label>
+              <Input
+                type="number"
+                placeholder="e.g. 70"
+                value={currentApoB}
+                onChange={(e) => setCurrentApoB(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="mb-2 block font-display text-sm font-semibold text-foreground">
+                Lp(a) (mg/dL)
               </label>
               <Input
                 type="number"
                 placeholder="e.g. 45"
                 value={currentLpa}
                 onChange={(e) => setCurrentLpa(e.target.value)}
-                className="text-lg"
               />
               {!isNaN(lpaNum) && lpaNum >= 50 && (
-                <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-danger">
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                  Lp(a) ≥50 mg/dL — auto-classified as Extreme Risk A
+                <div className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-danger">
+                  <AlertTriangle className="h-3 w-3" />
+                  ≥50 → Extreme A
                 </div>
               )}
             </div>
