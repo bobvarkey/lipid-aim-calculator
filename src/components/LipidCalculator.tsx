@@ -348,11 +348,25 @@ export default function LipidCalculator() {
                   </div>
                 </div>
                 <div className="p-5 space-y-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">LDL-C Target</p>
-                    <p className="mt-1 font-display text-2xl font-bold text-foreground whitespace-pre-line">
-                      {resultInfo.ldlGoal}
-                    </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">LDL-C Target</p>
+                      <p className="mt-1 font-display text-lg font-bold text-foreground whitespace-pre-line">
+                        {resultInfo.ldlGoal}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Non-HDL-C Target</p>
+                      <p className="mt-1 font-display text-lg font-bold text-foreground whitespace-pre-line">
+                        {resultInfo.nonHdlGoal}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">ApoB Target</p>
+                      <p className="mt-1 font-display text-lg font-bold text-foreground whitespace-pre-line">
+                        {resultInfo.apoBGoal}
+                      </p>
+                    </div>
                   </div>
 
                   {atGoal !== null && (
