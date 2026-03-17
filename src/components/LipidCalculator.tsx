@@ -375,7 +375,7 @@ export default function LipidCalculator() {
 
         <RiskSection
           title="Extreme Risk — Category A"
-          subtitle="CAD with ≥1 of the following"
+          subtitle="CAD plus a single major complicating factor (e.g., PAD, prior Stroke, or Stage 3/4 CKD)"
           conditions={EXTREME_A_CONDITIONS}
           selected={selectedExtA}
           onToggle={(i) => toggleItem(selectedExtA, setSelectedExtA, i)}
@@ -384,7 +384,7 @@ export default function LipidCalculator() {
 
         <RiskSection
           title="Extreme Risk — Category B"
-          subtitle="CAD with ≥1 of the following"
+          subtitle="CAD plus more severe or multiple complications (e.g., Diabetes with target organ damage, or recurrent events within 12 months)"
           conditions={EXTREME_B_CONDITIONS}
           selected={selectedExtB}
           onToggle={(i) => toggleItem(selectedExtB, setSelectedExtB, i)}
