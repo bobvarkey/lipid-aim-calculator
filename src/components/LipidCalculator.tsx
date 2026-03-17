@@ -373,6 +373,10 @@ export default function LipidCalculator() {
           accent="warning"
         />
 
+        <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-xs text-danger font-medium leading-relaxed">
+          <strong>Note:</strong> CAD is typically a "must" to fall under the "Extreme Risk" category, with PAD, stroke, or CKD acting as additional major complicating factors.
+        </div>
+
         <RiskSection
           title="Extreme Risk — Category A"
           subtitle="CAD plus a single major complicating factor (e.g., PAD, prior Stroke, or Stage 3/4 CKD)"
