@@ -561,6 +561,112 @@ export default function LipidCalculator() {
         <p className="mt-8 text-center text-xs text-muted-foreground">
           Reference: Lipid Association of India 2023 Update — Consensus Statement IV on Cardiovascular Risk Assessment and Lipid Management in Indian Patients
         </p>
+
+        {/* Educational Reference Section */}
+        <div className="mt-8 no-print">
+          <button
+            onClick={() => setShowEducation(!showEducation)}
+            className="w-full flex items-center justify-between rounded-xl border border-border bg-card px-5 py-4 text-left transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                <Info className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-display text-sm font-bold text-foreground">Understanding Lp(a), ApoB & Cardiovascular Risk</p>
+                <p className="text-xs text-muted-foreground">Key concepts, risk tables & 2026 guideline updates</p>
+              </div>
+            </div>
+            {showEducation ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
+          </button>
+
+          {showEducation && (
+            <div className="mt-4 space-y-6">
+              {/* Images */}
+              <Card className="border-border bg-card overflow-hidden">
+                <img src={cvRiskMeasures} alt="Core measures to assess cardiovascular risk - Information scale showing ApoB, Lp(a) vs Non-HDL-C, TG, TC, VLDL-C, LDL-C" className="w-full" />
+              </Card>
+              <Card className="border-border bg-card overflow-hidden">
+                <img src={lipoproteinParticles} alt="Lipoprotein particles - VLDL, LDL, IDL (atherogenic with ApoB) and HDL (protective with ApoA1)" className="w-full" />
+              </Card>
+              <Card className="border-border bg-card overflow-hidden">
+                <img src={cprFramework} alt="CPR Framework for Risk Evaluation - 2026 ACC/AHA Dyslipidemia Guidelines" className="w-full" />
+              </Card>
+
+              {/* Lp(a) Section */}
+              <Card className="border-border bg-card p-5">
+                <h3 className="font-display text-base font-bold text-foreground mb-3">Lp(a) — Lipoprotein(a)</h3>
+                <div className="space-y-2 text-sm text-foreground leading-relaxed">
+                  <p>• <strong>Optimal:</strong> ≤14 mg/dL</p>
+                  <p>• <strong>Normal:</strong> ≤30 mg/dL</p>
+                  <p>• <strong>Elevated:</strong> &gt;50 mg/dL</p>
+                </div>
+                <div className="mt-4 space-y-1.5 text-sm text-foreground leading-relaxed">
+                  <p>• Lp(a) 10–49 mg/dL → <strong>28% higher</strong> cardiovascular risk</p>
+                  <p>• Lp(a) 50–99 mg/dL → <strong>44% higher</strong> cardiovascular risk</p>
+                  <p>• Lp(a) &gt;100 mg/dL → <strong>114% higher</strong> cardiovascular risk</p>
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground italic">
+                  Lp(a) confers a genetic risk — it represents a specific, highly inherited subset of particles that are particularly dangerous, often described as a "hidden" risk factor that does not respond to standard diet or lifestyle changes.
+                </p>
+              </Card>
+
+              {/* Lp(a) Risk Table */}
+              <Card className="border-border bg-card p-5">
+                <h3 className="font-display text-base font-bold text-foreground mb-3">Lp(a) & Relative ASCVD Risk</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-2 pr-4 font-semibold text-muted-foreground">Lp(a) Level</th>
+                        <th className="text-left py-2 font-semibold text-muted-foreground">Relative ASCVD Risk</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-foreground">
+                      <tr className="border-b border-border/50"><td className="py-2 pr-4">&lt;75 nmol/L (&lt;30 mg/dL)</td><td className="py-2">Reference (low)</td></tr>
+                      <tr className="border-b border-border/50"><td className="py-2 pr-4">75–124 nmol/L (30–49 mg/dL)</td><td className="py-2 font-semibold">1.2×</td></tr>
+                      <tr className="border-b border-border/50"><td className="py-2 pr-4">≥125 nmol/L (≥50 mg/dL)</td><td className="py-2 font-semibold text-warning">1.4×</td></tr>
+                      <tr className="border-b border-border/50"><td className="py-2 pr-4">≥250 nmol/L (≥100 mg/dL)</td><td className="py-2 font-semibold text-danger">2×</td></tr>
+                      <tr className="border-b border-border/50"><td className="py-2 pr-4">≥350 nmol/L (≥150 mg/dL)</td><td className="py-2 font-semibold text-danger">3×</td></tr>
+                      <tr><td className="py-2 pr-4">≥430 nmol/L (≥180 mg/dL)</td><td className="py-2 font-semibold text-danger">4×</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+
+              {/* ApoB Section */}
+              <Card className="border-border bg-card p-5">
+                <h3 className="font-display text-base font-bold text-foreground mb-3">ApoB — Apolipoprotein B</h3>
+                <div className="space-y-2.5 text-sm text-foreground leading-relaxed">
+                  <p>• LDL is sometimes <strong>calculated</strong>; ApoB is always <strong>measured</strong>.</p>
+                  <p>• LDL is just one of three atherogenic particles. <strong>ApoB counts all of them.</strong></p>
+                  <p>• LDL counts mass, whereas <strong>ApoB counts number of particles</strong>.</p>
+                  <p>• ApoB is a <strong>more accurate predictor</strong> of cardiovascular events than LDL-C or non-HDL cholesterol.</p>
+                  <p>• Discordance between ApoB and LDL-C is common, especially in people with <strong>metabolic syndrome, diabetes, or high triglycerides</strong>.</p>
+                  <p>• When ApoB and LDL-C disagree, <strong>ApoB is the better predictor of risk</strong>.</p>
+                  <p>• Young adults with high ApoB but normal LDL-C had a <strong>55% higher risk</strong> of developing coronary artery calcification 25 years later, while those with high LDL-C but normal ApoB did not show increased risk.</p>
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground italic">
+                  ApoB is "sticky cholesterol" — it reflects the total number of atherogenic particles (LDL + Lp(a) + others).
+                </p>
+              </Card>
+
+              {/* 2026 Guidelines */}
+              <Card className="border-border bg-card p-5">
+                <h3 className="font-display text-base font-bold text-foreground mb-3">2026 AHA/ACC Guideline Highlights</h3>
+                <p className="text-sm text-foreground leading-relaxed mb-3">
+                  The American Heart Association and American College of Cardiology released the first cholesterol guideline update in eight years, with <strong>52 distinct new recommendations</strong>.
+                </p>
+                <div className="space-y-2.5 text-sm text-foreground leading-relaxed">
+                  <p>• <strong>Lp(a) testing</strong> is now recommended for all adults — it is the strongest hereditary risk factor for heart disease.</p>
+                  <p>• Treatment is now recommended for <strong>younger adults</strong>, based on 30-year heart disease risk projections rather than 10-year risk.</p>
+                  <p>• <strong>ApoB testing, hsCRP (inflammation), and CAC (imaging)</strong> are recommended more frequently — essentially better biomarkers for heart health.</p>
+                  <p>• <strong>Specific LDL targets are back</strong>, after being removed in the 2013 guidelines.</p>
+                </div>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
