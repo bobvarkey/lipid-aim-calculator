@@ -3,7 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity, Printer } from "lucide-react";
+import { Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity, Printer, Info, ChevronDown, ChevronUp } from "lucide-react";
+import cvRiskMeasures from "@/assets/cv-risk-measures.png";
+import lipoproteinParticles from "@/assets/lipoprotein-particles.png";
+import cprFramework from "@/assets/cpr-framework.png";
 
 type RiskCategory = null | "vhrg" | "extreme-a" | "extreme-b";
 
