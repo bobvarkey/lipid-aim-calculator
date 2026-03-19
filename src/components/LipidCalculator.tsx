@@ -112,6 +112,7 @@ const RESULTS: Record<string, ResultInfo> = {
 };
 
 export default function LipidCalculator() {
+  const [showEducation, setShowEducation] = useState(false);
   const [currentLDL, setCurrentLDL] = useState("");
   const [currentLpa, setCurrentLpa] = useState("");
   const [currentNonHDL, setCurrentNonHDL] = useState("");
