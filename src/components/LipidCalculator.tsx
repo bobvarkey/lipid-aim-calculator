@@ -593,6 +593,260 @@ export default function LipidCalculator() {
                 <img src={cprFramework} alt="CPR Framework for Risk Evaluation - 2026 ACC/AHA Dyslipidemia Guidelines" className="w-full" />
               </Card>
 
+              {/* 2026 AHA/ACC At-a-Glance */}
+              <Card className="border-border bg-card p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                    <Heart className="h-4 w-4 text-primary" />
+                  </div>
+                  <h3 className="font-display text-base font-bold text-foreground">2026 AHA/ACC Dyslipidemia Guidelines At-a-Glance</h3>
+                </div>
+                <p className="text-sm text-foreground leading-relaxed mb-4">
+                  The American Heart Association and American College of Cardiology released the first cholesterol guideline update in eight years, with <strong>52 distinct new recommendations</strong>.
+                </p>
+
+                {/* Key Recommendations */}
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Key Recommendation</p>
+                  <p className="text-sm text-foreground leading-relaxed">
+                    <strong>Lp(a) Screening:</strong> Measure Lp(a) at least once in every adult's life to identify very high inherited levels (&gt;180 mg/dL), which can reclassify moderate-risk patients to higher risk.
+                  </p>
+                </div>
+
+                {/* Biggest Changes */}
+                <div className="space-y-2.5 text-sm text-foreground leading-relaxed mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Biggest Changes</p>
+                  <p>• <strong>Lp(a) testing</strong> is now recommended for all adults — it is the strongest hereditary risk factor for heart disease.</p>
+                  <p>• Treatment is now recommended for <strong>younger adults</strong>, based on 30-year heart disease risk projections rather than 10-year risk.</p>
+                  <p>• <strong>ApoB testing, hsCRP (inflammation), and CAC (imaging)</strong> are recommended more frequently — essentially better biomarkers for heart health.</p>
+                  <p>• <strong>Specific LDL targets are back</strong>, after being removed in the 2013 guidelines.</p>
+                </div>
+
+                {/* Risk Categories & LDL-C Targets */}
+                <div className="mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Risk Categories & LDL-C Targets</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Risk Level</th>
+                          <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Clinical Criteria</th>
+                          <th className="text-left py-2 font-semibold text-muted-foreground">LDL-C Target</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-foreground">
+                        <tr className="border-b border-border/50">
+                          <td className="py-2.5 pr-3 font-semibold text-danger">Very High</td>
+                          <td className="py-2.5 pr-3 text-xs leading-relaxed">ASCVD, diabetes with organ damage/&gt;20y duration, eGFR&lt;30, FH with ASCVD, SCORE&gt;10%</td>
+                          <td className="py-2.5 font-semibold whitespace-nowrap">&lt;55 mg/dL<br /><span className="font-normal text-xs text-muted-foreground">(&lt;40 mg/dL recurrent ASCVD)</span></td>
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="py-2.5 pr-3 font-semibold text-warning">High</td>
+                          <td className="py-2.5 pr-3 text-xs leading-relaxed">LDL-C&gt;190, TC&gt;310, BP&gt;180/110, FH, diabetes&gt;10y, eGFR 30–59, SCORE 5–10%</td>
+                          <td className="py-2.5 font-semibold">&lt;70 mg/dL</td>
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="py-2.5 pr-3 font-semibold text-primary">Moderate</td>
+                          <td className="py-2.5 pr-3 text-xs leading-relaxed">Younger diabetes (&lt;35 T1DM/&lt;50 T2DM), diabetes&lt;10y without other risks, SCORE 1–5%</td>
+                          <td className="py-2.5 font-semibold">&lt;100 mg/dL</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2.5 pr-3 font-semibold text-success">Low</td>
+                          <td className="py-2.5 pr-3 text-xs leading-relaxed">SCORE &lt;1%</td>
+                          <td className="py-2.5 font-semibold">&lt;116 mg/dL</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Clinical ASCVD Definition */}
+                <div className="rounded-lg border border-border bg-muted/50 p-4 mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Clinical ASCVD: Very High Risk Definition</p>
+                  <p className="text-sm text-foreground leading-relaxed mb-2">
+                    ≥2 major ASCVD events <strong>OR</strong> 1 major ASCVD event + ≥2 high-risk conditions:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-foreground">
+                    <div>
+                      <p className="font-semibold mb-1">Major ASCVD Events:</p>
+                      <p className="text-muted-foreground leading-relaxed">ACS, MI, ischemic stroke, symptomatic PAD</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">High-Risk Conditions:</p>
+                      <p className="text-muted-foreground leading-relaxed">Age ≥65, coronary bypass/PCI, current smoker, diabetes, HF, HTN, LDL-C ≥100 mg/dL despite max statin + ezetimibe</p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground leading-relaxed italic">
+                    ASCVD includes history of ACS, MI, stable or unstable angina, coronary or other arterial revascularization, stroke, TIA, or PAD.
+                  </p>
+                </div>
+
+                {/* Subclinical Atherosclerosis / CAC Score */}
+                <div className="mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Subclinical Atherosclerosis — CAC Score Management</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">CAC Score</th>
+                          <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Risk / Action</th>
+                          <th className="text-left py-2 font-semibold text-muted-foreground">LDL-C Target</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-foreground">
+                        <tr className="border-b border-border/50">
+                          <td className="py-2.5 pr-3">0</td>
+                          <td className="py-2.5 pr-3">Low risk</td>
+                          <td className="py-2.5 font-semibold">&lt;100 mg/dL</td>
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="py-2.5 pr-3">1–99 AU</td>
+                          <td className="py-2.5 pr-3">Start moderate statin</td>
+                          <td className="py-2.5 font-semibold">&lt;70 mg/dL</td>
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="py-2.5 pr-3">100–399 AU</td>
+                          <td className="py-2.5 pr-3">High-intensity statin</td>
+                          <td className="py-2.5 font-semibold">&lt;55 mg/dL</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2.5 pr-3">≥400 AU</td>
+                          <td className="py-2.5 pr-3">Very high-intensity</td>
+                          <td className="py-2.5 font-semibold">&lt;40 mg/dL</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Primary Prevention */}
+                <div className="mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Primary Prevention: Adults 30–79y Without ASCVD</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">10-Year Risk</th>
+                          <th className="text-left py-2 font-semibold text-muted-foreground">LDL-C Target</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-foreground">
+                        <tr className="border-b border-border/50"><td className="py-2 pr-3">Low (&lt;5%)</td><td className="py-2 font-semibold">&lt;100 mg/dL</td></tr>
+                        <tr className="border-b border-border/50"><td className="py-2 pr-3">Borderline (5–7.5%)</td><td className="py-2 font-semibold">&lt;100 mg/dL <span className="font-normal text-xs text-muted-foreground">(consider)</span></td></tr>
+                        <tr className="border-b border-border/50"><td className="py-2 pr-3">Intermediate (7.5–20%)</td><td className="py-2 font-semibold">&lt;70 mg/dL</td></tr>
+                        <tr><td className="py-2 pr-3">High (≥20%)</td><td className="py-2 font-semibold">&lt;55 mg/dL</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Treatment Algorithms */}
+                <div className="space-y-4 mb-5">
+                  <div className="rounded-lg border border-danger/20 bg-danger/5 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-danger mb-2">Secondary Prevention: Very High Risk ASCVD</p>
+                    <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
+                      <li>Start <strong>high-intensity statin</strong> → LDL &lt;55 mg/dL</li>
+                      <li>Add <strong>ezetimibe</strong> if not at goal</li>
+                      <li>Add <strong>PCSK9 inhibitor</strong> if still not at goal</li>
+                      <li>Monitor adherence and lifestyle</li>
+                    </ol>
+                  </div>
+
+                  <div className="rounded-lg border border-warning/20 bg-warning/5 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-warning mb-2">Secondary Prevention: Not Very High Risk ASCVD</p>
+                    <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
+                      <li>Start <strong>moderate statin</strong> → LDL &lt;70 mg/dL</li>
+                      <li>Add <strong>ezetimibe</strong> if not at goal</li>
+                      <li>Add <strong>bempedoic acid</strong> if statin-intolerant</li>
+                      <li>Optional goal: &lt;55 mg/dL</li>
+                    </ol>
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-muted/50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Severe Hypercholesterolemia (LDL-C ≥190 mg/dL)</p>
+                    <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
+                      <li><strong>Cascade screening</strong> + complete genetic testing</li>
+                      <li>Add <strong>ezetimibe</strong></li>
+                      <li>Add <strong>PCSK9 inhibitor</strong> if not at goal</li>
+                    </ol>
+                  </div>
+                </div>
+
+                {/* TG ≥500 */}
+                <div className="rounded-lg border border-border bg-muted/50 p-4 mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Adults with Triglycerides ≥500 mg/dL</p>
+                  <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
+                    <li>Identify/manage <strong>secondary causes</strong></li>
+                    <li><strong>Lifestyle:</strong> Optimize diet/exercise</li>
+                    <li>If TG persists ≥500 mg/dL:
+                      <ul className="ml-5 mt-1 space-y-1 list-disc">
+                        <li><strong>Pancreatitis risk:</strong> Refer to lipid specialist</li>
+                        <li><strong>Prevent ASCVD risk:</strong> Add fiber/omega-3, fenofibrate, or icosapent ethyl</li>
+                      </ul>
+                    </li>
+                  </ol>
+                </div>
+
+                {/* Statin-Intolerant */}
+                <div className="rounded-lg border border-border bg-muted/50 p-4 mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Statin-Intolerant Adults</p>
+                  <div className="space-y-1.5 text-sm text-foreground leading-relaxed">
+                    <p>• Evaluate muscle symptoms</p>
+                    <p>• <strong>ASCVD absent:</strong> LDL &lt;100 mg/dL → ezetimibe</p>
+                    <p>• <strong>ASCVD present:</strong> LDL &lt;70 mg/dL → ezetimibe + bempedoic acid</p>
+                    <p>• If goals not met → Add <strong>PCSK9 inhibitor</strong></p>
+                  </div>
+                </div>
+
+                {/* Screening Recommendations */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Screening Recommendations</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">COR</th>
+                          <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">LOE</th>
+                          <th className="text-left py-2 font-semibold text-muted-foreground">Recommendation</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-foreground">
+                        <tr className="border-b border-border/50">
+                          <td className="py-2 pr-3 font-semibold">1</td>
+                          <td className="py-2 pr-3">B-NR</td>
+                          <td className="py-2 text-xs leading-relaxed">Lipid profile every 5y for ASCVD risk, more frequent with risk factors</td>
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="py-2 pr-3 font-semibold">1</td>
+                          <td className="py-2 pr-3">B-NR</td>
+                          <td className="py-2 text-xs leading-relaxed">Children 9–11y to screen for FH/other lipid disorders</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2 pr-3 font-semibold">2a</td>
+                          <td className="py-2 pr-3">B-NR</td>
+                          <td className="py-2 text-xs leading-relaxed">Cascade screening with lipid profile for FH relatives</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Summary */}
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Summary</p>
+                  <div className="space-y-1.5 text-sm text-foreground leading-relaxed">
+                    <p>• <strong>Screening:</strong> Lp(a) once in adults, lipid profile every 5y</p>
+                    <p>• <strong>Targets:</strong> Very high-risk &lt;55 mg/dL, high &lt;70 mg/dL, moderate &lt;100 mg/dL</p>
+                    <p>• <strong>Key drugs:</strong> Statins first, then ezetimibe / PCSK9i / bempedoic acid</p>
+                    <p>• <strong>Special cases:</strong> TG ≥500 mg/dL → fibrates/omega-3; severe hypercholesterolemia → cascade screening + PCSK9i</p>
+                  </div>
+                </div>
+
+                <p className="mt-4 text-[11px] text-muted-foreground italic">
+                  Source: 2026 AHA/ACC Dyslipidemia Guidelines At-a-Glance
+                </p>
+              </Card>
+
               {/* Lp(a) Section */}
               <Card className="border-border bg-card p-5">
                 <h3 className="font-display text-base font-bold text-foreground mb-3">Lp(a) — Lipoprotein(a)</h3>
@@ -649,20 +903,6 @@ export default function LipidCalculator() {
                 <p className="mt-3 text-sm text-muted-foreground italic">
                   ApoB is "sticky cholesterol" — it reflects the total number of atherogenic particles (LDL + Lp(a) + others).
                 </p>
-              </Card>
-
-              {/* 2026 Guidelines */}
-              <Card className="border-border bg-card p-5">
-                <h3 className="font-display text-base font-bold text-foreground mb-3">2026 AHA/ACC Guideline Highlights</h3>
-                <p className="text-sm text-foreground leading-relaxed mb-3">
-                  The American Heart Association and American College of Cardiology released the first cholesterol guideline update in eight years, with <strong>52 distinct new recommendations</strong>.
-                </p>
-                <div className="space-y-2.5 text-sm text-foreground leading-relaxed">
-                  <p>• <strong>Lp(a) testing</strong> is now recommended for all adults — it is the strongest hereditary risk factor for heart disease.</p>
-                  <p>• Treatment is now recommended for <strong>younger adults</strong>, based on 30-year heart disease risk projections rather than 10-year risk.</p>
-                  <p>• <strong>ApoB testing, hsCRP (inflammation), and CAC (imaging)</strong> are recommended more frequently — essentially better biomarkers for heart health.</p>
-                  <p>• <strong>Specific LDL targets are back</strong>, after being removed in the 2013 guidelines.</p>
-                </div>
               </Card>
             </div>
           )}
