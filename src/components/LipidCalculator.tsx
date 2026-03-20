@@ -660,6 +660,42 @@ export default function LipidCalculator() {
                   </div>
                 </div>
 
+                {/* ApoB Treatment Targets */}
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">ApoB Treatment Targets</p>
+                  <p className="text-sm text-foreground leading-relaxed mb-3">
+                    Because on-treatment LDL-C and apoB levels were nearly identical in trial data, the same number can be used for both. If a target LDL-C is &lt;70 mg/dL, the target apoB should also be &lt;70 mg/dL (0.70 g/L). This simple approach eliminates confusion between guidelines.
+                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Risk Level</th>
+                          <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">LDL-C Target</th>
+                          <th className="text-left py-2 font-semibold text-muted-foreground">ApoB Target</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-foreground">
+                        <tr className="border-b border-border/50">
+                          <td className="py-2 pr-3 font-semibold text-danger">Very High</td>
+                          <td className="py-2 pr-3 font-semibold">&lt;55 mg/dL</td>
+                          <td className="py-2 font-semibold">&lt;55 mg/dL (0.55 g/L)</td>
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="py-2 pr-3 font-semibold text-warning">High</td>
+                          <td className="py-2 pr-3 font-semibold">&lt;70 mg/dL</td>
+                          <td className="py-2 font-semibold">&lt;70 mg/dL (0.70 g/L)</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2 pr-3 font-semibold text-primary">Moderate</td>
+                          <td className="py-2 pr-3 font-semibold">&lt;100 mg/dL</td>
+                          <td className="py-2 font-semibold">&lt;100 mg/dL (1.0 g/L)</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
                 {/* Clinical ASCVD Definition */}
                 <div className="rounded-lg border border-border bg-muted/50 p-4 mb-5">
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Clinical ASCVD: Very High Risk Definition</p>
