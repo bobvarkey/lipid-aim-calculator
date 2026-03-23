@@ -707,7 +707,7 @@ export default function LipidCalculator() {
                         </thead>
                         <tbody className="text-foreground">
                           <tr className="border-b border-border/50">
-                            <td className="py-2 pr-3 font-semibold text-emerald-600">Optimal</td>
+                            <td className="py-2 pr-3 font-semibold text-primary">Optimal</td>
                             <td className="py-2">&lt;80 mg/dL (&lt;60 mg/dL for high risk of arterial occlusion)</td>
                           </tr>
                           <tr className="border-b border-border/50">
