@@ -694,6 +694,90 @@ export default function LipidCalculator() {
                       </tbody>
                     </table>
                   </div>
+                  {/* ApoB Reference Ranges */}
+                  <div className="mt-4 rounded-lg border border-primary/10 bg-background p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Key ApoB Levels (Reference Ranges)</p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Category</th>
+                            <th className="text-left py-2 font-semibold text-muted-foreground">ApoB Level</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-foreground">
+                          <tr className="border-b border-border/50">
+                            <td className="py-2 pr-3 font-semibold text-emerald-600">Optimal</td>
+                            <td className="py-2">&lt;80 mg/dL (&lt;60 mg/dL for high risk of arterial occlusion)</td>
+                          </tr>
+                          <tr className="border-b border-border/50">
+                            <td className="py-2 pr-3 font-semibold text-warning">Borderline High</td>
+                            <td className="py-2">90–109 mg/dL</td>
+                          </tr>
+                          <tr className="border-b border-border/50">
+                            <td className="py-2 pr-3 font-semibold text-danger">High Risk</td>
+                            <td className="py-2">≥110 mg/dL (often defined as ≥120 mg/dL)</td>
+                          </tr>
+                          <tr className="border-b border-border/50">
+                            <td className="py-2 pr-3 text-muted-foreground">Male Typical Range</td>
+                            <td className="py-2">66–133 mg/dL</td>
+                          </tr>
+                          <tr>
+                            <td className="py-2 pr-3 text-muted-foreground">Female Typical Range</td>
+                            <td className="py-2">60–117 mg/dL</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Treatment Goals Table (Non-HDL-C, LDL-C, ApoB) */}
+                  <div className="mt-4 rounded-lg border border-primary/10 bg-background p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1">Treatment Goals: Non-HDL-C, LDL-C & ApoB (mg/dL)</p>
+                    <p className="text-xs text-muted-foreground mb-2">*ApoB is a secondary, optional target of treatment.</p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Risk Category</th>
+                            <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Non-HDL-C</th>
+                            <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">LDL-C</th>
+                            <th className="text-left py-2 font-semibold text-primary">ApoB*</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-foreground">
+                          <tr className="border-b border-border/50">
+                            <td className="py-2 pr-3">Low</td>
+                            <td className="py-2 pr-3">&lt;130</td>
+                            <td className="py-2 pr-3">&lt;100</td>
+                            <td className="py-2 font-semibold text-primary">&lt;90</td>
+                          </tr>
+                          <tr className="border-b border-border/50">
+                            <td className="py-2 pr-3">Moderate</td>
+                            <td className="py-2 pr-3">&lt;130</td>
+                            <td className="py-2 pr-3">&lt;100</td>
+                            <td className="py-2 font-semibold text-primary">&lt;90</td>
+                          </tr>
+                          <tr className="border-b border-border/50">
+                            <td className="py-2 pr-3">High</td>
+                            <td className="py-2 pr-3">&lt;130</td>
+                            <td className="py-2 pr-3">&lt;100</td>
+                            <td className="py-2 font-semibold text-primary">&lt;90</td>
+                          </tr>
+                          <tr>
+                            <td className="py-2 pr-3 font-semibold">Very High</td>
+                            <td className="py-2 pr-3">&lt;100</td>
+                            <td className="py-2 pr-3">&lt;70</td>
+                            <td className="py-2 font-semibold text-primary">&lt;80</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-danger mt-3 leading-relaxed font-medium">
+                    ⚠️ Elevated levels of Lp(a) significantly increase the risk of heart disease, stroke, and aortic valve stenosis, even if your other cholesterol numbers are normal.
+                  </p>
                 </div>
 
                 {/* Clinical ASCVD Definition */}
