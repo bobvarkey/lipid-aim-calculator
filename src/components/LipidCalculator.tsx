@@ -238,13 +238,18 @@ export default function LipidCalculator() {
   const apoBNum = parseFloat(currentApoB);
 
   const ldlAtGoal = resultInfo && !isNaN(ldlNum)
-    ? result === "extreme-b" ? ldlNum <= 30 : ldlNum < 50
+    ? result === "extreme-c" ? ldlNum <= 15
+      : result === "extreme-b" ? ldlNum <= 30
+      : ldlNum < 50
     : null;
   const nonHdlAtGoal = resultInfo && !isNaN(nonHdlNum)
-    ? result === "extreme-b" ? nonHdlNum <= 60 : nonHdlNum < 80
+    ? result === "extreme-c" ? nonHdlNum <= 40
+      : result === "extreme-b" ? nonHdlNum <= 60
+      : nonHdlNum < 80
     : null;
   const apoBAtGoal = resultInfo && !isNaN(apoBNum)
-    ? result === "extreme-b" ? apoBNum < 45
+    ? result === "extreme-c" ? apoBNum < 35
+      : result === "extreme-b" ? apoBNum < 45
       : result === "extreme-a" ? apoBNum < 55
       : apoBNum < 65
     : null;
