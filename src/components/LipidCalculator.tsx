@@ -113,6 +113,21 @@ const RESULTS: Record<string, ResultInfo> = {
       "Reinforce lifestyle measures",
     ],
   },
+  "extreme-c": {
+    category: "Extreme Risk — Category C",
+    ldlGoal: "10–15 mg/dL",
+    nonHdlGoal: "≤ 40 mg/dL",
+    apoBGoal: "< 35 mg/dL",
+    color: "danger",
+    icon: <AlertTriangle className="h-6 w-6" />,
+    treatment: [
+      "Maximize high-intensity statin + ezetimibe + PCSK9 inhibitor",
+      "Anti-inflammatory therapy (e.g., colchicine)",
+      "Guideline-directed management of diabetes, hypertension, and other conditions",
+      "Optimal lifestyle intervention",
+      "Target LDL-C 10–15 mg/dL",
+    ],
+  },
 };
 
 export default function LipidCalculator() {
