@@ -227,6 +227,7 @@ export default function LipidCalculator() {
     setSelectedVHRG(new Array(VHRG_CONDITIONS.length).fill(false));
     setSelectedExtA(new Array(EXTREME_A_CONDITIONS.length).fill(false));
     setSelectedExtB(new Array(EXTREME_B_CONDITIONS.length).fill(false));
+    setSelectedExtC(new Array(EXTREME_C_CONDITIONS.length).fill(false));
     setResult(null);
     setShowResult(false);
   };
