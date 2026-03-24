@@ -55,6 +55,10 @@ const EXTREME_B_CONDITIONS = [
   "Homozygous familial hypercholesterolemia",
 ];
 
+const EXTREME_C_CONDITIONS = [
+  "Recurrent ASCVD events despite optimal lifestyle intervention + aggressive lipid-lowering therapy + anti-inflammatory agents (e.g., colchicine) + guideline-directed management of diabetes/hypertension",
+];
+
 interface ResultInfo {
   category: string;
   ldlGoal: string;
