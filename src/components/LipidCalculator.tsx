@@ -8,7 +8,7 @@ import cvRiskMeasures from "@/assets/cv-risk-measures.png";
 import lipoproteinParticles from "@/assets/lipoprotein-particles.png";
 import cprFramework from "@/assets/cpr-framework.png";
 
-type RiskCategory = null | "vhrg" | "extreme-a" | "extreme-b";
+type RiskCategory = null | "vhrg" | "extreme-a" | "extreme-b" | "extreme-c";
 
 const SMURFS = [
   { key: "smoking", label: "Smoking", letter: "S" },
@@ -53,6 +53,10 @@ const EXTREME_B_CONDITIONS = [
   "CAD with Diabetes + polyvascular disease / ≥3 major ASCVD risk factors / target organ damage",
   "Recurrent ACS (within 12 months) despite being on LDL-C goal",
   "Homozygous familial hypercholesterolemia",
+];
+
+const EXTREME_C_CONDITIONS = [
+  "Recurrent ASCVD events despite optimal lifestyle intervention + aggressive lipid-lowering therapy + anti-inflammatory agents (e.g., colchicine) + guideline-directed management of diabetes/hypertension",
 ];
 
 interface ResultInfo {
@@ -109,6 +113,21 @@ const RESULTS: Record<string, ResultInfo> = {
       "Reinforce lifestyle measures",
     ],
   },
+  "extreme-c": {
+    category: "Extreme Risk — Category C",
+    ldlGoal: "10–15 mg/dL",
+    nonHdlGoal: "≤ 40 mg/dL",
+    apoBGoal: "< 35 mg/dL",
+    color: "danger",
+    icon: <AlertTriangle className="h-6 w-6" />,
+    treatment: [
+      "Maximize high-intensity statin + ezetimibe + PCSK9 inhibitor",
+      "Anti-inflammatory therapy (e.g., colchicine)",
+      "Guideline-directed management of diabetes, hypertension, and other conditions",
+      "Optimal lifestyle intervention",
+      "Target LDL-C 10–15 mg/dL",
+    ],
+  },
 };
 
 export default function LipidCalculator() {
@@ -122,6 +141,7 @@ export default function LipidCalculator() {
   const [selectedVHRG, setSelectedVHRG] = useState<boolean[]>(new Array(VHRG_CONDITIONS.length).fill(false));
   const [selectedExtA, setSelectedExtA] = useState<boolean[]>(new Array(EXTREME_A_CONDITIONS.length).fill(false));
   const [selectedExtB, setSelectedExtB] = useState<boolean[]>(new Array(EXTREME_B_CONDITIONS.length).fill(false));
+  const [selectedExtC, setSelectedExtC] = useState<boolean[]>(new Array(EXTREME_C_CONDITIONS.length).fill(false));
   const [result, setResult] = useState<RiskCategory>(null);
   const [showResult, setShowResult] = useState(false);
   const smurfCount = selectedSmurfs.filter(Boolean).length;
@@ -183,7 +203,9 @@ export default function LipidCalculator() {
   };
 
   const calculate = () => {
-    if (selectedExtB.some(Boolean)) {
+    if (selectedExtC.some(Boolean)) {
+      setResult("extreme-c");
+    } else if (selectedExtB.some(Boolean)) {
       setResult("extreme-b");
     } else if (selectedExtA.some(Boolean)) {
       setResult("extreme-a");
@@ -205,6 +227,7 @@ export default function LipidCalculator() {
     setSelectedVHRG(new Array(VHRG_CONDITIONS.length).fill(false));
     setSelectedExtA(new Array(EXTREME_A_CONDITIONS.length).fill(false));
     setSelectedExtB(new Array(EXTREME_B_CONDITIONS.length).fill(false));
+    setSelectedExtC(new Array(EXTREME_C_CONDITIONS.length).fill(false));
     setResult(null);
     setShowResult(false);
   };
@@ -215,13 +238,18 @@ export default function LipidCalculator() {
   const apoBNum = parseFloat(currentApoB);
 
   const ldlAtGoal = resultInfo && !isNaN(ldlNum)
-    ? result === "extreme-b" ? ldlNum <= 30 : ldlNum < 50
+    ? result === "extreme-c" ? ldlNum <= 15
+      : result === "extreme-b" ? ldlNum <= 30
+      : ldlNum < 50
     : null;
   const nonHdlAtGoal = resultInfo && !isNaN(nonHdlNum)
-    ? result === "extreme-b" ? nonHdlNum <= 60 : nonHdlNum < 80
+    ? result === "extreme-c" ? nonHdlNum <= 40
+      : result === "extreme-b" ? nonHdlNum <= 60
+      : nonHdlNum < 80
     : null;
   const apoBAtGoal = resultInfo && !isNaN(apoBNum)
-    ? result === "extreme-b" ? apoBNum < 45
+    ? result === "extreme-c" ? apoBNum < 35
+      : result === "extreme-b" ? apoBNum < 45
       : result === "extreme-a" ? apoBNum < 55
       : apoBNum < 65
     : null;
@@ -396,6 +424,15 @@ export default function LipidCalculator() {
           conditions={EXTREME_B_CONDITIONS}
           selected={selectedExtB}
           onToggle={(i) => toggleItem(selectedExtB, setSelectedExtB, i)}
+          accent="danger"
+        />
+
+        <RiskSection
+          title="Extreme Risk — Category C"
+          subtitle="Recurrent ASCVD events despite holistic risk reduction (optimal lifestyle, aggressive lipid-lowering, anti-inflammatory agents, guideline-directed management of diabetes/HTN)"
+          conditions={EXTREME_C_CONDITIONS}
+          selected={selectedExtC}
+          onToggle={(i) => toggleItem(selectedExtC, setSelectedExtC, i)}
           accent="danger"
         />
 
