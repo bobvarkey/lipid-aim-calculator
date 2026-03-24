@@ -8,7 +8,7 @@ import cvRiskMeasures from "@/assets/cv-risk-measures.png";
 import lipoproteinParticles from "@/assets/lipoprotein-particles.png";
 import cprFramework from "@/assets/cpr-framework.png";
 
-type RiskCategory = null | "vhrg" | "extreme-a" | "extreme-b";
+type RiskCategory = null | "vhrg" | "extreme-a" | "extreme-b" | "extreme-c";
 
 const SMURFS = [
   { key: "smoking", label: "Smoking", letter: "S" },
