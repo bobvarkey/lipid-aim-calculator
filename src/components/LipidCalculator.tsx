@@ -595,6 +595,107 @@ export default function LipidCalculator() {
           </Card>
         )}
 
+        {/* Clinical Guidance Cards */}
+        <div className="mt-6 space-y-4">
+          {/* High-Risk Features */}
+          <Card className="border-border bg-card p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <AlertTriangle className="h-4 w-4 text-warning" />
+              <h3 className="font-display text-sm font-bold text-foreground">High-Risk Features (LDL-C Target &lt;70 mg/dL)</h3>
+            </div>
+            <ul className="space-y-1.5 text-sm text-foreground leading-relaxed">
+              <li>• Nonalcoholic fatty liver disease with fibrosis grades II and III</li>
+              <li>• Metabolic syndrome</li>
+              <li>• Chronic kidney disease stage 3B/4</li>
+              <li>• ApoB &gt;130 mg/dL</li>
+              <li>• Lp(a) ≥50 mg/dL</li>
+              <li>• CAC score 1–99 but &lt;75th percentile for age, gender, and ethnic group</li>
+              <li>• Extreme elevation of a single risk factor</li>
+            </ul>
+          </Card>
+
+          {/* Risk Modifiers */}
+          <Card className="border-border bg-card p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Activity className="h-4 w-4 text-primary" />
+              <h3 className="font-display text-sm font-bold text-foreground">Risk Modifiers (May Upgrade Low/Moderate → Higher Risk)</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-foreground leading-relaxed">
+              <span>• Elevated TG (fasting &gt;150 or nonfasting &gt;175 mg/dL)</span>
+              <span>• Lp(a) 20–49 mg/dL</span>
+              <span>• Increased waist circumference (&gt;90 cm ♂, &gt;80 cm ♀)</span>
+              <span>• Impaired fasting glucose (100–125 mg/dL)</span>
+              <span>• hsCRP &gt;2 mg/L</span>
+              <span>• Air pollution exposure</span>
+              <span>• Inflammatory joint diseases</span>
+              <span>• Premature menopause</span>
+              <span>• Preeclampsia / Gestational diabetes</span>
+              <span>• Polycystic ovary syndrome</span>
+              <span>• High polygenic risk score</span>
+              <span>• HIV infection</span>
+            </div>
+          </Card>
+
+          {/* Diabetes & Dyslipidemia */}
+          <Card className="border-border bg-card p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Heart className="h-4 w-4 text-danger" />
+              <h3 className="font-display text-sm font-bold text-foreground">Diabetes & Dyslipidemia — Day 1 Treatment</h3>
+            </div>
+            <p className="text-sm text-foreground leading-relaxed mb-3">
+              All patients with diabetes mellitus should be initiated on dyslipidemia treatment <strong>on day 1 of diagnosis</strong>. Targets must be attained by <strong>week 12</strong>.
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Scenario</th>
+                    <th className="text-left py-2 font-semibold text-muted-foreground">LDL-C Target</th>
+                  </tr>
+                </thead>
+                <tbody className="text-foreground">
+                  <tr className="border-b border-border/50">
+                    <td className="py-2 pr-3">Diabetes mellitus (baseline)</td>
+                    <td className="py-2 font-semibold">&lt;70 mg/dL</td>
+                  </tr>
+                  <tr className="border-b border-border/50">
+                    <td className="py-2 pr-3">Diabetes + target organ damage or ≥2 major ASCVD RF</td>
+                    <td className="py-2 font-semibold">&lt;50 mg/dL</td>
+                  </tr>
+                  <tr className="border-b border-border/50">
+                    <td className="py-2 pr-3">Diabetes + ASCVD (Extreme Risk A)</td>
+                    <td className="py-2 font-semibold">≤30 mg/dL (optional)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-3">ASCVD + Diabetes with TOD or ≥2 major ASCVD RF</td>
+                    <td className="py-2 font-semibold">≤30 mg/dL</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* ASCVD & ACS Management */}
+          <Card className="border-border bg-card p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              <h3 className="font-display text-sm font-bold text-foreground">ASCVD & ACS Management</h3>
+            </div>
+            <ul className="space-y-2 text-sm text-foreground leading-relaxed">
+              <li>• All ASCVD patients must achieve <strong>LDL-C &lt;50 mg/dL</strong>.</li>
+              <li>• Recurrent ACS or polyvascular disease (Extreme Risk B): target <strong>≤30 mg/dL</strong>.</li>
+              <li>• In ACS: lipid profile at <strong>emergency triage</strong>, repeat within <strong>2 weeks</strong> of initiating therapy.</li>
+              <li>• Start <strong>combination therapy</strong> (high-intensity statin + ezetimibe) at presentation to ED.</li>
+              <li>• Intensify every <strong>2 weeks</strong> until goals achieved, preferably by <strong>week 4</strong>.</li>
+            </ul>
+          </Card>
+
+          {/* Subclinical Atherosclerosis */}
+          <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground leading-relaxed">
+            <strong>Subclinical Atherosclerosis:</strong> Any form — including nonobstructive carotid, femoral, or coronary plaques or ABI &lt;0.9 — is considered <strong>equivalent to ASCVD</strong>, with similar LDL-C targets as for clinically manifest ASCVD.
+          </div>
+        </div>
+
         <p className="mt-8 text-center text-xs text-muted-foreground">
           Reference: Lipid Association of India 2023 Update — Consensus Statement IV on Cardiovascular Risk Assessment and Lipid Management in Indian Patients
         </p>
