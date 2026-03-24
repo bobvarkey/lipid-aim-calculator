@@ -427,6 +427,15 @@ export default function LipidCalculator() {
           accent="danger"
         />
 
+        <RiskSection
+          title="Extreme Risk — Category C"
+          subtitle="Recurrent ASCVD events despite holistic risk reduction (optimal lifestyle, aggressive lipid-lowering, anti-inflammatory agents, guideline-directed management of diabetes/HTN)"
+          conditions={EXTREME_C_CONDITIONS}
+          selected={selectedExtC}
+          onToggle={(i) => toggleItem(selectedExtC, setSelectedExtC, i)}
+          accent="danger"
+        />
+
         {/* Actions */}
         <div className="mt-6 flex gap-3 no-print">
           <Button onClick={calculate} className="flex-1 font-display text-base font-semibold" size="lg">
