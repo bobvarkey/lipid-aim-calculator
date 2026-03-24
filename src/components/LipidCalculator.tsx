@@ -141,6 +141,7 @@ export default function LipidCalculator() {
   const [selectedVHRG, setSelectedVHRG] = useState<boolean[]>(new Array(VHRG_CONDITIONS.length).fill(false));
   const [selectedExtA, setSelectedExtA] = useState<boolean[]>(new Array(EXTREME_A_CONDITIONS.length).fill(false));
   const [selectedExtB, setSelectedExtB] = useState<boolean[]>(new Array(EXTREME_B_CONDITIONS.length).fill(false));
+  const [selectedExtC, setSelectedExtC] = useState<boolean[]>(new Array(EXTREME_C_CONDITIONS.length).fill(false));
   const [result, setResult] = useState<RiskCategory>(null);
   const [showResult, setShowResult] = useState(false);
   const smurfCount = selectedSmurfs.filter(Boolean).length;
