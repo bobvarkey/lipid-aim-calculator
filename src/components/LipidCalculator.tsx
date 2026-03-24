@@ -203,7 +203,9 @@ export default function LipidCalculator() {
   };
 
   const calculate = () => {
-    if (selectedExtB.some(Boolean)) {
+    if (selectedExtC.some(Boolean)) {
+      setResult("extreme-c");
+    } else if (selectedExtB.some(Boolean)) {
       setResult("extreme-b");
     } else if (selectedExtA.some(Boolean)) {
       setResult("extreme-a");
