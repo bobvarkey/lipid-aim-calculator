@@ -46,24 +46,22 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
     render();
   }, [chart]);
 
-  // Auto-fit: scale chart to fit container on initial render
+  // Auto-fit: scale chart to fit container width on initial render
   useEffect(() => {
     if (!svg || !containerRef.current || !innerRef.current) return;
     const timer = setTimeout(() => {
       const svgEl = innerRef.current?.querySelector("svg");
       if (!svgEl || !containerRef.current) return;
-      const svgRect = svgEl.getBoundingClientRect();
-      const containerWidth = containerRef.current.clientWidth;
-      const containerHeight = containerRef.current.clientHeight;
-      if (svgRect.width > 0 && containerWidth > 0) {
-        const fitW = containerWidth / svgRect.width;
-        const fitH = containerHeight / svgRect.height;
-        const fitScale = Math.max(0.25, Math.min(1, Math.min(fitW, fitH) * scale));
+      // Get the natural SVG dimensions from viewBox or attributes
+      const svgWidth = parseFloat(svgEl.getAttribute("width") || "0") || svgEl.viewBox?.baseVal?.width || svgEl.getBoundingClientRect().width;
+      const containerWidth = containerRef.current.clientWidth - 16; // padding
+      if (svgWidth > 0 && containerWidth > 0) {
+        const fitScale = Math.max(0.2, Math.min(1, containerWidth / svgWidth));
         setInitialScale(fitScale);
         setScale(fitScale);
         setTranslate({ x: 0, y: 0 });
       }
-    }, 150);
+    }, 200);
     return () => clearTimeout(timer);
   }, [svg]);
 
