@@ -211,7 +211,7 @@ Repeat lipids in 6–12 months.`;
                 <label className="mb-1 block text-xs font-semibold text-muted-foreground">{lab.toUpperCase()}</label>
                 <Input
                   type="number"
-                  value={data[lab]}
+                  value={data[lab] as number}
                   onChange={(e) => setData({ ...data, [lab]: +e.target.value })}
                 />
               </div>
