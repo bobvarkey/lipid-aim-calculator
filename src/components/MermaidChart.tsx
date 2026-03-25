@@ -115,7 +115,7 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
       <div
         ref={containerRef}
         className="overflow-auto rounded-lg border border-border bg-background cursor-grab active:cursor-grabbing"
-        style={{ maxHeight: "80vh" }}
+        style={{ maxHeight: "70vh", minHeight: "400px" }}
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
