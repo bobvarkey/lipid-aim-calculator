@@ -12,11 +12,11 @@ mermaid.initialize({
   startOnLoad: false,
   theme: "default",
   flowchart: {
-    useMaxWidth: true,
+    useMaxWidth: false,
     htmlLabels: true,
     curve: "basis",
-    nodeSpacing: 20,
-    rankSpacing: 30,
+    nodeSpacing: 25,
+    rankSpacing: 35,
   },
   securityLevel: "loose",
 });
@@ -27,7 +27,7 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const [svg, setSvg] = useState("");
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(0.5);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
@@ -46,18 +46,18 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
   }, [chart]);
 
   const zoom = useCallback((delta: number) => {
-    setScale((s) => Math.max(0.3, Math.min(4, s + delta)));
+    setScale((s) => Math.max(0.15, Math.min(3, s + delta)));
   }, []);
 
   const resetView = useCallback(() => {
-    setScale(1);
+    setScale(0.5);
     setTranslate({ x: 0, y: 0 });
   }, []);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
-      zoom(e.deltaY > 0 ? -0.15 : 0.15);
+      zoom(e.deltaY > 0 ? -0.1 : 0.1);
     }
   }, [zoom]);
 
@@ -99,10 +99,10 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
   return (
     <div className={`relative ${className}`}>
       <div className="absolute top-2 right-2 z-10 flex gap-1 no-print">
-        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => zoom(0.2)}>
+        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => zoom(0.15)}>
           <ZoomIn className="h-4 w-4" />
         </Button>
-        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => zoom(-0.2)}>
+        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => zoom(-0.15)}>
           <ZoomOut className="h-4 w-4" />
         </Button>
         <Button variant="outline" size="icon" className="h-8 w-8" onClick={resetView}>
@@ -110,12 +110,12 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
         </Button>
       </div>
       <div className="text-[10px] text-muted-foreground absolute bottom-1 right-2 z-10 no-print">
-        {Math.round(scale * 100)}% · Pinch/Ctrl+scroll to zoom · Drag to pan
+        {Math.round(scale * 100)}% · Ctrl+scroll to zoom · Drag to pan
       </div>
       <div
         ref={containerRef}
-        className="overflow-auto rounded-lg border border-border bg-background cursor-grab active:cursor-grabbing"
-        style={{ maxHeight: "70vh", minHeight: "400px" }}
+        className="overflow-hidden rounded-lg border border-border bg-background cursor-grab active:cursor-grabbing touch-none"
+        style={{ height: "70vh", minHeight: "500px" }}
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -127,7 +127,6 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
       >
         <div
           ref={innerRef}
-          className="p-4"
           style={{
             transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`,
             transformOrigin: "top left",
