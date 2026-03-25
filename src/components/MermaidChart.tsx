@@ -39,31 +39,24 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
       try {
         const { svg: renderedSvg } = await mermaid.render(idRef.current, chart);
         setSvg(renderedSvg);
+        
+        // Extract intrinsic width from the SVG string to compute fit scale
+        const widthMatch = renderedSvg.match(/width="([^"]+)"/);
+        if (widthMatch && containerRef.current) {
+          const svgWidth = parseFloat(widthMatch[1]);
+          const containerWidth = containerRef.current.clientWidth - 16;
+          if (svgWidth > 0 && containerWidth > 0) {
+            const fitScale = Math.max(0.15, Math.min(1, containerWidth / svgWidth));
+            setInitialScale(fitScale);
+            setScale(fitScale);
+          }
+        }
       } catch (e) {
         console.error("Mermaid render error:", e);
       }
     };
     render();
   }, [chart]);
-
-  // Auto-fit: scale chart to fit container width on initial render
-  useEffect(() => {
-    if (!svg || !containerRef.current || !innerRef.current) return;
-    const timer = setTimeout(() => {
-      const svgEl = innerRef.current?.querySelector("svg");
-      if (!svgEl || !containerRef.current) return;
-      // Get the natural SVG dimensions from viewBox or attributes
-      const svgWidth = parseFloat(svgEl.getAttribute("width") || "0") || svgEl.viewBox?.baseVal?.width || svgEl.getBoundingClientRect().width;
-      const containerWidth = containerRef.current.clientWidth - 16; // padding
-      if (svgWidth > 0 && containerWidth > 0) {
-        const fitScale = Math.max(0.2, Math.min(1, containerWidth / svgWidth));
-        setInitialScale(fitScale);
-        setScale(fitScale);
-        setTranslate({ x: 0, y: 0 });
-      }
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [svg]);
 
   const zoom = useCallback((delta: number) => {
     setScale((s) => Math.max(0.1, Math.min(3, s + delta)));
