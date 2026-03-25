@@ -12,11 +12,11 @@ mermaid.initialize({
   startOnLoad: false,
   theme: "default",
   flowchart: {
-    useMaxWidth: false,
+    useMaxWidth: true,
     htmlLabels: true,
     curve: "basis",
-    nodeSpacing: 30,
-    rankSpacing: 40,
+    nodeSpacing: 20,
+    rankSpacing: 30,
   },
   securityLevel: "loose",
 });
@@ -28,7 +28,6 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
   const innerRef = useRef<HTMLDivElement>(null);
   const [svg, setSvg] = useState("");
   const [scale, setScale] = useState(1);
-  const [initialScale, setInitialScale] = useState(1);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
@@ -39,18 +38,6 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
       try {
         const { svg: renderedSvg } = await mermaid.render(idRef.current, chart);
         setSvg(renderedSvg);
-        
-        // Extract intrinsic width from the SVG string to compute fit scale
-        const widthMatch = renderedSvg.match(/width="([^"]+)"/);
-        if (widthMatch && containerRef.current) {
-          const svgWidth = parseFloat(widthMatch[1]);
-          const containerWidth = containerRef.current.clientWidth - 16;
-          if (svgWidth > 0 && containerWidth > 0) {
-            const fitScale = Math.max(0.15, Math.min(1, containerWidth / svgWidth));
-            setInitialScale(fitScale);
-            setScale(fitScale);
-          }
-        }
       } catch (e) {
         console.error("Mermaid render error:", e);
       }
@@ -59,18 +46,18 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
   }, [chart]);
 
   const zoom = useCallback((delta: number) => {
-    setScale((s) => Math.max(0.1, Math.min(3, s + delta)));
+    setScale((s) => Math.max(0.3, Math.min(4, s + delta)));
   }, []);
 
   const resetView = useCallback(() => {
-    setScale(initialScale);
+    setScale(1);
     setTranslate({ x: 0, y: 0 });
-  }, [initialScale]);
+  }, []);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
-      zoom(e.deltaY > 0 ? -0.1 : 0.1);
+      zoom(e.deltaY > 0 ? -0.15 : 0.15);
     }
   }, [zoom]);
 
@@ -90,7 +77,6 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
 
   const handleMouseUp = useCallback(() => setIsDragging(false), []);
 
-  // Touch support for mobile pan
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (e.touches.length !== 1) return;
     const touch = e.touches[0];
@@ -113,10 +99,10 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
   return (
     <div className={`relative ${className}`}>
       <div className="absolute top-2 right-2 z-10 flex gap-1 no-print">
-        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => zoom(0.15)}>
+        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => zoom(0.2)}>
           <ZoomIn className="h-4 w-4" />
         </Button>
-        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => zoom(-0.15)}>
+        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => zoom(-0.2)}>
           <ZoomOut className="h-4 w-4" />
         </Button>
         <Button variant="outline" size="icon" className="h-8 w-8" onClick={resetView}>
@@ -128,8 +114,8 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
       </div>
       <div
         ref={containerRef}
-        className="overflow-hidden rounded-lg border border-border bg-background cursor-grab active:cursor-grabbing touch-none"
-        style={{ minHeight: "600px" }}
+        className="overflow-auto rounded-lg border border-border bg-background cursor-grab active:cursor-grabbing"
+        style={{ maxHeight: "80vh" }}
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -141,6 +127,7 @@ export default function MermaidChart({ chart, className = "" }: MermaidChartProp
       >
         <div
           ref={innerRef}
+          className="p-4"
           style={{
             transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`,
             transformOrigin: "top left",
