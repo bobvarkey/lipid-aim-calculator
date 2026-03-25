@@ -1,4 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -133,6 +134,7 @@ const RESULTS: Record<string, ResultInfo> = {
 };
 
 export default function LipidCalculator() {
+  const navigate = useNavigate();
   const [showEducation, setShowEducation] = useState(false);
   const [currentLDL, setCurrentLDL] = useState("");
   const [currentLpa, setCurrentLpa] = useState("");
@@ -597,15 +599,30 @@ export default function LipidCalculator() {
           </Card>
         )}
 
+        {/* Link to ASCVD EMR */}
+        <Card className="mt-6 border-border bg-card p-5 no-print">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-display text-sm font-bold text-foreground">ASCVD Risk Assessment & EMR</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">ACC/AHA Primary Prevention Pathway with EMR Note Generator</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => navigate("/ascvd")} className="gap-1.5">
+              Open Tool
+              <Activity className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </Card>
+
         {/* Clinical Flowchart */}
-        <Card className="mt-6 border-border bg-card p-5 overflow-x-auto">
+        <Card className="mt-6 border-border bg-card p-5">
           <div className="flex items-center gap-2 mb-4">
             <Activity className="h-4 w-4 text-primary" />
             <h3 className="font-display text-sm font-bold text-foreground">Clinical Decision Flowchart</h3>
+            <span className="text-[10px] text-muted-foreground ml-auto">Zoomable · Drag to pan</span>
           </div>
           <Suspense fallback={<div className="text-sm text-muted-foreground text-center py-8">Loading flowchart...</div>}>
             <MermaidChart
-              className="w-full [&_svg]:max-w-full"
+              className="w-full"
               chart={`flowchart TD
     A[Start: Patient with Dyslipidemia / Diabetes] --> B{High-Risk Features?}
     B -->|Yes| C[High-Risk Features - LDL-C target less than 70 mg/dL]
