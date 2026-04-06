@@ -40,32 +40,33 @@ const MAJOR_ASCVD_RF = [
 ];
 
 const VHRG_CONDITIONS = [
-  { label: "ASCVD (CAD/PAD/TIA or stroke)", ldl: "< 50 mg/dL" },
+  { label: "Established ASCVD (CAD, ischemic stroke/TIA of atherosclerotic origin, or PAD)", ldl: "< 50 mg/dL" },
   { label: "Homozygous familial hypercholesterolemia", ldl: "< 50 mg/dL" },
   { label: "Diabetes with ≥3 major ASCVD risk factors / target organ damage", ldl: "< 50 mg/dL" },
 ];
 
 const EXTREME_A_CONDITIONS = [
-  { label: "CAD with Diabetes (without target organ damage / 0–2 major ASCVD risk factors)", ldl: "< 50 mg/dL (≤30 optional)" },
-  { label: "CAD with Familial hypercholesterolemia", ldl: "< 50 mg/dL (≤30 optional)" },
-  { label: "CAD with ≥3 major ASCVD risk factors", ldl: "< 50 mg/dL (≤30 optional)" },
-  { label: "CAD with CKD stage 3B or 4", ldl: "< 50 mg/dL (≤30 optional)" },
-  { label: "CAD with ≥2 major ASCVD risk factors + ≥1 moderate nonconventional risk factor", ldl: "< 50 mg/dL (≤30 optional)" },
-  { label: "CAD with Lp(a) ≥50 mg/dL", ldl: "< 50 mg/dL (≤30 optional)" },
-  { label: "CAD with Coronary calcium score ≥300 HU", ldl: "< 50 mg/dL (≤30 optional)" },
-  { label: "CAD with Extreme of a single risk factor", ldl: "< 50 mg/dL (≤30 optional)" },
-  { label: "CAD with PAD", ldl: "< 50 mg/dL (≤30 optional)" },
-  { label: "CAD with H/o TIA or stroke", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "Very-high-risk ASCVD or equivalent features (CAD, stroke, PAD, or subclinical high-risk burden)", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "High coronary calcium score or extensive plaque burden (subclinical atherosclerosis)", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "ASCVD with Diabetes (without target organ damage / 0–2 major ASCVD risk factors)", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "ASCVD with Familial hypercholesterolemia", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "ASCVD with ≥3 major ASCVD risk factors", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "ASCVD with CKD stage 3B or 4", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "ASCVD with Lp(a) ≥50 mg/dL", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "ASCVD with Coronary calcium score ≥300 HU", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "ASCVD with PAD or polyvascular disease", ldl: "< 50 mg/dL (≤30 optional)" },
+  { label: "ASCVD with H/o TIA or ischemic stroke", ldl: "< 50 mg/dL (≤30 optional)" },
 ];
 
 const EXTREME_B_CONDITIONS = [
   { label: "CAD with Diabetes + polyvascular disease / ≥3 major ASCVD risk factors / target organ damage", ldl: "≤ 30 mg/dL" },
+  { label: "CAD with very-high-risk features and recurrent/progressive events despite LDL-C < 50 mg/dL", ldl: "≤ 30 mg/dL" },
   { label: "Recurrent ACS (within 12 months) despite being on LDL-C goal", ldl: "≤ 30 mg/dL" },
   { label: "Homozygous familial hypercholesterolemia", ldl: "≤ 30 mg/dL" },
 ];
 
 const EXTREME_C_CONDITIONS = [
-  { label: "Recurrent ASCVD events despite optimal lifestyle intervention + aggressive lipid-lowering therapy + anti-inflammatory agents (e.g., colchicine) + guideline-directed management of diabetes/hypertension", ldl: "10–15 mg/dL" },
+  { label: "Ongoing ASCVD sequelae despite already achieving LDL-C ≤30 mg/dL + optimal lifestyle + aggressive lipid-lowering + anti-inflammatory agents (e.g., colchicine) + guideline-directed management of comorbidities", ldl: "10–15 mg/dL" },
 ];
 
 interface ResultInfo {
@@ -101,9 +102,9 @@ const RESULTS: Record<string, ResultInfo> = {
     color: "danger",
     icon: <AlertTriangle className="h-6 w-6" />,
     treatment: [
-      "High-intensity statin therapy",
-      "If LDL-C ≥50 mg/dL → Add ezetimibe",
-      "If still ≥50 mg/dL → Category A pathway",
+      "High-intensity statin first",
+      "Add ezetimibe if LDL-C target not met",
+      "Add PCSK9 inhibitor if combination insufficient",
       "Optional goal ≤30 mg/dL after physician–patient discussion",
       "Reinforce lifestyle measures",
     ],
@@ -116,8 +117,8 @@ const RESULTS: Record<string, ResultInfo> = {
     color: "danger",
     icon: <AlertTriangle className="h-6 w-6" />,
     treatment: [
-      "High-intensity statin therapy",
-      "If LDL-C ≥50 mg/dL → Add ezetimibe",
+      "Maximal statin + ezetimibe (often insufficient alone)",
+      "PCSK9 inhibitor–based intensification commonly required",
       "Aggressive LDL-C lowering to ≤30 mg/dL",
       "Reinforce lifestyle measures",
     ],
@@ -130,11 +131,11 @@ const RESULTS: Record<string, ResultInfo> = {
     color: "danger",
     icon: <AlertTriangle className="h-6 w-6" />,
     treatment: [
-      "Maximize high-intensity statin + ezetimibe + PCSK9 inhibitor",
+      "Ultralow LDL-C strategy: maximize statin + ezetimibe + PCSK9 inhibitor",
       "Anti-inflammatory therapy (e.g., colchicine)",
-      "Guideline-directed management of diabetes, hypertension, and other conditions",
-      "Optimal lifestyle intervention",
-      "Target LDL-C 10–15 mg/dL",
+      "Strict control of all other risk factors",
+      "Guideline-directed management of comorbidities",
+      "Target LDL-C 10–15 mg/dL (residual-risk phenotype)",
     ],
   },
 };
@@ -160,17 +161,17 @@ export default function LipidCalculator() {
   useEffect(() => {
     if (ascvdRFCount >= 3) {
       setSelectedVHRG((prev) => { if (prev[2]) return prev; const c = [...prev]; c[2] = true; return c; });
-      setSelectedExtA((prev) => { if (prev[2]) return prev; const c = [...prev]; c[2] = true; return c; });
+      setSelectedExtA((prev) => { if (prev[4]) return prev; const c = [...prev]; c[4] = true; return c; });
     } else {
       setSelectedVHRG((prev) => { if (!prev[2]) return prev; const c = [...prev]; c[2] = false; return c; });
-      setSelectedExtA((prev) => { if (!prev[2]) return prev; const c = [...prev]; c[2] = false; return c; });
+      setSelectedExtA((prev) => { if (!prev[4]) return prev; const c = [...prev]; c[4] = false; return c; });
     }
   }, [ascvdRFCount]);
 
   const lpaNum = parseFloat(currentLpa);
   useEffect(() => {
     const isElevated = !isNaN(lpaNum) && lpaNum >= 50;
-    setSelectedExtA((prev) => { if (prev[5] === isElevated) return prev; const c = [...prev]; c[5] = isElevated; return c; });
+    setSelectedExtA((prev) => { if (prev[6] === isElevated) return prev; const c = [...prev]; c[6] = isElevated; return c; });
   }, [lpaNum]);
 
   const toggleItem = (arr: boolean[], setter: React.Dispatch<React.SetStateAction<boolean[]>>, idx: number) => {
@@ -358,12 +359,12 @@ export default function LipidCalculator() {
             />
 
             <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-xs text-danger font-medium leading-relaxed mb-4">
-              <strong>Note:</strong> CAD is typically required for "Extreme Risk" classification.
+              <strong>Note:</strong> LAI uses an <strong>ASCVD-centered model</strong>, not a CAD-only model. Established ASCVD includes CAD, ischemic stroke/TIA of atherosclerotic origin, and PAD. CAD is explicitly mentioned in Category B wording.
             </div>
 
             <InteractiveRiskSection
               title="Extreme Risk — Category A"
-              subtitle="CAD plus a single major complicating factor"
+              subtitle="Very-high-risk ASCVD or equivalent features (CAD not mandatory)"
               conditions={EXTREME_A_CONDITIONS}
               selected={selectedExtA}
               onToggle={(i) => toggleItem(selectedExtA, setSelectedExtA, i)}
@@ -372,7 +373,7 @@ export default function LipidCalculator() {
 
             <InteractiveRiskSection
               title="Extreme Risk — Category B"
-              subtitle="CAD plus severe or multiple complications"
+              subtitle="CAD + very-high-risk features or recurrent events despite LDL-C <50"
               conditions={EXTREME_B_CONDITIONS}
               selected={selectedExtB}
               onToggle={(i) => toggleItem(selectedExtB, setSelectedExtB, i)}
@@ -381,7 +382,7 @@ export default function LipidCalculator() {
 
             <InteractiveRiskSection
               title="Extreme Risk — Category C"
-              subtitle="Recurrent events despite holistic maximal therapy"
+              subtitle="Residual-risk phenotype: ongoing ASCVD sequelae despite LDL-C ≤30 mg/dL"
               conditions={EXTREME_C_CONDITIONS}
               selected={selectedExtC}
               onToggle={(i) => toggleItem(selectedExtC, setSelectedExtC, i)}
