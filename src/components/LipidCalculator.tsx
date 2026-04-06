@@ -161,17 +161,17 @@ export default function LipidCalculator() {
   useEffect(() => {
     if (ascvdRFCount >= 3) {
       setSelectedVHRG((prev) => { if (prev[2]) return prev; const c = [...prev]; c[2] = true; return c; });
-      setSelectedExtA((prev) => { if (prev[2]) return prev; const c = [...prev]; c[2] = true; return c; });
+      setSelectedExtA((prev) => { if (prev[4]) return prev; const c = [...prev]; c[4] = true; return c; });
     } else {
       setSelectedVHRG((prev) => { if (!prev[2]) return prev; const c = [...prev]; c[2] = false; return c; });
-      setSelectedExtA((prev) => { if (!prev[2]) return prev; const c = [...prev]; c[2] = false; return c; });
+      setSelectedExtA((prev) => { if (!prev[4]) return prev; const c = [...prev]; c[4] = false; return c; });
     }
   }, [ascvdRFCount]);
 
   const lpaNum = parseFloat(currentLpa);
   useEffect(() => {
     const isElevated = !isNaN(lpaNum) && lpaNum >= 50;
-    setSelectedExtA((prev) => { if (prev[5] === isElevated) return prev; const c = [...prev]; c[5] = isElevated; return c; });
+    setSelectedExtA((prev) => { if (prev[6] === isElevated) return prev; const c = [...prev]; c[6] = isElevated; return c; });
   }, [lpaNum]);
 
   const toggleItem = (arr: boolean[], setter: React.Dispatch<React.SetStateAction<boolean[]>>, idx: number) => {
