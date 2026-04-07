@@ -307,7 +307,7 @@ export default function LipidCalculator() {
     );
     if (result?.why.length) lines.push("Rationale: " + result.why.join(" "));
     return lines.join("\n");
-  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, egfr, hscrp]);
+  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, creatinine, egfr, egfrAuto, hscrp]);
 
   const copyNote = async () => {
     try {
