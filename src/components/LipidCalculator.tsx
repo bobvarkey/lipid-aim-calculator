@@ -525,6 +525,32 @@ export default function LipidCalculator() {
               </div>
               <div className="grid grid-cols-3 gap-3 mb-3">
                 <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Height (cm)</label>
+                  <Input type="number" placeholder="e.g. 170" value={height} onChange={(e) => setHeight(e.target.value)} />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Weight (kg)</label>
+                  <Input type="number" placeholder="e.g. 75" value={weight} onChange={(e) => setWeight(e.target.value)} />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">
+                    BMI (kg/m²)
+                    {bmiAuto && <span className="ml-1 text-[10px] font-normal text-primary">auto</span>}
+                  </label>
+                  <Input
+                    type="number"
+                    placeholder="e.g. 26"
+                    value={bmi}
+                    onChange={(e) => { setBmi(e.target.value); setBmiAuto(false); setHeight(""); setWeight(""); }}
+                    className={bmiAuto ? "bg-muted" : ""}
+                  />
+                  {!isNaN(parseFloat(bmi)) && parseFloat(bmi) >= 25 && (
+                    <p className="mt-0.5 text-[10px] font-medium text-danger">≥25 → Obesity (Asian cut-off)</p>
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3 mb-3">
+                <div>
                   <label className="mb-1.5 block text-xs font-semibold text-foreground">LDL-C (mg/dL)</label>
                   <Input type="number" placeholder="e.g. 85" value={ldl} onChange={(e) => setLdl(e.target.value)} />
                 </div>
@@ -570,6 +596,11 @@ export default function LipidCalculator() {
                     onChange={(e) => { setEgfr(e.target.value); setEgfrAuto(false); setCreatinine(""); }}
                     className={egfrAuto ? "bg-muted" : ""}
                   />
+                  {ckdStage && (
+                    <p className={`mt-0.5 text-[10px] font-medium ${egfrVal < 60 ? "text-danger" : "text-muted-foreground"}`}>
+                      CKD {ckdStage}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
