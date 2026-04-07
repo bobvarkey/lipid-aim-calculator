@@ -426,10 +426,14 @@ export default function LipidCalculator() {
                   <Input type="number" placeholder="e.g. 7.2" value={hba1c} onChange={(e) => setHba1c(e.target.value)} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="mb-1.5 block text-xs font-semibold text-foreground">eGFR (mL/min/1.73m²)</label>
                   <Input type="number" placeholder="e.g. 45" value={egfr} onChange={(e) => setEgfr(e.target.value)} />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
+                  <Input type="number" placeholder="e.g. 42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-semibold text-foreground">hsCRP (mg/L)</label>
