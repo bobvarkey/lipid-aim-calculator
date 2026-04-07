@@ -276,6 +276,7 @@ export default function LipidCalculator() {
     lines.push(
       "Labs: LDL-C=" + (ldl || "—") +
       ", Non-HDL-C=" + (nonhdl || "—") +
+      ", HDL-C=" + (hdl || "—") +
       ", ApoB=" + (apob || "—") +
       ", Lp(a)=" + (lpa || "—") +
       ", HbA1c=" + (hba1c || "—") +
