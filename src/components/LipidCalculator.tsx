@@ -140,6 +140,25 @@ export default function LipidCalculator() {
     setRfChecked((prev) => (prev.ageRisk === hit ? prev : { ...prev, ageRisk: hit }));
   }, [age, sex]);
 
+  // ─── Auto-calculate eGFR from creatinine (CKD-EPI 2021) ───
+  useEffect(() => {
+    const cr = parseFloat(creatinine);
+    const a = parseFloat(age);
+    if (isNaN(cr) || cr <= 0 || isNaN(a) || a <= 0) {
+      setEgfrAuto(false);
+      return;
+    }
+    // CKD-EPI 2021 (race-free)
+    const kappa = sex === "female" ? 0.7 : 0.9;
+    const alpha = sex === "female" ? -0.241 : -0.302;
+    const sexMultiplier = sex === "female" ? 1.012 : 1.0;
+    const minRatio = Math.min(cr / kappa, 1);
+    const maxRatio = Math.max(cr / kappa, 1);
+    const calculated = 142 * Math.pow(minRatio, alpha) * Math.pow(maxRatio, -1.200) * Math.pow(0.9938, a) * sexMultiplier;
+    setEgfr(Math.round(calculated).toString());
+    setEgfrAuto(true);
+  }, [creatinine, age, sex]);
+
   // ─── Auto-derive CKD from eGFR ───
   useEffect(() => {
     const v = parseFloat(egfr);
