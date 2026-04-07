@@ -318,7 +318,7 @@ export default function LipidCalculator() {
 
   const reset = () => {
     setAge(""); setSex("male"); setLdl(""); setNonhdl(""); setApob(""); setLpa("");
-    setHba1c(""); setEgfr(""); setHscrp(""); setHdl("");
+    setHba1c(""); setEgfr(""); setCreatinine(""); setEgfrAuto(false); setHscrp(""); setHdl("");
     setRfChecked(Object.fromEntries(MAJOR_RF_KEYS.map((k) => [k, false])));
     setModChecked(Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false])));
   };
@@ -448,20 +448,27 @@ export default function LipidCalculator() {
                   <Input type="number" placeholder="e.g. 7.2" value={hba1c} onChange={(e) => setHba1c(e.target.value)} />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">eGFR (mL/min/1.73m²)</label>
-                  <Input type="number" placeholder="e.g. 45" value={egfr} onChange={(e) => setEgfr(e.target.value)} />
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Creatinine (mg/dL)</label>
+                  <Input type="number" placeholder="e.g. 1.2" value={creatinine} onChange={(e) => setCreatinine(e.target.value)} />
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">Enter to auto-calculate eGFR</p>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
-                  <Input type="number" placeholder="e.g. 42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">hsCRP (mg/L)</label>
-                  <Input type="number" placeholder="e.g. 3.5" value={hscrp} onChange={(e) => setHscrp(e.target.value)} />
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">
+                    eGFR (mL/min/1.73m²)
+                    {egfrAuto && <span className="ml-1 text-[10px] font-normal text-primary">auto</span>}
+                  </label>
+                  <Input
+                    type="number"
+                    placeholder="e.g. 45"
+                    value={egfr}
+                    onChange={(e) => { setEgfr(e.target.value); setEgfrAuto(false); setCreatinine(""); }}
+                    className={egfrAuto ? "bg-muted" : ""}
+                  />
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-3">
             </Card>
 
             {/* ─── Major ASCVD Risk Factors ─── */}
