@@ -301,7 +301,8 @@ export default function LipidCalculator() {
       ", ApoB=" + (apob || "—") +
       ", Lp(a)=" + (lpa || "—") +
       ", HbA1c=" + (hba1c || "—") +
-      ", eGFR=" + (egfr || "—") +
+      ", Creatinine=" + (creatinine || "—") +
+      ", eGFR=" + (egfr || "—") + (egfrAuto ? " (auto)" : "") +
       ", hsCRP=" + (hscrp || "—")
     );
     if (result?.why.length) lines.push("Rationale: " + result.why.join(" "));
