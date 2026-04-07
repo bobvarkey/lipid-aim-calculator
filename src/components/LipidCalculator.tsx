@@ -296,7 +296,7 @@ export default function LipidCalculator() {
 
   const reset = () => {
     setAge(""); setSex("male"); setLdl(""); setNonhdl(""); setApob(""); setLpa("");
-    setHba1c(""); setEgfr(""); setHscrp("");
+    setHba1c(""); setEgfr(""); setHscrp(""); setHdl("");
     setRfChecked(Object.fromEntries(MAJOR_RF_KEYS.map((k) => [k, false])));
     setModChecked(Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false])));
   };
