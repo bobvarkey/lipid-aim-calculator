@@ -469,6 +469,15 @@ export default function LipidCalculator() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
+                  <Input type="number" placeholder="e.g. 42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">hsCRP (mg/L)</label>
+                  <Input type="number" placeholder="e.g. 3.5" value={hscrp} onChange={(e) => setHscrp(e.target.value)} />
+                </div>
+              </div>
             </Card>
 
             {/* ─── Major ASCVD Risk Factors ─── */}
