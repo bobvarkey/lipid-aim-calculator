@@ -103,6 +103,16 @@ const TREATMENTS: Record<string, string[]> = {
   ],
 };
 
+// ─── CKD Stage helper ───
+function getCkdStage(egfrVal: number): string {
+  if (egfrVal >= 90) return "Stage 1 (≥90)";
+  if (egfrVal >= 60) return "Stage 2 (60–89)";
+  if (egfrVal >= 45) return "Stage 3A (45–59)";
+  if (egfrVal >= 30) return "Stage 3B (30–44)";
+  if (egfrVal >= 15) return "Stage 4 (15–29)";
+  return "Stage 5 (<15)";
+}
+
 export default function LipidCalculator() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("calculator");
@@ -120,6 +130,10 @@ export default function LipidCalculator() {
   const [egfrAuto, setEgfrAuto] = useState(false);
   const [hscrp, setHscrp] = useState("");
   const [hdl, setHdl] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [bmi, setBmi] = useState("");
+  const [bmiAuto, setBmiAuto] = useState(false);
 
   // ─── Risk factors (auto-derived where possible) ───
   const [rfChecked, setRfChecked] = useState<Record<string, boolean>>(
@@ -140,6 +154,28 @@ export default function LipidCalculator() {
     setRfChecked((prev) => (prev.ageRisk === hit ? prev : { ...prev, ageRisk: hit }));
   }, [age, sex]);
 
+  // ─── Auto-calculate BMI from height & weight ───
+  useEffect(() => {
+    const h = parseFloat(height);
+    const w = parseFloat(weight);
+    if (isNaN(h) || h <= 0 || isNaN(w) || w <= 0) {
+      setBmiAuto(false);
+      return;
+    }
+    const hm = h / 100;
+    const calculated = w / (hm * hm);
+    setBmi(calculated.toFixed(1));
+    setBmiAuto(true);
+  }, [height, weight]);
+
+  // ─── Auto-derive obesity from BMI ───
+  useEffect(() => {
+    const v = parseFloat(bmi);
+    if (isNaN(v)) return;
+    const isObese = v >= 25; // Asian cut-off for obesity
+    setRfChecked((prev) => (prev.obesity === isObese ? prev : { ...prev, obesity: isObese }));
+  }, [bmi]);
+
   // ─── Auto-calculate eGFR from creatinine (CKD-EPI 2021) ───
   useEffect(() => {
     const cr = parseFloat(creatinine);
@@ -148,7 +184,6 @@ export default function LipidCalculator() {
       setEgfrAuto(false);
       return;
     }
-    // CKD-EPI 2021 (race-free)
     const kappa = sex === "female" ? 0.7 : 0.9;
     const alpha = sex === "female" ? -0.241 : -0.302;
     const sexMultiplier = sex === "female" ? 1.012 : 1.0;
@@ -160,12 +195,20 @@ export default function LipidCalculator() {
   }, [creatinine, age, sex]);
 
   // ─── Auto-derive CKD from eGFR ───
+  const egfrVal = parseFloat(egfr);
+  const ckdStage = !isNaN(egfrVal) ? getCkdStage(egfrVal) : null;
+
   useEffect(() => {
     const v = parseFloat(egfr);
     if (isNaN(v)) return;
     setRfChecked((prev) => {
       const val = v < 60;
       return prev.ckd === val ? prev : { ...prev, ckd: val };
+    });
+    // Auto-derive CKD 3B/4 modifier
+    setModChecked((prev) => {
+      const is3b4 = v >= 15 && v < 45;
+      return prev.ckd34 === is3b4 ? prev : { ...prev, ckd34: is3b4 };
     });
   }, [egfr]);
 
@@ -275,39 +318,98 @@ export default function LipidCalculator() {
   // ─── EMR Note ───
   const generateNote = useCallback(() => {
     const lines: string[] = [];
-    lines.push("LAI EXTREME RISK ASSESSMENT");
-    lines.push("Predicted category: " + (result?.category || "Lower than VHR / not classifiable"));
-    lines.push("LDL-C target: " + (result?.ldlTarget || "Use standard LAI primary-prevention pathway"));
-    lines.push("Established ASCVD: " + (modChecked.ascvd ? "Yes" : "No"));
+    lines.push("═══════════════════════════════════════════════════");
+    lines.push("       LAI EXTREME RISK ASSESSMENT");
+    lines.push("═══════════════════════════════════════════════════");
+    lines.push("");
+
+    // Category prediction
+    lines.push("PREDICTED CATEGORY: " + (result?.category || "Lower than VHR / not classifiable"));
+    lines.push("LDL-C Target: " + (result?.ldlTarget || "Use standard LAI primary-prevention pathway"));
+    lines.push("Non-HDL-C Target: " + (result?.nonHdlTarget || "—"));
+    lines.push("ApoB Target: " + (result?.apoBTarget || "—"));
+    lines.push("");
+
+    // Demographics
+    lines.push("── DEMOGRAPHICS ──");
+    lines.push("Age: " + (age || "—") + " | Sex: " + (sex === "male" ? "Male" : "Female"));
+    if (height || weight || bmi) {
+      lines.push(
+        "Height: " + (height ? height + " cm" : "—") +
+        " | Weight: " + (weight ? weight + " kg" : "—") +
+        " | BMI: " + (bmi ? bmi + " kg/m²" + (bmiAuto ? " (auto)" : "") : "—")
+      );
+    }
+    lines.push("");
+
+    // Lab Values
+    lines.push("── LAB VALUES ──");
     lines.push(
-      "Territories: CAD=" + (modChecked.cad ? "Yes" : "No") +
-      ", Stroke/TIA=" + (modChecked.stroke ? "Yes" : "No") +
-      ", PAD=" + (modChecked.pad ? "Yes" : "No") +
-      ", Polyvascular=" + (modChecked.polyvascular ? "Yes" : "No")
+      "LDL-C: " + (ldl || "—") + " mg/dL" +
+      " | Non-HDL-C: " + (nonhdl || "—") + " mg/dL" +
+      " | HDL-C: " + (hdl || "—") + " mg/dL"
     );
     lines.push(
-      "Modifiers: DM=" + (rfChecked.dm ? "Yes" : "No") +
-      ", TOD=" + (modChecked.tod ? "Yes" : "No") +
-      ", FH=" + (modChecked.fh ? "Yes" : "No") +
-      ", HoFH=" + (modChecked.hofh ? "Yes" : "No") +
-      ", CKD3B/4=" + (modChecked.ckd34 ? "Yes" : "No") +
-      ", High plaque/CAC=" + (modChecked.subclinical ? "Yes" : "No")
+      "ApoB: " + (apob || "—") + " mg/dL" +
+      " | Lp(a): " + (lpa || "—") + " mg/dL" +
+      " | HbA1c: " + (hba1c || "—") + "%"
     );
-    lines.push("Risk factor count: " + rfCount);
     lines.push(
-      "Labs: LDL-C=" + (ldl || "—") +
-      ", Non-HDL-C=" + (nonhdl || "—") +
-      ", HDL-C=" + (hdl || "—") +
-      ", ApoB=" + (apob || "—") +
-      ", Lp(a)=" + (lpa || "—") +
-      ", HbA1c=" + (hba1c || "—") +
-      ", Creatinine=" + (creatinine || "—") +
-      ", eGFR=" + (egfr || "—") + (egfrAuto ? " (auto)" : "") +
-      ", hsCRP=" + (hscrp || "—")
+      "Creatinine: " + (creatinine || "—") + " mg/dL" +
+      " | eGFR: " + (egfr || "—") + " mL/min/1.73m²" + (egfrAuto ? " (auto)" : "") +
+      (ckdStage ? " → CKD " + ckdStage : "") +
+      " | hsCRP: " + (hscrp || "—") + " mg/L"
     );
-    if (result?.why.length) lines.push("Rationale: " + result.why.join(" "));
+    lines.push("");
+
+    // Active ASCVD Risk Factors
+    lines.push("── MAJOR ASCVD RISK FACTORS (" + rfCount + "/" + MAJOR_RF_KEYS.length + ") ──");
+    const activeRf = MAJOR_RF_KEYS.filter((k) => rfChecked[k]);
+    const inactiveRf = MAJOR_RF_KEYS.filter((k) => !rfChecked[k]);
+    if (activeRf.length > 0) {
+      activeRf.forEach((k) => lines.push("  ✓ " + MAJOR_RF_LABELS[k]));
+    }
+    if (inactiveRf.length > 0) {
+      inactiveRf.forEach((k) => lines.push("  ✗ " + MAJOR_RF_LABELS[k]));
+    }
+    lines.push("");
+
+    // Active Modifiers / Sub-classifiers
+    lines.push("── ASCVD HISTORY & EXTREME-RISK MODIFIERS ──");
+    const activeMod = MODIFIER_KEYS.filter((k) => modChecked[k]);
+    const inactiveMod = MODIFIER_KEYS.filter((k) => !modChecked[k]);
+    if (activeMod.length > 0) {
+      activeMod.forEach((k) => lines.push("  ✓ " + MODIFIER_LABELS[k]));
+    } else {
+      lines.push("  (none selected)");
+    }
+    if (inactiveMod.length > 0) {
+      inactiveMod.forEach((k) => lines.push("  ✗ " + MODIFIER_LABELS[k]));
+    }
+    lines.push("");
+
+    // Qualifiers summary
+    lines.push("── QUALIFIERS ──");
+    lines.push("  Established ASCVD: " + (modChecked.ascvd ? "YES" : "No"));
+    lines.push("  Family Hx premature CHD: " + (rfChecked.fhx ? "YES" : "No"));
+    lines.push("  Obesity: " + (rfChecked.obesity ? "YES" + (bmi ? " (BMI " + bmi + ")" : "") : "No"));
+    lines.push("  High coronary calcium: " + (modChecked.subclinical ? "YES" : "No"));
+    lines.push("  CKD: " + (rfChecked.ckd ? "YES" + (ckdStage ? " — " + ckdStage : "") : "No"));
+    lines.push("  CKD Stage 3B/4: " + (modChecked.ckd34 ? "YES" : "No"));
+    lines.push("");
+
+    // Rationale
+    if (result?.why.length) {
+      lines.push("── RATIONALE ──");
+      result.why.forEach((w) => lines.push("  • " + w));
+      lines.push("");
+    }
+
+    lines.push("═══════════════════════════════════════════════════");
+    lines.push("Ref: Lipid Association of India 2023 — Consensus Statement IV");
+
     return lines.join("\n");
-  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, creatinine, egfr, egfrAuto, hscrp]);
+  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, creatinine, egfr, egfrAuto, hscrp, age, sex, height, weight, bmi, bmiAuto, ckdStage]);
 
   const copyNote = async () => {
     try {
@@ -320,6 +422,7 @@ export default function LipidCalculator() {
   const reset = () => {
     setAge(""); setSex("male"); setLdl(""); setNonhdl(""); setApob(""); setLpa("");
     setHba1c(""); setEgfr(""); setCreatinine(""); setEgfrAuto(false); setHscrp(""); setHdl("");
+    setHeight(""); setWeight(""); setBmi(""); setBmiAuto(false);
     setRfChecked(Object.fromEntries(MAJOR_RF_KEYS.map((k) => [k, false])));
     setModChecked(Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false])));
   };
