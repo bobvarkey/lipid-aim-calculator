@@ -27,7 +27,7 @@ const MAJOR_RF_LABELS: Record<string, string> = {
   ageRisk: "Age threshold met (men ≥45 y, women ≥55 y)",
   smoking: "Current cigarette smoking",
   htn: "Hypertension (BP ≥140/90 or treated)",
-  lowhdl: "Low HDL-C",
+  lowhdl: "Low HDL-C (men <40 mg/dL, women <50 mg/dL)",
   fhx: "Family history of premature CHD",
   dm: "Diabetes mellitus",
   ckd: "Chronic kidney disease (eGFR <60)",
