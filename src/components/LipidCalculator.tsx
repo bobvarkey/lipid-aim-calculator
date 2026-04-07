@@ -117,6 +117,7 @@ export default function LipidCalculator() {
   const [hba1c, setHba1c] = useState("");
   const [egfr, setEgfr] = useState("");
   const [hscrp, setHscrp] = useState("");
+  const [hdl, setHdl] = useState("");
 
   // ─── Risk factors (auto-derived where possible) ───
   const [rfChecked, setRfChecked] = useState<Record<string, boolean>>(
