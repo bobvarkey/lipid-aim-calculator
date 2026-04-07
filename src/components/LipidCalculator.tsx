@@ -46,7 +46,7 @@ const MODIFIER_LABELS: Record<string, string> = {
   cad: "CAD / coronary ASCVD",
   stroke: "Ischemic stroke or TIA of atherosclerotic origin",
   pad: "PAD",
-  polyvascular: "Polyvascular disease",
+  polyvascular: "Polyvascular disease (≥2 arterial territories: CAD, cerebrovascular, PAD)",
   tod: "Diabetes target organ damage",
   fh: "Familial hypercholesterolemia / strong family history",
   hofh: "Homozygous familial hypercholesterolemia",
@@ -116,6 +116,8 @@ export default function LipidCalculator() {
   const [lpa, setLpa] = useState("");
   const [hba1c, setHba1c] = useState("");
   const [egfr, setEgfr] = useState("");
+  const [creatinine, setCreatinine] = useState("");
+  const [egfrAuto, setEgfrAuto] = useState(false);
   const [hscrp, setHscrp] = useState("");
   const [hdl, setHdl] = useState("");
 
@@ -137,6 +139,25 @@ export default function LipidCalculator() {
     const hit = (sex === "male" && a >= 45) || (sex === "female" && a >= 55);
     setRfChecked((prev) => (prev.ageRisk === hit ? prev : { ...prev, ageRisk: hit }));
   }, [age, sex]);
+
+  // ─── Auto-calculate eGFR from creatinine (CKD-EPI 2021) ───
+  useEffect(() => {
+    const cr = parseFloat(creatinine);
+    const a = parseFloat(age);
+    if (isNaN(cr) || cr <= 0 || isNaN(a) || a <= 0) {
+      setEgfrAuto(false);
+      return;
+    }
+    // CKD-EPI 2021 (race-free)
+    const kappa = sex === "female" ? 0.7 : 0.9;
+    const alpha = sex === "female" ? -0.241 : -0.302;
+    const sexMultiplier = sex === "female" ? 1.012 : 1.0;
+    const minRatio = Math.min(cr / kappa, 1);
+    const maxRatio = Math.max(cr / kappa, 1);
+    const calculated = 142 * Math.pow(minRatio, alpha) * Math.pow(maxRatio, -1.200) * Math.pow(0.9938, a) * sexMultiplier;
+    setEgfr(Math.round(calculated).toString());
+    setEgfrAuto(true);
+  }, [creatinine, age, sex]);
 
   // ─── Auto-derive CKD from eGFR ───
   useEffect(() => {
@@ -280,12 +301,13 @@ export default function LipidCalculator() {
       ", ApoB=" + (apob || "—") +
       ", Lp(a)=" + (lpa || "—") +
       ", HbA1c=" + (hba1c || "—") +
-      ", eGFR=" + (egfr || "—") +
+      ", Creatinine=" + (creatinine || "—") +
+      ", eGFR=" + (egfr || "—") + (egfrAuto ? " (auto)" : "") +
       ", hsCRP=" + (hscrp || "—")
     );
     if (result?.why.length) lines.push("Rationale: " + result.why.join(" "));
     return lines.join("\n");
-  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, egfr, hscrp]);
+  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, creatinine, egfr, egfrAuto, hscrp]);
 
   const copyNote = async () => {
     try {
@@ -297,7 +319,7 @@ export default function LipidCalculator() {
 
   const reset = () => {
     setAge(""); setSex("male"); setLdl(""); setNonhdl(""); setApob(""); setLpa("");
-    setHba1c(""); setEgfr(""); setHscrp(""); setHdl("");
+    setHba1c(""); setEgfr(""); setCreatinine(""); setEgfrAuto(false); setHscrp(""); setHdl("");
     setRfChecked(Object.fromEntries(MAJOR_RF_KEYS.map((k) => [k, false])));
     setModChecked(Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false])));
   };
@@ -427,11 +449,27 @@ export default function LipidCalculator() {
                   <Input type="number" placeholder="e.g. 7.2" value={hba1c} onChange={(e) => setHba1c(e.target.value)} />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">eGFR (mL/min/1.73m²)</label>
-                  <Input type="number" placeholder="e.g. 45" value={egfr} onChange={(e) => setEgfr(e.target.value)} />
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Creatinine (mg/dL)</label>
+                  <Input type="number" placeholder="e.g. 1.2" value={creatinine} onChange={(e) => setCreatinine(e.target.value)} />
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">Enter to auto-calculate eGFR</p>
                 </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">
+                    eGFR (mL/min/1.73m²)
+                    {egfrAuto && <span className="ml-1 text-[10px] font-normal text-primary">auto</span>}
+                  </label>
+                  <Input
+                    type="number"
+                    placeholder="e.g. 45"
+                    value={egfr}
+                    onChange={(e) => { setEgfr(e.target.value); setEgfrAuto(false); setCreatinine(""); }}
+                    className={egfrAuto ? "bg-muted" : ""}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1.5 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
                   <Input type="number" placeholder="e.g. 42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
@@ -493,6 +531,11 @@ export default function LipidCalculator() {
                     <span className="text-sm leading-snug text-foreground">{MODIFIER_LABELS[key]}</span>
                   </label>
                 ))}
+              </div>
+              <div className="mt-3 rounded-lg bg-muted/50 px-3 py-2">
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">Polyvascular disease:</span> Atherosclerosis in ≥2 major arterial territories — coronary (CAD), cerebrovascular (ischemic stroke/TIA), and/or peripheral arterial disease (PAD). Presence significantly elevates cardiovascular risk.
+                </p>
               </div>
             </Card>
 
