@@ -46,7 +46,7 @@ const MODIFIER_LABELS: Record<string, string> = {
   cad: "CAD / coronary ASCVD",
   stroke: "Ischemic stroke or TIA of atherosclerotic origin",
   pad: "PAD",
-  polyvascular: "Polyvascular disease",
+  polyvascular: "Polyvascular disease (≥2 arterial territories: CAD, cerebrovascular, PAD)",
   tod: "Diabetes target organ damage",
   fh: "Familial hypercholesterolemia / strong family history",
   hofh: "Homozygous familial hypercholesterolemia",
@@ -116,6 +116,8 @@ export default function LipidCalculator() {
   const [lpa, setLpa] = useState("");
   const [hba1c, setHba1c] = useState("");
   const [egfr, setEgfr] = useState("");
+  const [creatinine, setCreatinine] = useState("");
+  const [egfrAuto, setEgfrAuto] = useState(false);
   const [hscrp, setHscrp] = useState("");
   const [hdl, setHdl] = useState("");
 
