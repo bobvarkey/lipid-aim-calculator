@@ -27,7 +27,7 @@ const MAJOR_RF_LABELS: Record<string, string> = {
   ageRisk: "Age threshold met (men ≥45 y, women ≥55 y)",
   smoking: "Current cigarette smoking",
   htn: "Hypertension (BP ≥140/90 or treated)",
-  lowhdl: "Low HDL-C",
+  lowhdl: "Low HDL-C (men <40 mg/dL, women <50 mg/dL)",
   fhx: "Family history of premature CHD",
   dm: "Diabetes mellitus",
   ckd: "Chronic kidney disease (eGFR <60)",
@@ -117,6 +117,7 @@ export default function LipidCalculator() {
   const [hba1c, setHba1c] = useState("");
   const [egfr, setEgfr] = useState("");
   const [hscrp, setHscrp] = useState("");
+  const [hdl, setHdl] = useState("");
 
   // ─── Risk factors (auto-derived where possible) ───
   const [rfChecked, setRfChecked] = useState<Record<string, boolean>>(
@@ -155,6 +156,14 @@ export default function LipidCalculator() {
     }
   }, [hba1c]);
 
+  // ─── Auto-derive low HDL from HDL-C and sex ───
+  useEffect(() => {
+    const v = parseFloat(hdl);
+    if (isNaN(v)) return;
+    const isLow = sex === "male" ? v < 40 : v < 50;
+    setRfChecked((prev) => (prev.lowhdl === isLow ? prev : { ...prev, lowhdl: isLow }));
+  }, [hdl, sex]);
+
   const rfCount = Object.values(rfChecked).filter(Boolean).length;
 
   const toggleRf = (key: string) =>
@@ -176,7 +185,7 @@ export default function LipidCalculator() {
     const why: string[] = [];
 
     // Category C
-    if (v.sequelae30 && v.ascvd && !isNaN(ldlVal) && ldlVal <= 30) {
+    if (v.sequelae30) {
       cat = "Extreme Risk C";
       ldlTarget = "10–15 mg/dL";
       nonHdlTarget = "≤ 40 mg/dL";
@@ -267,6 +276,7 @@ export default function LipidCalculator() {
     lines.push(
       "Labs: LDL-C=" + (ldl || "—") +
       ", Non-HDL-C=" + (nonhdl || "—") +
+      ", HDL-C=" + (hdl || "—") +
       ", ApoB=" + (apob || "—") +
       ", Lp(a)=" + (lpa || "—") +
       ", HbA1c=" + (hba1c || "—") +
@@ -275,7 +285,7 @@ export default function LipidCalculator() {
     );
     if (result?.why.length) lines.push("Rationale: " + result.why.join(" "));
     return lines.join("\n");
-  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, apob, lpa, hba1c, egfr, hscrp]);
+  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, egfr, hscrp]);
 
   const copyNote = async () => {
     try {
@@ -287,7 +297,7 @@ export default function LipidCalculator() {
 
   const reset = () => {
     setAge(""); setSex("male"); setLdl(""); setNonhdl(""); setApob(""); setLpa("");
-    setHba1c(""); setEgfr(""); setHscrp("");
+    setHba1c(""); setEgfr(""); setHscrp(""); setHdl("");
     setRfChecked(Object.fromEntries(MAJOR_RF_KEYS.map((k) => [k, false])));
     setModChecked(Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false])));
   };
@@ -417,10 +427,14 @@ export default function LipidCalculator() {
                   <Input type="number" placeholder="e.g. 7.2" value={hba1c} onChange={(e) => setHba1c(e.target.value)} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="mb-1.5 block text-xs font-semibold text-foreground">eGFR (mL/min/1.73m²)</label>
                   <Input type="number" placeholder="e.g. 45" value={egfr} onChange={(e) => setEgfr(e.target.value)} />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
+                  <Input type="number" placeholder="e.g. 42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-semibold text-foreground">hsCRP (mg/L)</label>
@@ -437,7 +451,7 @@ export default function LipidCalculator() {
               </div>
               <p className="mb-3 text-xs text-muted-foreground">
                 Count: <span className="font-bold text-foreground">{rfCount}/{MAJOR_RF_KEYS.length}</span>
-                {" · "}CKD and age auto-derived from inputs
+                {" · "}CKD, age, and low HDL auto-derived from inputs
               </p>
               <div className="space-y-2.5">
                 {MAJOR_RF_KEYS.map((key) => (
