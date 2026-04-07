@@ -451,7 +451,7 @@ export default function LipidCalculator() {
               </div>
               <p className="mb-3 text-xs text-muted-foreground">
                 Count: <span className="font-bold text-foreground">{rfCount}/{MAJOR_RF_KEYS.length}</span>
-                {" · "}CKD and age auto-derived from inputs
+                {" · "}CKD, age, and low HDL auto-derived from inputs
               </p>
               <div className="space-y-2.5">
                 {MAJOR_RF_KEYS.map((key) => (
