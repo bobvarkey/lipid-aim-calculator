@@ -176,7 +176,7 @@ export default function LipidCalculator() {
     const why: string[] = [];
 
     // Category C
-    if (v.sequelae30 && v.ascvd && !isNaN(ldlVal) && ldlVal <= 30) {
+    if (v.sequelae30) {
       cat = "Extreme Risk C";
       ldlTarget = "10–15 mg/dL";
       nonHdlTarget = "≤ 40 mg/dL";
