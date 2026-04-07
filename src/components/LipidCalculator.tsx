@@ -156,6 +156,14 @@ export default function LipidCalculator() {
     }
   }, [hba1c]);
 
+  // ─── Auto-derive low HDL from HDL-C and sex ───
+  useEffect(() => {
+    const v = parseFloat(hdl);
+    if (isNaN(v)) return;
+    const isLow = sex === "male" ? v < 40 : v < 50;
+    setRfChecked((prev) => (prev.lowhdl === isLow ? prev : { ...prev, lowhdl: isLow }));
+  }, [hdl, sex]);
+
   const rfCount = Object.values(rfChecked).filter(Boolean).length;
 
   const toggleRf = (key: string) =>
