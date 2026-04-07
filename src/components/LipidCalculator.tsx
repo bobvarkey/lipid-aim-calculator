@@ -532,6 +532,11 @@ export default function LipidCalculator() {
                   </label>
                 ))}
               </div>
+              <div className="mt-3 rounded-lg bg-muted/50 px-3 py-2">
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">Polyvascular disease:</span> Atherosclerosis in ≥2 major arterial territories — coronary (CAD), cerebrovascular (ischemic stroke/TIA), and/or peripheral arterial disease (PAD). Presence significantly elevates cardiovascular risk.
+                </p>
+              </div>
             </Card>
 
             {/* ─── Predicted Category (live) ─── */}
