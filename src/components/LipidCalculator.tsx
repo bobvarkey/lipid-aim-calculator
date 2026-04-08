@@ -321,6 +321,22 @@ export default function LipidCalculator() {
 
   const result = classify();
 
+  // ─── PREVENT auto-calculation ───
+  const preventResult: PreventResult | null = useMemo(() => {
+    const a = parseFloat(age);
+    const s = parseFloat(sbp);
+    const tc = parseFloat(totalChol);
+    const h = parseFloat(hdl);
+    const e = parseFloat(egfr);
+    const b = parseFloat(bmi);
+    if ([a, s, tc, h, e, b].some(isNaN)) return null;
+    return calculatePrevent({
+      age: a, sex, sbp: s, bpMed, totalChol: tc, hdl: h,
+      statin: onStatin, diabetes: rfChecked.dm, smoking: rfChecked.smoking,
+      egfr: e, bmi: b,
+    });
+  }, [age, sex, sbp, totalChol, hdl, egfr, bmi, bpMed, onStatin, rfChecked.dm, rfChecked.smoking]);
+
   // ─── EMR Note ───
   const generateNote = useCallback(() => {
     const lines: string[] = [];
