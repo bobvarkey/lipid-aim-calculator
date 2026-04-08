@@ -334,7 +334,14 @@ export default function LipidCalculator() {
     lines.push("LDL-C Target: " + (result?.ldlTarget || "Use standard LAI primary-prevention pathway"));
     lines.push("Non-HDL-C Target: " + (result?.nonHdlTarget || "—"));
     lines.push("ApoB Target: " + (result?.apoBTarget || "—"));
-    lines.push("");
+    if (preventResult?.valid) {
+      lines.push("── PREVENT 10-YEAR ASCVD RISK ──");
+      lines.push("10-Year Risk: " + preventResult.riskPct + "% (" + preventResult.category + " Risk)");
+      lines.push("SBP: " + (sbp || "—") + " mmHg | Total Chol: " + (totalChol || "—") + " mg/dL");
+      lines.push("BP Medication: " + (bpMed ? "Yes" : "No") + " | Statin: " + (onStatin ? "Yes" : "No"));
+      lines.push("");
+    }
+
 
     // Demographics
     lines.push("── DEMOGRAPHICS ──");
