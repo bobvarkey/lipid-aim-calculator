@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity, Printer, Target, Copy, ClipboardCheck } from "lucide-react";
+import { Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity, Printer, Target, Copy, ClipboardCheck, TrendingUp } from "lucide-react";
 import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
 import ClinicalGuidance from "@/components/calculator/ClinicalGuidance";
 import EducationSection from "@/components/calculator/EducationSection";
+import { calculatePrevent, type PreventResult } from "@/lib/prevent";
 
 type TabKey = "calculator" | "primary" | "flowchart" | "education";
 
