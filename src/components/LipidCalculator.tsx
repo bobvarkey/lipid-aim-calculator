@@ -135,6 +135,11 @@ export default function LipidCalculator() {
   const [weight, setWeight] = useState("");
   const [bmi, setBmi] = useState("");
   const [bmiAuto, setBmiAuto] = useState(false);
+  // ─── PREVENT inputs ───
+  const [sbp, setSbp] = useState("");
+  const [totalChol, setTotalChol] = useState("");
+  const [bpMed, setBpMed] = useState(false);
+  const [onStatin, setOnStatin] = useState(false);
 
   // ─── Risk factors (auto-derived where possible) ───
   const [rfChecked, setRfChecked] = useState<Record<string, boolean>>(
