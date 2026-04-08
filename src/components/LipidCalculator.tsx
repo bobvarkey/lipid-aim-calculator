@@ -626,7 +626,7 @@ export default function LipidCalculator() {
                   )}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
                   <label className="mb-1.5 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
                   <Input type="number" placeholder="e.g. 42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
@@ -635,6 +635,102 @@ export default function LipidCalculator() {
                   <label className="mb-1.5 block text-xs font-semibold text-foreground">hsCRP (mg/L)</label>
                   <Input type="number" placeholder="e.g. 3.5" value={hscrp} onChange={(e) => setHscrp(e.target.value)} />
                 </div>
+              </div>
+              {/* PREVENT-specific inputs */}
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">SBP (mmHg)</label>
+                  <Input type="number" placeholder="e.g. 130" value={sbp} onChange={(e) => setSbp(e.target.value)} />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Total Cholesterol (mg/dL)</label>
+                  <Input type="number" placeholder="e.g. 200" value={totalChol} onChange={(e) => setTotalChol(e.target.value)} />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex cursor-pointer items-center gap-2">
+                  <Checkbox checked={bpMed} onCheckedChange={() => setBpMed(!bpMed)} />
+                  <span className="text-sm text-foreground">On BP medication</span>
+                </label>
+                <label className="flex cursor-pointer items-center gap-2">
+                  <Checkbox checked={onStatin} onCheckedChange={() => setOnStatin(!onStatin)} />
+                  <span className="text-sm text-foreground">On statin</span>
+                </label>
+              </div>
+              <p className="mt-2 text-[10px] text-muted-foreground">SBP, Total Cholesterol, BP med & statin are used by the PREVENT calculator below.</p>
+            </Card>
+
+            {/* ─── PREVENT 10-Year ASCVD Risk ─── */}
+            <Card className="border-border bg-card overflow-hidden">
+              <div className={`px-5 py-4 ${
+                preventResult?.valid
+                  ? preventResult.category === "High" ? "bg-danger/10"
+                  : preventResult.category === "Intermediate" ? "bg-warning/10"
+                  : preventResult.category === "Borderline" ? "bg-primary/10"
+                  : "bg-success/10"
+                  : "bg-muted/30"
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-foreground" />
+                    <h2 className="font-display text-sm font-bold text-foreground">
+                      AHA PREVENT — 10-Year ASCVD Risk
+                    </h2>
+                  </div>
+                  {preventResult?.valid && (
+                    <span className={`font-display text-2xl font-bold ${
+                      preventResult.category === "High" ? "text-danger"
+                      : preventResult.category === "Intermediate" ? "text-warning"
+                      : preventResult.category === "Borderline" ? "text-primary"
+                      : "text-success"
+                    }`}>
+                      {preventResult.riskPct}%
+                    </span>
+                  )}
+                </div>
+                {preventResult?.valid && (
+                  <p className={`mt-1 text-xs font-semibold ${
+                    preventResult.category === "High" ? "text-danger"
+                    : preventResult.category === "Intermediate" ? "text-warning"
+                    : preventResult.category === "Borderline" ? "text-primary"
+                    : "text-success"
+                  }`}>
+                    {preventResult.category} Risk
+                    {preventResult.category === "Low" && " (<5%)"}
+                    {preventResult.category === "Borderline" && " (5–7.5%)"}
+                    {preventResult.category === "Intermediate" && " (7.5–20%)"}
+                    {preventResult.category === "High" && " (≥20%)"}
+                  </p>
+                )}
+              </div>
+              <div className="p-5">
+                {preventResult?.valid ? (
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recommended Next Steps</p>
+                    <ul className="space-y-2">
+                      {preventResult.nextSteps.map((step, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-foreground leading-relaxed">
+                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{i + 1}</span>
+                          {step}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-[10px] text-muted-foreground italic mt-2">
+                      Ref: Khan SS et al. Circulation 2024;149(6):430-449. AHA PREVENT Equations (base model, sex-specific, race-free).
+                    </p>
+                  </div>
+                ) : preventResult && !preventResult.valid ? (
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Cannot calculate — fix the following:</p>
+                    {preventResult.warnings.map((w, i) => (
+                      <p key={i} className="text-xs text-danger">• {w}</p>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-2">
+                    Enter Age, SBP, Total Cholesterol, HDL-C, eGFR, and BMI to auto-calculate PREVENT score.
+                  </p>
+                )}
               </div>
             </Card>
 
