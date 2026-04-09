@@ -4,7 +4,16 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity, Printer, Target, Copy, ClipboardCheck, TrendingUp } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity,
+  Printer, Target, Copy, ClipboardCheck, TrendingUp, User,
+  TestTube, ChevronDown, Stethoscope, FileText,
+} from "lucide-react";
 import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
 import ClinicalGuidance from "@/components/calculator/ClinicalGuidance";
 import EducationSection from "@/components/calculator/EducationSection";
@@ -13,10 +22,10 @@ import { calculatePrevent, type PreventResult } from "@/lib/prevent";
 type TabKey = "calculator" | "primary" | "flowchart" | "education";
 
 const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-  { key: "calculator", label: "Risk Calculator", icon: <Target className="h-3.5 w-3.5" /> },
-  { key: "primary", label: "Primary Prevention", icon: <ShieldCheck className="h-3.5 w-3.5" /> },
-  { key: "flowchart", label: "Flowchart", icon: <Activity className="h-3.5 w-3.5" /> },
-  { key: "education", label: "Education", icon: <Heart className="h-3.5 w-3.5" /> },
+  { key: "calculator", label: "Calculator", icon: <Target className="h-4 w-4" /> },
+  { key: "primary", label: "Prevention", icon: <ShieldCheck className="h-4 w-4" /> },
+  { key: "flowchart", label: "Flowchart", icon: <Activity className="h-4 w-4" /> },
+  { key: "education", label: "Education", icon: <Heart className="h-4 w-4" /> },
 ];
 
 // ─── Major ASCVD Risk Factors ───
@@ -114,6 +123,40 @@ function getCkdStage(egfrVal: number): string {
   return "Stage 5 (<15)";
 }
 
+// ─── Collapsible Section ───
+function Section({
+  title,
+  icon,
+  children,
+  defaultOpen = true,
+  badge,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  badge?: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <Card className="border-border bg-card overflow-hidden">
+        <CollapsibleTrigger className="flex w-full items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors">
+          <div className="flex items-center gap-2.5">
+            {icon}
+            <h2 className="font-display text-sm font-bold text-foreground">{title}</h2>
+            {badge}
+          </div>
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="px-5 pb-5 pt-1">{children}</div>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
+  );
+}
+
 export default function LipidCalculator() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("calculator");
@@ -141,11 +184,10 @@ export default function LipidCalculator() {
   const [bpMed, setBpMed] = useState(false);
   const [onStatin, setOnStatin] = useState(false);
 
-  // ─── Risk factors (auto-derived where possible) ───
+  // ─── Risk factors ───
   const [rfChecked, setRfChecked] = useState<Record<string, boolean>>(
     Object.fromEntries(MAJOR_RF_KEYS.map((k) => [k, false]))
   );
-  // ─── Modifiers ───
   const [modChecked, setModChecked] = useState<Record<string, boolean>>(
     Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false]))
   );
@@ -160,73 +202,55 @@ export default function LipidCalculator() {
     setRfChecked((prev) => (prev.ageRisk === hit ? prev : { ...prev, ageRisk: hit }));
   }, [age, sex]);
 
-  // ─── Auto-calculate BMI from height & weight ───
+  // ─── Auto-calculate BMI ───
   useEffect(() => {
     const h = parseFloat(height);
     const w = parseFloat(weight);
-    if (isNaN(h) || h <= 0 || isNaN(w) || w <= 0) {
-      setBmiAuto(false);
-      return;
-    }
+    if (isNaN(h) || h <= 0 || isNaN(w) || w <= 0) { setBmiAuto(false); return; }
     const hm = h / 100;
-    const calculated = w / (hm * hm);
-    setBmi(calculated.toFixed(1));
+    setBmi((w / (hm * hm)).toFixed(1));
     setBmiAuto(true);
   }, [height, weight]);
 
-  // ─── Auto-derive obesity from BMI ───
+  // ─── Auto-derive obesity ───
   useEffect(() => {
     const v = parseFloat(bmi);
     if (isNaN(v)) return;
-    const isObese = v >= 25; // Asian cut-off for obesity
+    const isObese = v >= 25;
     setRfChecked((prev) => (prev.obesity === isObese ? prev : { ...prev, obesity: isObese }));
   }, [bmi]);
 
-  // ─── Auto-calculate eGFR from creatinine (CKD-EPI 2021) ───
+  // ─── Auto-calculate eGFR (CKD-EPI 2021) ───
   useEffect(() => {
     const cr = parseFloat(creatinine);
     const a = parseFloat(age);
-    if (isNaN(cr) || cr <= 0 || isNaN(a) || a <= 0) {
-      setEgfrAuto(false);
-      return;
-    }
+    if (isNaN(cr) || cr <= 0 || isNaN(a) || a <= 0) { setEgfrAuto(false); return; }
     const kappa = sex === "female" ? 0.7 : 0.9;
     const alpha = sex === "female" ? -0.241 : -0.302;
-    const sexMultiplier = sex === "female" ? 1.012 : 1.0;
-    const minRatio = Math.min(cr / kappa, 1);
-    const maxRatio = Math.max(cr / kappa, 1);
-    const calculated = 142 * Math.pow(minRatio, alpha) * Math.pow(maxRatio, -1.200) * Math.pow(0.9938, a) * sexMultiplier;
+    const sexMul = sex === "female" ? 1.012 : 1.0;
+    const calculated = 142 * Math.pow(Math.min(cr / kappa, 1), alpha) * Math.pow(Math.max(cr / kappa, 1), -1.200) * Math.pow(0.9938, a) * sexMul;
     setEgfr(Math.round(calculated).toString());
     setEgfrAuto(true);
   }, [creatinine, age, sex]);
 
-  // ─── Auto-derive CKD from eGFR ───
   const egfrVal = parseFloat(egfr);
   const ckdStage = !isNaN(egfrVal) ? getCkdStage(egfrVal) : null;
 
+  // ─── Auto-derive CKD ───
   useEffect(() => {
     const v = parseFloat(egfr);
     if (isNaN(v)) return;
-    setRfChecked((prev) => {
-      const val = v < 60;
-      return prev.ckd === val ? prev : { ...prev, ckd: val };
-    });
-    // Auto-derive CKD 3B/4 modifier
-    setModChecked((prev) => {
-      const is3b4 = v >= 15 && v < 45;
-      return prev.ckd34 === is3b4 ? prev : { ...prev, ckd34: is3b4 };
-    });
+    setRfChecked((prev) => { const val = v < 60; return prev.ckd === val ? prev : { ...prev, ckd: val }; });
+    setModChecked((prev) => { const is3b4 = v >= 15 && v < 45; return prev.ckd34 === is3b4 ? prev : { ...prev, ckd34: is3b4 }; });
   }, [egfr]);
 
-  // ─── Auto-derive DM from HbA1c ───
+  // ─── Auto-derive DM ───
   useEffect(() => {
     const v = parseFloat(hba1c);
-    if (!isNaN(v) && v > 7) {
-      setRfChecked((prev) => (prev.dm ? prev : { ...prev, dm: true }));
-    }
+    if (!isNaN(v) && v > 7) setRfChecked((prev) => (prev.dm ? prev : { ...prev, dm: true }));
   }, [hba1c]);
 
-  // ─── Auto-derive low HDL from HDL-C and sex ───
+  // ─── Auto-derive low HDL ───
   useEffect(() => {
     const v = parseFloat(hdl);
     if (isNaN(v)) return;
@@ -235,106 +259,50 @@ export default function LipidCalculator() {
   }, [hdl, sex]);
 
   const rfCount = Object.values(rfChecked).filter(Boolean).length;
+  const toggleRf = (key: string) => setRfChecked((prev) => ({ ...prev, [key]: !prev[key] }));
+  const toggleMod = (key: string) => setModChecked((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  const toggleRf = (key: string) =>
-    setRfChecked((prev) => ({ ...prev, [key]: !prev[key] }));
-  const toggleMod = (key: string) =>
-    setModChecked((prev) => ({ ...prev, [key]: !prev[key] }));
-
-  // ─── Classification logic: C → B → A → VHR ───
+  // ─── Classification logic ───
   const classify = useCallback((): CategoryResult | null => {
     const v = modChecked;
-    const ldlVal = parseFloat(ldl);
     const lpaVal = parseFloat(lpa);
     const rf = rfCount;
-
-    let cat = "";
-    let ldlTarget = "";
-    let nonHdlTarget = "";
-    let apoBTarget = "";
+    let cat = "", ldlTarget = "", nonHdlTarget = "", apoBTarget = "";
     const why: string[] = [];
 
-    // Category C
     if (v.sequelae30) {
-      cat = "Extreme Risk C";
-      ldlTarget = "10–15 mg/dL";
-      nonHdlTarget = "≤ 40 mg/dL";
-      apoBTarget = "< 35 mg/dL";
+      cat = "Extreme Risk C"; ldlTarget = "10–15 mg/dL"; nonHdlTarget = "≤ 40 mg/dL"; apoBTarget = "< 35 mg/dL";
       why.push("Ongoing ASCVD sequelae despite LDL-C ≤30 mg/dL and intensive therapy.");
-    }
-    // Category B
-    else if (
-      (v.cad && (rfChecked.dm || v.polyvascular || v.tod || rf >= 3)) ||
-      v.recurrent50 ||
-      v.acs12 ||
-      v.hofh
-    ) {
-      cat = "Extreme Risk B";
-      ldlTarget = "≤ 30 mg/dL";
-      nonHdlTarget = "≤ 60 mg/dL";
-      apoBTarget = "< 45 mg/dL";
+    } else if ((v.cad && (rfChecked.dm || v.polyvascular || v.tod || rf >= 3)) || v.recurrent50 || v.acs12 || v.hofh) {
+      cat = "Extreme Risk B"; ldlTarget = "≤ 30 mg/dL"; nonHdlTarget = "≤ 60 mg/dL"; apoBTarget = "< 45 mg/dL";
       if (v.cad) why.push("CAD present with very-high-risk features.");
       if (v.recurrent50) why.push("Recurrent/progressive events despite LDL-C <50 mg/dL.");
       if (v.acs12) why.push("Recurrent ACS within 12 months despite LDL goal.");
       if (v.hofh) why.push("Homozygous familial hypercholesterolemia selected.");
-    }
-    // Category A
-    else if (
-      (v.ascvd &&
-        (rfChecked.dm || v.fh || rf >= 3 || v.ckd34 || v.polyvascular || v.pad || v.stroke ||
-          (!isNaN(lpaVal) && lpaVal >= 50) || v.subclinical)) ||
-      v.subclinical
-    ) {
-      cat = "Extreme Risk A";
-      ldlTarget = "< 50 mg/dL, optional ≤ 30 mg/dL";
-      nonHdlTarget = "< 80 mg/dL (optional ≤ 60)";
-      apoBTarget = "< 55 mg/dL";
+    } else if ((v.ascvd && (rfChecked.dm || v.fh || rf >= 3 || v.ckd34 || v.polyvascular || v.pad || v.stroke || (!isNaN(lpaVal) && lpaVal >= 50) || v.subclinical)) || v.subclinical) {
+      cat = "Extreme Risk A"; ldlTarget = "< 50 mg/dL, optional ≤ 30 mg/dL"; nonHdlTarget = "< 80 mg/dL (optional ≤ 60)"; apoBTarget = "< 55 mg/dL";
       why.push("Very-high-risk ASCVD or equivalent burden detected.");
-      if (v.ascvd && !v.cad && (v.stroke || v.pad))
-        why.push("CAD not required because other ASCVD territories qualify.");
-      if (v.subclinical)
-        why.push("High calcium / extensive plaque burden supports extreme-risk A assignment.");
-    }
-    // Very High Risk
-    else if (v.ascvd || v.hofh || (rfChecked.dm && (rf >= 3 || v.tod))) {
-      cat = "Very High Risk";
-      ldlTarget = "< 50 mg/dL";
-      nonHdlTarget = "< 80 mg/dL";
-      apoBTarget = "< 65 mg/dL";
+      if (v.ascvd && !v.cad && (v.stroke || v.pad)) why.push("CAD not required because other ASCVD territories qualify.");
+      if (v.subclinical) why.push("High calcium / extensive plaque burden supports extreme-risk A assignment.");
+    } else if (v.ascvd || v.hofh || (rfChecked.dm && (rf >= 3 || v.tod))) {
+      cat = "Very High Risk"; ldlTarget = "< 50 mg/dL"; nonHdlTarget = "< 80 mg/dL"; apoBTarget = "< 65 mg/dL";
       if (v.ascvd) why.push("Established ASCVD present.");
       if (v.hofh) why.push("Homozygous FH present.");
-      if (rfChecked.dm && (rf >= 3 || v.tod))
-        why.push("Diabetes with ≥3 risk factors or target-organ damage.");
+      if (rfChecked.dm && (rf >= 3 || v.tod)) why.push("Diabetes with ≥3 risk factors or target-organ damage.");
     } else {
       return null;
     }
 
-    return {
-      category: cat,
-      ldlTarget,
-      nonHdlTarget,
-      apoBTarget,
-      treatment: TREATMENTS[cat] || [],
-      why,
-    };
-  }, [modChecked, rfChecked, rfCount, ldl, lpa]);
+    return { category: cat, ldlTarget, nonHdlTarget, apoBTarget, treatment: TREATMENTS[cat] || [], why };
+  }, [modChecked, rfChecked, rfCount, lpa]);
 
   const result = classify();
 
-  // ─── PREVENT auto-calculation ───
+  // ─── PREVENT ───
   const preventResult: PreventResult | null = useMemo(() => {
-    const a = parseFloat(age);
-    const s = parseFloat(sbp);
-    const tc = parseFloat(totalChol);
-    const h = parseFloat(hdl);
-    const e = parseFloat(egfr);
-    const b = parseFloat(bmi);
+    const a = parseFloat(age), s = parseFloat(sbp), tc = parseFloat(totalChol), h = parseFloat(hdl), e = parseFloat(egfr), b = parseFloat(bmi);
     if ([a, s, tc, h, e, b].some(isNaN)) return null;
-    return calculatePrevent({
-      age: a, sex, sbp: s, bpMed, totalChol: tc, hdl: h,
-      statin: onStatin, diabetes: rfChecked.dm, smoking: rfChecked.smoking,
-      egfr: e, bmi: b,
-    });
+    return calculatePrevent({ age: a, sex, sbp: s, bpMed, totalChol: tc, hdl: h, statin: onStatin, diabetes: rfChecked.dm, smoking: rfChecked.smoking, egfr: e, bmi: b });
   }, [age, sex, sbp, totalChol, hdl, egfr, bmi, bpMed, onStatin, rfChecked.dm, rfChecked.smoking]);
 
   // ─── EMR Note ───
@@ -344,8 +312,6 @@ export default function LipidCalculator() {
     lines.push("       LAI EXTREME RISK ASSESSMENT");
     lines.push("═══════════════════════════════════════════════════");
     lines.push("");
-
-    // Category prediction
     lines.push("PREDICTED CATEGORY: " + (result?.category || "Lower than VHR / not classifiable"));
     lines.push("LDL-C Target: " + (result?.ldlTarget || "Use standard LAI primary-prevention pathway"));
     lines.push("Non-HDL-C Target: " + (result?.nonHdlTarget || "—"));
@@ -357,67 +323,23 @@ export default function LipidCalculator() {
       lines.push("BP Medication: " + (bpMed ? "Yes" : "No") + " | Statin: " + (onStatin ? "Yes" : "No"));
       lines.push("");
     }
-
-
-    // Demographics
     lines.push("── DEMOGRAPHICS ──");
     lines.push("Age: " + (age || "—") + " | Sex: " + (sex === "male" ? "Male" : "Female"));
     if (height || weight || bmi) {
-      lines.push(
-        "Height: " + (height ? height + " cm" : "—") +
-        " | Weight: " + (weight ? weight + " kg" : "—") +
-        " | BMI: " + (bmi ? bmi + " kg/m²" + (bmiAuto ? " (auto)" : "") : "—")
-      );
+      lines.push("Height: " + (height ? height + " cm" : "—") + " | Weight: " + (weight ? weight + " kg" : "—") + " | BMI: " + (bmi ? bmi + " kg/m²" + (bmiAuto ? " (auto)" : "") : "—"));
     }
     lines.push("");
-
-    // Lab Values
     lines.push("── LAB VALUES ──");
-    lines.push(
-      "LDL-C: " + (ldl || "—") + " mg/dL" +
-      " | Non-HDL-C: " + (nonhdl || "—") + " mg/dL" +
-      " | HDL-C: " + (hdl || "—") + " mg/dL"
-    );
-    lines.push(
-      "ApoB: " + (apob || "—") + " mg/dL" +
-      " | Lp(a): " + (lpa || "—") + " mg/dL" +
-      " | HbA1c: " + (hba1c || "—") + "%"
-    );
-    lines.push(
-      "Creatinine: " + (creatinine || "—") + " mg/dL" +
-      " | eGFR: " + (egfr || "—") + " mL/min/1.73m²" + (egfrAuto ? " (auto)" : "") +
-      (ckdStage ? " → CKD " + ckdStage : "") +
-      " | hsCRP: " + (hscrp || "—") + " mg/L"
-    );
+    lines.push("LDL-C: " + (ldl || "—") + " mg/dL | Non-HDL-C: " + (nonhdl || "—") + " mg/dL | HDL-C: " + (hdl || "—") + " mg/dL");
+    lines.push("ApoB: " + (apob || "—") + " mg/dL | Lp(a): " + (lpa || "—") + " mg/dL | HbA1c: " + (hba1c || "—") + "%");
+    lines.push("Creatinine: " + (creatinine || "—") + " mg/dL | eGFR: " + (egfr || "—") + " mL/min/1.73m²" + (egfrAuto ? " (auto)" : "") + (ckdStage ? " → CKD " + ckdStage : "") + " | hsCRP: " + (hscrp || "—") + " mg/L");
     lines.push("");
-
-    // Active ASCVD Risk Factors
     lines.push("── MAJOR ASCVD RISK FACTORS (" + rfCount + "/" + MAJOR_RF_KEYS.length + ") ──");
-    const activeRf = MAJOR_RF_KEYS.filter((k) => rfChecked[k]);
-    const inactiveRf = MAJOR_RF_KEYS.filter((k) => !rfChecked[k]);
-    if (activeRf.length > 0) {
-      activeRf.forEach((k) => lines.push("  ✓ " + MAJOR_RF_LABELS[k]));
-    }
-    if (inactiveRf.length > 0) {
-      inactiveRf.forEach((k) => lines.push("  ✗ " + MAJOR_RF_LABELS[k]));
-    }
+    MAJOR_RF_KEYS.forEach((k) => lines.push("  " + (rfChecked[k] ? "✓" : "✗") + " " + MAJOR_RF_LABELS[k]));
     lines.push("");
-
-    // Active Modifiers / Sub-classifiers
     lines.push("── ASCVD HISTORY & EXTREME-RISK MODIFIERS ──");
-    const activeMod = MODIFIER_KEYS.filter((k) => modChecked[k]);
-    const inactiveMod = MODIFIER_KEYS.filter((k) => !modChecked[k]);
-    if (activeMod.length > 0) {
-      activeMod.forEach((k) => lines.push("  ✓ " + MODIFIER_LABELS[k]));
-    } else {
-      lines.push("  (none selected)");
-    }
-    if (inactiveMod.length > 0) {
-      inactiveMod.forEach((k) => lines.push("  ✗ " + MODIFIER_LABELS[k]));
-    }
+    MODIFIER_KEYS.forEach((k) => lines.push("  " + (modChecked[k] ? "✓" : "✗") + " " + MODIFIER_LABELS[k]));
     lines.push("");
-
-    // Qualifiers summary
     lines.push("── QUALIFIERS ──");
     lines.push("  Established ASCVD: " + (modChecked.ascvd ? "YES" : "No"));
     lines.push("  Family Hx premature CHD: " + (rfChecked.fhx ? "YES" : "No"));
@@ -426,28 +348,19 @@ export default function LipidCalculator() {
     lines.push("  CKD: " + (rfChecked.ckd ? "YES" + (ckdStage ? " — " + ckdStage : "") : "No"));
     lines.push("  CKD Stage 3B/4: " + (modChecked.ckd34 ? "YES" : "No"));
     lines.push("");
-
-    // Rationale
     if (result?.why.length) {
       lines.push("── RATIONALE ──");
       result.why.forEach((w) => lines.push("  • " + w));
       lines.push("");
     }
-
     lines.push("═══════════════════════════════════════════════════");
     lines.push("Ref: Lipid Association of India 2023 — Consensus Statement IV");
-
     return lines.join("\n");
   }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, creatinine, egfr, egfrAuto, hscrp, age, sex, height, weight, bmi, bmiAuto, ckdStage, preventResult, sbp, totalChol, bpMed, onStatin]);
 
   const copyNote = async () => {
-    try {
-      await navigator.clipboard.writeText(generateNote());
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {}
+    try { await navigator.clipboard.writeText(generateNote()); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch {}
   };
-
 
   const reset = () => {
     setAge(""); setSex("male"); setLdl(""); setNonhdl(""); setApob(""); setLpa("");
@@ -464,140 +377,125 @@ export default function LipidCalculator() {
   const apoBNum = parseFloat(apob);
   const lpaNum = parseFloat(lpa);
 
-  const ldlAtGoal = result && !isNaN(ldlNum)
-    ? result.category === "Extreme Risk C" ? ldlNum <= 15
-    : result.category === "Extreme Risk B" ? ldlNum <= 30
-    : ldlNum < 50
-    : null;
-  const nonHdlAtGoal = result && !isNaN(nonHdlNum)
-    ? result.category === "Extreme Risk C" ? nonHdlNum <= 40
-    : result.category === "Extreme Risk B" ? nonHdlNum <= 60
-    : nonHdlNum < 80
-    : null;
-  const apoBAtGoal = result && !isNaN(apoBNum)
-    ? result.category === "Extreme Risk C" ? apoBNum < 35
-    : result.category === "Extreme Risk B" ? apoBNum < 45
-    : result.category === "Extreme Risk A" ? apoBNum < 55
-    : apoBNum < 65
-    : null;
+  const ldlAtGoal = result && !isNaN(ldlNum) ? (result.category === "Extreme Risk C" ? ldlNum <= 15 : result.category === "Extreme Risk B" ? ldlNum <= 30 : ldlNum < 50) : null;
+  const nonHdlAtGoal = result && !isNaN(nonHdlNum) ? (result.category === "Extreme Risk C" ? nonHdlNum <= 40 : result.category === "Extreme Risk B" ? nonHdlNum <= 60 : nonHdlNum < 80) : null;
+  const apoBAtGoal = result && !isNaN(apoBNum) ? (result.category === "Extreme Risk C" ? apoBNum < 35 : result.category === "Extreme Risk B" ? apoBNum < 45 : result.category === "Extreme Risk A" ? apoBNum < 55 : apoBNum < 65) : null;
 
-  const catColor = result
-    ? result.category === "Very High Risk" ? "warning" : "danger"
-    : "muted";
+  const catColor = result ? (result.category === "Very High Risk" ? "warning" : "danger") : "muted";
 
   return (
-    <div className="min-h-screen bg-background px-4 py-8 md:py-12">
-      <div className="mx-auto max-w-2xl">
-        {/* Header */}
-        <div className="mb-6 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary">
-            <Heart className="h-7 w-7 text-primary-foreground" />
+    <div className="min-h-screen bg-background">
+      {/* ─── Sticky Header + Tabs ─── */}
+      <div className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="mx-auto max-w-2xl px-4">
+          <div className="flex items-center gap-3 py-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
+              <Heart className="h-4.5 w-4.5 text-primary-foreground" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="font-display text-base font-bold tracking-tight text-foreground truncate">
+                LAI Extreme Risk Predictor
+              </h1>
+              <p className="text-[10px] text-muted-foreground truncate">
+                Lipid Association of India 2023 — Consensus IV
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" className="no-print shrink-0" onClick={reset}>
+              <RotateCcw className="h-4 w-4" />
+            </Button>
           </div>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            LAI Extreme Risk Predictor
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Lipid Association of India 2023 Update — Consensus Statement IV
-          </p>
+          <div className="flex gap-0.5 pb-2 overflow-x-auto no-print">
+            {TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                  activeTab === tab.key
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="mb-6 flex gap-1 overflow-x-auto rounded-xl border border-border bg-card p-1 no-print">
-          {TABS.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                activeTab === tab.key
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
+      {/* ─── Content ─── */}
+      <div className="mx-auto max-w-2xl px-4 py-5">
         {activeTab === "calculator" && (
-          <div className="space-y-4">
-            {/* ASCVD EMR Link */}
-            <Card className="border-border bg-card p-4 no-print">
+          <div className="space-y-3">
+            {/* Quick Link */}
+            <Card className="border-border bg-card p-3.5 no-print">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-display text-sm font-bold text-foreground">ASCVD Risk Assessment & EMR</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">ACC/AHA Primary Prevention with EMR Note Generator</p>
+                  <h3 className="font-display text-xs font-bold text-foreground">ASCVD Risk Assessment & EMR</h3>
+                  <p className="text-[10px] text-muted-foreground">ACC/AHA Primary Prevention</p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => navigate("/ascvd")} className="gap-1.5">
-                  Open <Activity className="h-3.5 w-3.5" />
+                <Button variant="outline" size="sm" onClick={() => navigate("/ascvd")} className="gap-1.5 text-xs h-7">
+                  Open <Activity className="h-3 w-3" />
                 </Button>
               </div>
             </Card>
 
-            {/* ─── Inputs ─── */}
-            <Card className="border-border bg-card p-5">
-              <h2 className="font-display text-sm font-bold text-foreground mb-3">Inputs</h2>
+            {/* ── Section 1: Demographics & Anthropometrics ── */}
+            <Section title="Demographics & Body Metrics" icon={<User className="h-4 w-4 text-primary" />}>
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Age</label>
+                  <label className="mb-1 block text-xs font-semibold text-foreground">Age</label>
                   <Input type="number" placeholder="e.g. 55" value={age} onChange={(e) => setAge(e.target.value)} />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Sex</label>
-                  <select
-                    value={sex}
-                    onChange={(e) => setSex(e.target.value as "male" | "female")}
-                    className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
-                  >
+                  <label className="mb-1 block text-xs font-semibold text-foreground">Sex</label>
+                  <select value={sex} onChange={(e) => setSex(e.target.value as "male" | "female")} className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground">
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3 mb-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Height (cm)</label>
-                  <Input type="number" placeholder="e.g. 170" value={height} onChange={(e) => setHeight(e.target.value)} />
+                  <label className="mb-1 block text-xs font-semibold text-foreground">Height (cm)</label>
+                  <Input type="number" placeholder="170" value={height} onChange={(e) => setHeight(e.target.value)} />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Weight (kg)</label>
-                  <Input type="number" placeholder="e.g. 75" value={weight} onChange={(e) => setWeight(e.target.value)} />
+                  <label className="mb-1 block text-xs font-semibold text-foreground">Weight (kg)</label>
+                  <Input type="number" placeholder="75" value={weight} onChange={(e) => setWeight(e.target.value)} />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">
-                    BMI (kg/m²)
-                    {bmiAuto && <span className="ml-1 text-[10px] font-normal text-primary">auto</span>}
+                  <label className="mb-1 block text-xs font-semibold text-foreground">
+                    BMI {bmiAuto && <span className="text-[10px] font-normal text-primary">auto</span>}
                   </label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 26"
-                    value={bmi}
-                    onChange={(e) => { setBmi(e.target.value); setBmiAuto(false); setHeight(""); setWeight(""); }}
-                    className={bmiAuto ? "bg-muted" : ""}
-                  />
+                  <Input type="number" placeholder="26" value={bmi} onChange={(e) => { setBmi(e.target.value); setBmiAuto(false); setHeight(""); setWeight(""); }} className={bmiAuto ? "bg-muted" : ""} />
                   {!isNaN(parseFloat(bmi)) && parseFloat(bmi) >= 25 && (
                     <p className="mt-0.5 text-[10px] font-medium text-danger">≥25 → Obesity (Asian cut-off)</p>
                   )}
                 </div>
               </div>
+            </Section>
+
+            {/* ── Section 2: Lab Values ── */}
+            <Section title="Lab Values" icon={<TestTube className="h-4 w-4 text-primary" />}>
               <div className="grid grid-cols-3 gap-3 mb-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">LDL-C (mg/dL)</label>
-                  <Input type="number" placeholder="e.g. 85" value={ldl} onChange={(e) => setLdl(e.target.value)} />
+                  <label className="mb-1 block text-xs font-semibold text-foreground">LDL-C (mg/dL)</label>
+                  <Input type="number" placeholder="85" value={ldl} onChange={(e) => setLdl(e.target.value)} />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Non-HDL-C</label>
-                  <Input type="number" placeholder="e.g. 110" value={nonhdl} onChange={(e) => setNonhdl(e.target.value)} />
+                  <label className="mb-1 block text-xs font-semibold text-foreground">Non-HDL-C</label>
+                  <Input type="number" placeholder="110" value={nonhdl} onChange={(e) => setNonhdl(e.target.value)} />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">ApoB (mg/dL)</label>
-                  <Input type="number" placeholder="e.g. 70" value={apob} onChange={(e) => setApob(e.target.value)} />
+                  <label className="mb-1 block text-xs font-semibold text-foreground">ApoB (mg/dL)</label>
+                  <Input type="number" placeholder="70" value={apob} onChange={(e) => setApob(e.target.value)} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Lp(a) (mg/dL)</label>
-                  <Input type="number" placeholder="e.g. 45" value={lpa} onChange={(e) => setLpa(e.target.value)} />
+                  <label className="mb-1 block text-xs font-semibold text-foreground">Lp(a) (mg/dL)</label>
+                  <Input type="number" placeholder="45" value={lpa} onChange={(e) => setLpa(e.target.value)} />
                   {!isNaN(lpaNum) && lpaNum >= 50 && (
                     <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-danger">
                       <AlertTriangle className="h-3 w-3" /> ≥50 → Extreme Risk A
@@ -605,28 +503,31 @@ export default function LipidCalculator() {
                   )}
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">HbA1c (%)</label>
-                  <Input type="number" placeholder="e.g. 7.2" value={hba1c} onChange={(e) => setHba1c(e.target.value)} />
+                  <label className="mb-1 block text-xs font-semibold text-foreground">HbA1c (%)</label>
+                  <Input type="number" placeholder="7.2" value={hba1c} onChange={(e) => setHba1c(e.target.value)} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Creatinine (mg/dL)</label>
-                  <Input type="number" placeholder="e.g. 1.2" value={creatinine} onChange={(e) => setCreatinine(e.target.value)} />
-                  <p className="mt-0.5 text-[10px] text-muted-foreground">Enter to auto-calculate eGFR</p>
+                  <label className="mb-1 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
+                  <Input type="number" placeholder="42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">
-                    eGFR (mL/min/1.73m²)
-                    {egfrAuto && <span className="ml-1 text-[10px] font-normal text-primary">auto</span>}
+                  <label className="mb-1 block text-xs font-semibold text-foreground">hsCRP (mg/L)</label>
+                  <Input type="number" placeholder="3.5" value={hscrp} onChange={(e) => setHscrp(e.target.value)} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-foreground">Creatinine (mg/dL)</label>
+                  <Input type="number" placeholder="1.2" value={creatinine} onChange={(e) => setCreatinine(e.target.value)} />
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">Auto-calculates eGFR</p>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-foreground">
+                    eGFR {egfrAuto && <span className="text-[10px] font-normal text-primary">auto</span>}
                   </label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 45"
-                    value={egfr}
-                    onChange={(e) => { setEgfr(e.target.value); setEgfrAuto(false); setCreatinine(""); }}
-                    className={egfrAuto ? "bg-muted" : ""}
-                  />
+                  <Input type="number" placeholder="45" value={egfr} onChange={(e) => { setEgfr(e.target.value); setEgfrAuto(false); setCreatinine(""); }} className={egfrAuto ? "bg-muted" : ""} />
                   {ckdStage && (
                     <p className={`mt-0.5 text-[10px] font-medium ${egfrVal < 60 ? "text-danger" : "text-muted-foreground"}`}>
                       CKD {ckdStage}
@@ -634,58 +535,56 @@ export default function LipidCalculator() {
                   )}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
-                  <Input type="number" placeholder="e.g. 42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">hsCRP (mg/L)</label>
-                  <Input type="number" placeholder="e.g. 3.5" value={hscrp} onChange={(e) => setHscrp(e.target.value)} />
-                </div>
-              </div>
-              {/* PREVENT-specific inputs */}
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">SBP (mmHg)</label>
-                  <Input type="number" placeholder="e.g. 130" value={sbp} onChange={(e) => setSbp(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">Total Cholesterol (mg/dL)</label>
-                  <Input type="number" placeholder="e.g. 200" value={totalChol} onChange={(e) => setTotalChol(e.target.value)} />
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-4">
-                <label className="flex cursor-pointer items-center gap-2">
-                  <Checkbox checked={bpMed} onCheckedChange={() => setBpMed(!bpMed)} />
-                  <span className="text-sm text-foreground">On BP medication</span>
-                </label>
-                <label className="flex cursor-pointer items-center gap-2">
-                  <Checkbox checked={onStatin} onCheckedChange={() => setOnStatin(!onStatin)} />
-                  <span className="text-sm text-foreground">On statin</span>
-                </label>
-              </div>
-              <p className="mt-2 text-[10px] text-muted-foreground">SBP, Total Cholesterol, BP med & statin are used by the PREVENT calculator below.</p>
-            </Card>
-
-            {/* ─── PREVENT 10-Year ASCVD Risk ─── */}
-            <Card className="border-border bg-card overflow-hidden">
-              <div className={`px-5 py-4 ${
-                preventResult?.valid
-                  ? preventResult.category === "High" ? "bg-danger/10"
-                  : preventResult.category === "Intermediate" ? "bg-warning/10"
-                  : preventResult.category === "Borderline" ? "bg-primary/10"
-                  : "bg-success/10"
-                  : "bg-muted/30"
-              }`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-foreground" />
-                    <h2 className="font-display text-sm font-bold text-foreground">
-                      AHA PREVENT — 10-Year ASCVD Risk
-                    </h2>
+              {/* PREVENT-specific */}
+              <div className="border-t border-border pt-3 mt-1">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">PREVENT Calculator Inputs</p>
+                <div className="grid grid-cols-2 gap-3 mb-2">
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-foreground">SBP (mmHg)</label>
+                    <Input type="number" placeholder="130" value={sbp} onChange={(e) => setSbp(e.target.value)} />
                   </div>
-                  {preventResult?.valid && (
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-foreground">Total Chol (mg/dL)</label>
+                    <Input type="number" placeholder="200" value={totalChol} onChange={(e) => setTotalChol(e.target.value)} />
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <Checkbox checked={bpMed} onCheckedChange={() => setBpMed(!bpMed)} />
+                    <span className="text-xs text-foreground">On BP medication</span>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <Checkbox checked={onStatin} onCheckedChange={() => setOnStatin(!onStatin)} />
+                    <span className="text-xs text-foreground">On statin</span>
+                  </label>
+                </div>
+              </div>
+            </Section>
+
+            {/* ── Section 3: PREVENT Risk Score ── */}
+            <Section
+              title="AHA PREVENT — 10-Year ASCVD Risk"
+              icon={<TrendingUp className="h-4 w-4 text-primary" />}
+              defaultOpen={true}
+              badge={preventResult?.valid ? (
+                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-bold ${
+                  preventResult.category === "High" ? "bg-danger/15 text-danger"
+                  : preventResult.category === "Intermediate" ? "bg-warning/15 text-warning"
+                  : preventResult.category === "Borderline" ? "bg-primary/15 text-primary"
+                  : "bg-success/15 text-success"
+                }`}>
+                  {preventResult.riskPct}% — {preventResult.category}
+                </span>
+              ) : undefined}
+            >
+              {preventResult?.valid ? (
+                <div className="space-y-3">
+                  <div className={`rounded-lg px-4 py-3 ${
+                    preventResult.category === "High" ? "bg-danger/10"
+                    : preventResult.category === "Intermediate" ? "bg-warning/10"
+                    : preventResult.category === "Borderline" ? "bg-primary/10"
+                    : "bg-success/10"
+                  }`}>
                     <span className={`font-display text-2xl font-bold ${
                       preventResult.category === "High" ? "text-danger"
                       : preventResult.category === "Intermediate" ? "text-warning"
@@ -694,72 +593,52 @@ export default function LipidCalculator() {
                     }`}>
                       {preventResult.riskPct}%
                     </span>
-                  )}
-                </div>
-                {preventResult?.valid && (
-                  <p className={`mt-1 text-xs font-semibold ${
-                    preventResult.category === "High" ? "text-danger"
-                    : preventResult.category === "Intermediate" ? "text-warning"
-                    : preventResult.category === "Borderline" ? "text-primary"
-                    : "text-success"
-                  }`}>
-                    {preventResult.category} Risk
-                    {preventResult.category === "Low" && " (<5%)"}
-                    {preventResult.category === "Borderline" && " (5–7.5%)"}
-                    {preventResult.category === "Intermediate" && " (7.5–20%)"}
-                    {preventResult.category === "High" && " (≥20%)"}
-                  </p>
-                )}
-              </div>
-              <div className="p-5">
-                {preventResult?.valid ? (
-                  <div className="space-y-3">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recommended Next Steps</p>
-                    <ul className="space-y-2">
-                      {preventResult.nextSteps.map((step, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-foreground leading-relaxed">
-                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{i + 1}</span>
-                          {step}
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="text-[10px] text-muted-foreground italic mt-2">
-                      Ref: Khan SS et al. Circulation 2024;149(6):430-449. AHA PREVENT Equations (base model, sex-specific, race-free).
-                    </p>
+                    <span className="text-sm text-muted-foreground ml-2">
+                      {preventResult.category} Risk
+                      {preventResult.category === "Low" && " (<5%)"}
+                      {preventResult.category === "Borderline" && " (5–7.5%)"}
+                      {preventResult.category === "Intermediate" && " (7.5–20%)"}
+                      {preventResult.category === "High" && " (≥20%)"}
+                    </span>
                   </div>
-                ) : preventResult && !preventResult.valid ? (
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Cannot calculate — fix the following:</p>
-                    {preventResult.warnings.map((w, i) => (
-                      <p key={i} className="text-xs text-danger">• {w}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recommended Next Steps</p>
+                  <ul className="space-y-2">
+                    {preventResult.nextSteps.map((step, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-foreground leading-relaxed">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{i + 1}</span>
+                        {step}
+                      </li>
                     ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-2">
-                    Enter Age, SBP, Total Cholesterol, HDL-C, eGFR, and BMI to auto-calculate PREVENT score.
+                  </ul>
+                  <p className="text-[10px] text-muted-foreground italic">
+                    Ref: Khan SS et al. Circulation 2024;149(6):430-449.
                   </p>
-                )}
-              </div>
-            </Card>
+                </div>
+              ) : preventResult && !preventResult.valid ? (
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Cannot calculate — fix the following:</p>
+                  {preventResult.warnings.map((w, i) => (
+                    <p key={i} className="text-xs text-danger">• {w}</p>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-2">
+                  Enter Age, SBP, Total Cholesterol, HDL-C, eGFR, and BMI to auto-calculate.
+                </p>
+              )}
+            </Section>
 
-            {/* ─── Major ASCVD Risk Factors ─── */}
-            <Card className="border-border bg-card p-5">
-              <div className="flex items-center gap-2 mb-1">
-                <Heart className="h-4 w-4 text-danger" />
-                <h2 className="font-display text-sm font-bold text-foreground">Major ASCVD Risk Factors</h2>
-              </div>
-              <p className="mb-3 text-xs text-muted-foreground">
-                Count: <span className="font-bold text-foreground">{rfCount}/{MAJOR_RF_KEYS.length}</span>
-                {" · "}CKD, age, and low HDL auto-derived from inputs
-              </p>
+            {/* ── Section 4: Risk Factors ── */}
+            <Section
+              title="Major ASCVD Risk Factors"
+              icon={<Heart className="h-4 w-4 text-danger" />}
+              badge={<span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs font-bold text-foreground">{rfCount}/{MAJOR_RF_KEYS.length}</span>}
+            >
+              <p className="mb-3 text-[10px] text-muted-foreground">CKD, age, low HDL, obesity auto-derived from inputs</p>
               <div className="space-y-2.5">
                 {MAJOR_RF_KEYS.map((key) => (
                   <label key={key} className="flex cursor-pointer items-start gap-3">
-                    <Checkbox
-                      checked={rfChecked[key]}
-                      onCheckedChange={() => toggleRf(key)}
-                      className="mt-0.5"
-                    />
+                    <Checkbox checked={rfChecked[key]} onCheckedChange={() => toggleRf(key)} className="mt-0.5" />
                     <span className="text-sm leading-snug text-foreground">{MAJOR_RF_LABELS[key]}</span>
                   </label>
                 ))}
@@ -770,49 +649,36 @@ export default function LipidCalculator() {
                   ≥3 major ASCVD risk factors — qualifies for higher risk stratification
                 </div>
               )}
-            </Card>
+            </Section>
 
-            {/* ─── ASCVD History & Extreme-Risk Modifiers ─── */}
-            <Card className="border-border bg-card p-5">
-              <div className="flex items-center gap-2 mb-1">
-                <Activity className="h-4 w-4 text-primary" />
-                <h2 className="font-display text-sm font-bold text-foreground">ASCVD History & Extreme-Risk Modifiers</h2>
-              </div>
-              <p className="mb-3 text-xs text-muted-foreground">
-                Tick all that apply. The algorithm auto-classifies C → B → A → VHR.
+            {/* ── Section 5: ASCVD History & Modifiers ── */}
+            <Section
+              title="ASCVD History & Extreme-Risk Modifiers"
+              icon={<Stethoscope className="h-4 w-4 text-primary" />}
+            >
+              <p className="mb-3 text-[10px] text-muted-foreground">
+                Tick all that apply. Auto-classifies C → B → A → VHR.
               </p>
               <div className="space-y-2.5">
                 {MODIFIER_KEYS.map((key) => (
                   <label key={key} className="flex cursor-pointer items-start gap-3">
-                    <Checkbox
-                      checked={modChecked[key]}
-                      onCheckedChange={() => toggleMod(key)}
-                      className="mt-0.5"
-                    />
+                    <Checkbox checked={modChecked[key]} onCheckedChange={() => toggleMod(key)} className="mt-0.5" />
                     <span className="text-sm leading-snug text-foreground">{MODIFIER_LABELS[key]}</span>
                   </label>
                 ))}
               </div>
               <div className="mt-3 rounded-lg bg-muted/50 px-3 py-2">
                 <p className="text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground">Polyvascular disease:</span> Atherosclerosis in ≥2 major arterial territories — coronary (CAD), cerebrovascular (ischemic stroke/TIA), and/or peripheral arterial disease (PAD). Presence significantly elevates cardiovascular risk.
+                  <span className="font-semibold text-foreground">Polyvascular disease:</span> Atherosclerosis in ≥2 major arterial territories — coronary (CAD), cerebrovascular (ischemic stroke/TIA), and/or peripheral arterial disease (PAD).
                 </p>
               </div>
-            </Card>
+            </Section>
 
-            {/* ─── Predicted Category (live) ─── */}
+            {/* ── Section 6: Classification Result ── */}
             <Card className={`border-border bg-card overflow-hidden`}>
-              <div className={`px-5 py-4 ${
-                result
-                  ? catColor === "warning" ? "bg-warning/10" : "bg-danger/10"
-                  : "bg-muted/30"
-              }`}>
+              <div className={`px-5 py-4 ${result ? (catColor === "warning" ? "bg-warning/10" : "bg-danger/10") : "bg-muted/30"}`}>
                 <div className="flex items-center justify-between">
-                  <div className={`flex items-center gap-2 font-display font-bold ${
-                    result
-                      ? catColor === "warning" ? "text-warning" : "text-danger"
-                      : "text-muted-foreground"
-                  }`}>
+                  <div className={`flex items-center gap-2 font-display font-bold ${result ? (catColor === "warning" ? "text-warning" : "text-danger") : "text-muted-foreground"}`}>
                     {result ? <AlertTriangle className="h-5 w-5" /> : <ShieldCheck className="h-5 w-5" />}
                     {result ? result.category : "Unclassified"}
                   </div>
@@ -823,27 +689,21 @@ export default function LipidCalculator() {
                   )}
                 </div>
               </div>
-
               <div className="p-5 space-y-4">
                 {result ? (
                   <>
-                    {/* Targets */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">LDL-C Target</p>
-                        <p className="mt-1 font-display text-lg font-bold text-foreground">{result.ldlTarget}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Non-HDL-C Target</p>
-                        <p className="mt-1 font-display text-lg font-bold text-foreground">{result.nonHdlTarget}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">ApoB Target</p>
-                        <p className="mt-1 font-display text-lg font-bold text-foreground">{result.apoBTarget}</p>
-                      </div>
+                      {[
+                        { label: "LDL-C Target", value: result.ldlTarget },
+                        { label: "Non-HDL-C Target", value: result.nonHdlTarget },
+                        { label: "ApoB Target", value: result.apoBTarget },
+                      ].map((t) => (
+                        <div key={t.label}>
+                          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.label}</p>
+                          <p className="mt-1 font-display text-lg font-bold text-foreground">{t.value}</p>
+                        </div>
+                      ))}
                     </div>
-
-                    {/* Goal indicators */}
                     {(ldlAtGoal !== null || nonHdlAtGoal !== null || apoBAtGoal !== null) && (
                       <div className="space-y-2">
                         {ldlAtGoal !== null && <GoalIndicator label={`LDL-C (${ldl} mg/dL)`} atGoal={ldlAtGoal} />}
@@ -851,18 +711,12 @@ export default function LipidCalculator() {
                         {apoBAtGoal !== null && <GoalIndicator label={`ApoB (${apob} mg/dL)`} atGoal={apoBAtGoal} />}
                       </div>
                     )}
-
-                    {/* Rationale */}
                     {result.why.length > 0 && (
                       <div className="rounded-lg bg-muted/50 px-4 py-3 space-y-1">
                         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rationale</p>
-                        {result.why.map((w, i) => (
-                          <p key={i} className="text-sm text-foreground">{w}</p>
-                        ))}
+                        {result.why.map((w, i) => <p key={i} className="text-sm text-foreground">{w}</p>)}
                       </div>
                     )}
-
-                    {/* Treatment */}
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Treatment Algorithm</p>
                       <ul className="space-y-2">
@@ -874,34 +728,24 @@ export default function LipidCalculator() {
                         ))}
                       </ul>
                     </div>
-
                     {result.category === "Extreme Risk A" && (
-                      <p className="text-xs text-muted-foreground italic">
-                        *The LDL-C goal of ≤30 mg/dL must be pursued after detailed risk–benefit discussion.
-                      </p>
+                      <p className="text-xs text-muted-foreground italic">*The LDL-C goal of ≤30 mg/dL must be pursued after detailed risk–benefit discussion.</p>
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-2">
-                    <p className="text-sm text-muted-foreground">
-                      Enter data or tick criteria to classify the patient.
-                    </p>
-                  </div>
+                  <p className="text-sm text-muted-foreground text-center py-2">Enter data or tick criteria to classify the patient.</p>
                 )}
               </div>
             </Card>
 
-            {/* Decision logic & Bucket summary */}
-            <Card className="border-border bg-card p-5">
-              <h2 className="font-display text-sm font-bold text-foreground mb-2">Decision Logic</h2>
+            {/* ── Section 7: Decision Logic ── */}
+            <Section title="Decision Logic & Bucket Summary" icon={<Target className="h-4 w-4 text-primary" />} defaultOpen={false}>
               <ol className="list-decimal ml-5 space-y-1 text-sm text-foreground mb-4">
                 <li>Check Category C first: ongoing ASCVD sequelae despite LDL-C ≤30 and intensive therapy.</li>
                 <li>Then Category B: CAD plus very-high-risk features or recurrent events despite LDL-C &lt;50.</li>
                 <li>Then Category A: ASCVD or equivalent burden with diabetes, FH, CKD, Lp(a), stroke, PAD, polyvascular disease, or high calcium/plaque burden.</li>
                 <li>If not extreme-risk, label Very High Risk when established ASCVD, homozygous FH, or diabetes with ≥3 major RF / target-organ damage is present.</li>
               </ol>
-
-              <h2 className="font-display text-sm font-bold text-foreground mb-2">Bucket Summary</h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -922,11 +766,10 @@ export default function LipidCalculator() {
                   </tbody>
                 </table>
               </div>
-            </Card>
+            </Section>
 
-            {/* ─── EMR Note ─── */}
-            <Card className="border-border bg-card p-5">
-              <h2 className="font-display text-sm font-bold text-foreground mb-2">EMR Note</h2>
+            {/* ── Section 8: EMR Note ── */}
+            <Section title="EMR Note" icon={<FileText className="h-4 w-4 text-primary" />}>
               <textarea
                 readOnly
                 value={generateNote()}
@@ -941,7 +784,7 @@ export default function LipidCalculator() {
                   <RotateCcw className="h-4 w-4" /> Reset
                 </Button>
               </div>
-            </Card>
+            </Section>
           </div>
         )}
 
@@ -949,7 +792,7 @@ export default function LipidCalculator() {
         {activeTab === "flowchart" && <ClinicalGuidance />}
         {activeTab === "education" && <EducationSection />}
 
-        <p className="mt-8 text-center text-xs text-muted-foreground">
+        <p className="mt-8 text-center text-xs text-muted-foreground pb-6">
           Reference: Lipid Association of India 2023 Update — Consensus Statement IV
         </p>
       </div>
@@ -959,9 +802,7 @@ export default function LipidCalculator() {
 
 function GoalIndicator({ label, atGoal }: { label: string; atGoal: boolean }) {
   return (
-    <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${
-      atGoal ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
-    }`}>
+    <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${atGoal ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}>
       {atGoal ? <ShieldCheck className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
       {label} — {atGoal ? "At goal" : "Above target"}
     </div>
