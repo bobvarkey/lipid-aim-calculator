@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { ShieldCheck, AlertTriangle, Heart, Activity } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ShieldCheck, AlertTriangle, Heart, Activity, Square, CheckSquare } from "lucide-react";
 
 const STEPS = [
   {
@@ -49,7 +51,64 @@ const RISK_TIERS = [
   { risk: "High (≥20%)", ldl: "<55 mg/dL", color: "text-danger", bg: "bg-danger/10" },
 ];
 
+// ─── Diabetes checklist items ───
+const DM_CHECKLIST = [
+  { id: "dm_baseline", label: "Diabetes mellitus (baseline)", target: "<70 mg/dL" },
+  { id: "dm_tod", label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL" },
+  { id: "dm_ascvd", label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (optional)" },
+  { id: "dm_ascvd_tod", label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL" },
+];
+
+// ─── ACS checklist ───
+const ACS_CHECKLIST = [
+  { id: "acs_ldl50", label: "All ASCVD patients must achieve LDL-C <50 mg/dL" },
+  { id: "acs_recurrent", label: "Recurrent ACS or polyvascular disease (Extreme Risk B): target ≤30 mg/dL" },
+  { id: "acs_triage", label: "Lipid profile at emergency triage, repeat within 2 weeks of initiating therapy" },
+  { id: "acs_combo", label: "Start combination therapy (high-intensity statin + ezetimibe) at presentation to ED" },
+  { id: "acs_intensify", label: "Intensify every 2 weeks until goals achieved, preferably by week 4" },
+];
+
+// ─── High-risk features checklist ───
+const HIGHRISK_CHECKLIST = [
+  { id: "hr_nafld", label: "Nonalcoholic fatty liver disease with fibrosis grades II and III" },
+  { id: "hr_metsyn", label: "Metabolic syndrome" },
+  { id: "hr_ckd", label: "Chronic kidney disease stage 3B/4" },
+  { id: "hr_apob", label: "ApoB >130 mg/dL" },
+  { id: "hr_lpa", label: "Lp(a) ≥50 mg/dL" },
+  { id: "hr_cac", label: "CAC score 1–99 but <75th percentile for age, gender, and ethnic group" },
+  { id: "hr_extreme", label: "Extreme elevation of a single risk factor" },
+];
+
+// ─── Risk modifiers checklist ───
+const MODIFIER_CHECKLIST = [
+  { id: "rm_tg", label: "Elevated TG (fasting >150 or nonfasting >175 mg/dL)" },
+  { id: "rm_lpa", label: "Lp(a) 20–49 mg/dL" },
+  { id: "rm_waist", label: "Increased waist circumference (>90 cm ♂, >80 cm ♀)" },
+  { id: "rm_ifg", label: "Impaired fasting glucose (100–125 mg/dL)" },
+  { id: "rm_crp", label: "hsCRP >2 mg/L" },
+  { id: "rm_air", label: "Air pollution exposure" },
+  { id: "rm_joint", label: "Inflammatory joint diseases" },
+  { id: "rm_meno", label: "Premature menopause" },
+  { id: "rm_preeclampsia", label: "Preeclampsia / Gestational diabetes" },
+  { id: "rm_pcos", label: "Polycystic ovary syndrome" },
+  { id: "rm_prs", label: "High polygenic risk score" },
+  { id: "rm_hiv", label: "HIV infection" },
+];
+
 export default function PrimaryPrevention() {
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+
+  const toggle = (id: string) =>
+    setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const countChecked = (items: { id: string }[]) =>
+    items.filter((i) => checked[i.id]).length;
+
+  const dmCount = countChecked(DM_CHECKLIST);
+  const acsCount = countChecked(ACS_CHECKLIST);
+  const hrCount = countChecked(HIGHRISK_CHECKLIST);
+  const rmCount = countChecked(MODIFIER_CHECKLIST);
+
   return (
     <div className="space-y-4">
       {/* LDL-C Targets by 10-Year Risk */}
@@ -93,60 +152,80 @@ export default function PrimaryPrevention() {
         </Card>
       ))}
 
-      {/* Diabetes Day-1 Treatment */}
+      {/* ─── Diabetes Day-1 Treatment (Checklist) ─── */}
       <Card className="border-border bg-card p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Heart className="h-4 w-4 text-danger" />
-          <h3 className="font-display text-sm font-bold text-foreground">
-            Diabetes & Dyslipidemia — Day 1 Treatment
-          </h3>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <Heart className="h-4 w-4 text-danger" />
+            <h3 className="font-display text-sm font-bold text-foreground">
+              Diabetes & Dyslipidemia — Day 1 Treatment
+            </h3>
+          </div>
+          {dmCount > 0 && (
+            <span className="rounded-full bg-danger/15 px-2 py-0.5 text-[10px] font-bold text-danger">
+              {dmCount}/{DM_CHECKLIST.length}
+            </span>
+          )}
         </div>
-        <p className="text-sm text-foreground leading-relaxed mb-3">
-          All patients with diabetes mellitus should be initiated on dyslipidemia treatment <strong>on day 1 of diagnosis</strong>. Targets must be attained by <strong>week 12</strong>.
+        <p className="text-xs text-muted-foreground mb-3">
+          Initiate dyslipidemia treatment <strong className="text-foreground">on day 1</strong> of diagnosis. Targets must be attained by <strong className="text-foreground">week 12</strong>.
         </p>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Scenario</th>
-                <th className="text-left py-2 font-semibold text-muted-foreground">LDL-C Target</th>
-              </tr>
-            </thead>
-            <tbody className="text-foreground">
-              <tr className="border-b border-border/50">
-                <td className="py-2 pr-3">Diabetes mellitus (baseline)</td>
-                <td className="py-2 font-semibold">&lt;70 mg/dL</td>
-              </tr>
-              <tr className="border-b border-border/50">
-                <td className="py-2 pr-3">Diabetes + target organ damage or ≥2 major ASCVD RF</td>
-                <td className="py-2 font-semibold">&lt;50 mg/dL</td>
-              </tr>
-              <tr className="border-b border-border/50">
-                <td className="py-2 pr-3">Diabetes + ASCVD (Extreme Risk A)</td>
-                <td className="py-2 font-semibold">≤30 mg/dL (optional)</td>
-              </tr>
-              <tr>
-                <td className="py-2 pr-3">ASCVD + Diabetes with TOD or ≥2 major ASCVD RF</td>
-                <td className="py-2 font-semibold">≤30 mg/dL</td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="space-y-2">
+          {DM_CHECKLIST.map((item) => (
+            <label
+              key={item.id}
+              className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                checked[item.id] ? "bg-danger/8 ring-1 ring-danger/20" : "hover:bg-muted/50"
+              }`}
+            >
+              <Checkbox
+                checked={!!checked[item.id]}
+                onCheckedChange={() => toggle(item.id)}
+                className="mt-0.5"
+              />
+              <div className="flex-1 min-w-0">
+                <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                <span className={`ml-2 inline-block rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold ${
+                  checked[item.id] ? "bg-danger/15 text-danger" : "text-muted-foreground"
+                }`}>
+                  {item.target}
+                </span>
+              </div>
+            </label>
+          ))}
         </div>
       </Card>
 
-      {/* ASCVD & ACS Management */}
+      {/* ─── ASCVD & ACS Management (Checklist) ─── */}
       <Card className="border-border bg-card p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Activity className="h-4 w-4 text-primary" />
-          <h3 className="font-display text-sm font-bold text-foreground">ASCVD & ACS Management</h3>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <Activity className="h-4 w-4 text-primary" />
+            <h3 className="font-display text-sm font-bold text-foreground">ASCVD & ACS Management</h3>
+          </div>
+          {acsCount > 0 && (
+            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">
+              {acsCount}/{ACS_CHECKLIST.length}
+            </span>
+          )}
         </div>
-        <ul className="space-y-2 text-sm text-foreground leading-relaxed">
-          <li>• All ASCVD patients must achieve <strong>LDL-C &lt;50 mg/dL</strong>.</li>
-          <li>• Recurrent ACS or polyvascular disease (Extreme Risk B): target <strong>≤30 mg/dL</strong>.</li>
-          <li>• In ACS: lipid profile at <strong>emergency triage</strong>, repeat within <strong>2 weeks</strong> of initiating therapy.</li>
-          <li>• Start <strong>combination therapy</strong> (high-intensity statin + ezetimibe) at presentation to ED.</li>
-          <li>• Intensify every <strong>2 weeks</strong> until goals achieved, preferably by <strong>week 4</strong>.</li>
-        </ul>
+        <div className="space-y-2 mt-3">
+          {ACS_CHECKLIST.map((item) => (
+            <label
+              key={item.id}
+              className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                checked[item.id] ? "bg-primary/8 ring-1 ring-primary/20" : "hover:bg-muted/50"
+              }`}
+            >
+              <Checkbox
+                checked={!!checked[item.id]}
+                onCheckedChange={() => toggle(item.id)}
+                className="mt-0.5"
+              />
+              <span className="text-sm leading-snug text-foreground">{item.label}</span>
+            </label>
+          ))}
+        </div>
       </Card>
 
       {/* Subclinical Atherosclerosis */}
@@ -154,42 +233,67 @@ export default function PrimaryPrevention() {
         <strong>Subclinical Atherosclerosis:</strong> Any form — including nonobstructive carotid, femoral, or coronary plaques or ABI &lt;0.9 — is considered <strong>equivalent to ASCVD</strong>, with similar LDL-C targets as for clinically manifest ASCVD.
       </div>
 
-      {/* High-Risk Features */}
+      {/* ─── High-Risk Features (Checklist) ─── */}
       <Card className="border-border bg-card p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <AlertTriangle className="h-4 w-4 text-warning" />
-          <h3 className="font-display text-sm font-bold text-foreground">High-Risk Features (LDL-C Target &lt;70 mg/dL)</h3>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-warning" />
+            <h3 className="font-display text-sm font-bold text-foreground">High-Risk Features (LDL-C Target &lt;70 mg/dL)</h3>
+          </div>
+          {hrCount > 0 && (
+            <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[10px] font-bold text-warning">
+              {hrCount}/{HIGHRISK_CHECKLIST.length}
+            </span>
+          )}
         </div>
-        <ul className="space-y-1.5 text-sm text-foreground leading-relaxed">
-          <li>• Nonalcoholic fatty liver disease with fibrosis grades II and III</li>
-          <li>• Metabolic syndrome</li>
-          <li>• Chronic kidney disease stage 3B/4</li>
-          <li>• ApoB &gt;130 mg/dL</li>
-          <li>• Lp(a) ≥50 mg/dL</li>
-          <li>• CAC score 1–99 but &lt;75th percentile for age, gender, and ethnic group</li>
-          <li>• Extreme elevation of a single risk factor</li>
-        </ul>
+        <div className="space-y-2 mt-3">
+          {HIGHRISK_CHECKLIST.map((item) => (
+            <label
+              key={item.id}
+              className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                checked[item.id] ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50"
+              }`}
+            >
+              <Checkbox
+                checked={!!checked[item.id]}
+                onCheckedChange={() => toggle(item.id)}
+                className="mt-0.5"
+              />
+              <span className="text-sm leading-snug text-foreground">{item.label}</span>
+            </label>
+          ))}
+        </div>
       </Card>
 
-      {/* Risk Modifiers */}
+      {/* ─── Risk Modifiers (Checklist) ─── */}
       <Card className="border-border bg-card p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Activity className="h-4 w-4 text-primary" />
-          <h3 className="font-display text-sm font-bold text-foreground">Risk Modifiers (May Upgrade Low/Moderate → Higher Risk)</h3>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <Activity className="h-4 w-4 text-primary" />
+            <h3 className="font-display text-sm font-bold text-foreground">Risk Modifiers (May Upgrade Low/Moderate → Higher Risk)</h3>
+          </div>
+          {rmCount > 0 && (
+            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">
+              {rmCount}/{MODIFIER_CHECKLIST.length}
+            </span>
+          )}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-foreground leading-relaxed">
-          <span>• Elevated TG (fasting &gt;150 or nonfasting &gt;175 mg/dL)</span>
-          <span>• Lp(a) 20–49 mg/dL</span>
-          <span>• Increased waist circumference (&gt;90 cm ♂, &gt;80 cm ♀)</span>
-          <span>• Impaired fasting glucose (100–125 mg/dL)</span>
-          <span>• hsCRP &gt;2 mg/L</span>
-          <span>• Air pollution exposure</span>
-          <span>• Inflammatory joint diseases</span>
-          <span>• Premature menopause</span>
-          <span>• Preeclampsia / Gestational diabetes</span>
-          <span>• Polycystic ovary syndrome</span>
-          <span>• High polygenic risk score</span>
-          <span>• HIV infection</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+          {MODIFIER_CHECKLIST.map((item) => (
+            <label
+              key={item.id}
+              className={`flex cursor-pointer items-start gap-2.5 rounded-lg px-3 py-2 transition-colors ${
+                checked[item.id] ? "bg-primary/8 ring-1 ring-primary/20" : "hover:bg-muted/50"
+              }`}
+            >
+              <Checkbox
+                checked={!!checked[item.id]}
+                onCheckedChange={() => toggle(item.id)}
+                className="mt-0.5"
+              />
+              <span className="text-sm leading-snug text-foreground">{item.label}</span>
+            </label>
+          ))}
         </div>
       </Card>
     </div>
