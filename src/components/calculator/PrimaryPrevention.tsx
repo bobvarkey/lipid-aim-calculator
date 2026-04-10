@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ShieldCheck, AlertTriangle, Heart, Activity, Square, CheckSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { ShieldCheck, AlertTriangle, Heart, Activity, Copy, FileText, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 const STEPS = [
   {
@@ -95,8 +98,39 @@ const MODIFIER_CHECKLIST = [
   { id: "rm_hiv", label: "HIV infection" },
 ];
 
+// ─── Risk upgrade interpretation ───
+function getRiskUpgradeInterpretation(hrCount: number, rmCount: number) {
+  const total = hrCount + rmCount;
+  let severity: "none" | "mild" | "moderate" | "high" = "none";
+  let message = "";
+  let recommendation = "";
+
+  if (total === 0) {
+    severity = "none";
+    message = "No high-risk features or risk modifiers identified.";
+    recommendation = "Standard risk-based management per baseline ASCVD risk tier.";
+  } else if (total === 1) {
+    severity = "mild";
+    message = `1 risk factor identified (${hrCount} high-risk, ${rmCount} modifier). A single significant modifier can tip borderline risk (5–7.5%) toward statin initiation.`;
+    recommendation = "Consider moderate-intensity statin if borderline 10-year ASCVD risk. Discuss shared decision-making with patient.";
+  } else if (total >= 2 && total <= 3) {
+    severity = "moderate";
+    message = `${total} risk factors identified (${hrCount} high-risk, ${rmCount} modifiers). ≥2 factors more reliably upgrade intermediate risk (7.5–20%) to higher categories.`;
+    recommendation = "Strongly consider moderate-to-high intensity statin. Target LDL-C <70 mg/dL. Studies show clusters of ≥2 metabolic modifiers double event rates.";
+  } else {
+    severity = "high";
+    message = `${total} risk factors identified (${hrCount} high-risk, ${rmCount} modifiers). Multiple compounding factors amplify ASCVD risk synergistically beyond individual prediction.`;
+    recommendation = "Aggressive lipid-lowering therapy warranted. Target LDL-C <70 mg/dL (consider <55 mg/dL). Initiate high-intensity statin ± ezetimibe. Consider CAC or ABI testing to further refine risk.";
+  }
+
+  return { severity, message, recommendation, total };
+}
+
 export default function PrimaryPrevention() {
   const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const [noteEdited, setNoteEdited] = useState(false);
+  const [customNote, setCustomNote] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const toggle = (id: string) =>
     setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -108,6 +142,81 @@ export default function PrimaryPrevention() {
   const acsCount = countChecked(ACS_CHECKLIST);
   const hrCount = countChecked(HIGHRISK_CHECKLIST);
   const rmCount = countChecked(MODIFIER_CHECKLIST);
+
+  const riskInfo = useMemo(() => getRiskUpgradeInterpretation(hrCount, rmCount), [hrCount, rmCount]);
+
+  // ─── Generate exportable note ───
+  const generatedNote = useMemo(() => {
+    const lines: string[] = [];
+    lines.push("═══ PRIMARY PREVENTION — CLINICAL SUMMARY ═══");
+    lines.push(`Date: ${new Date().toLocaleDateString()}`);
+    lines.push("");
+
+    // Diabetes section
+    const dmChecked = DM_CHECKLIST.filter((i) => checked[i.id]);
+    if (dmChecked.length > 0) {
+      lines.push("▸ DIABETES & DYSLIPIDEMIA — Day 1 Treatment:");
+      dmChecked.forEach((i) => lines.push(`  ✓ ${i.label} → Target: ${i.target}`));
+      lines.push("");
+    }
+
+    // ACS section
+    const acsChecked = ACS_CHECKLIST.filter((i) => checked[i.id]);
+    if (acsChecked.length > 0) {
+      lines.push("▸ ASCVD & ACS MANAGEMENT:");
+      acsChecked.forEach((i) => lines.push(`  ✓ ${i.label}`));
+      lines.push("");
+    }
+
+    // High-risk features
+    const hrChecked = HIGHRISK_CHECKLIST.filter((i) => checked[i.id]);
+    if (hrChecked.length > 0) {
+      lines.push(`▸ HIGH-RISK FEATURES (${hrChecked.length}/${HIGHRISK_CHECKLIST.length}):`);
+      hrChecked.forEach((i) => lines.push(`  ✓ ${i.label}`));
+      lines.push("");
+    }
+
+    // Risk modifiers
+    const rmChecked = MODIFIER_CHECKLIST.filter((i) => checked[i.id]);
+    if (rmChecked.length > 0) {
+      lines.push(`▸ RISK MODIFIERS (${rmChecked.length}/${MODIFIER_CHECKLIST.length}):`);
+      rmChecked.forEach((i) => lines.push(`  ✓ ${i.label}`));
+      lines.push("");
+    }
+
+    // Interpretation
+    lines.push("▸ RISK UPGRADE ASSESSMENT:");
+    lines.push(`  Combined risk factors: ${riskInfo.total} (${hrCount} high-risk features, ${rmCount} modifiers)`);
+    lines.push(`  Interpretation: ${riskInfo.message}`);
+    lines.push(`  Recommendation: ${riskInfo.recommendation}`);
+    lines.push("");
+
+    // Guideline references
+    lines.push("▸ GUIDELINE FRAMEWORK:");
+    lines.push("  • ACC/AHA: ≥1 risk-enhancing factor supports moderate-intensity statin for borderline/intermediate risk.");
+    lines.push("  • ESC/SCORE2: 1–2 modifiers commonly suffice for reclassification; >4 risks overestimation.");
+    lines.push("  • Practical: ≥2 metabolic modifiers alongside high-risk features double event rates.");
+    lines.push("  • If uncertainty persists, discuss CAC scoring or ABI testing.");
+
+    if (dmChecked.length === 0 && acsChecked.length === 0 && hrChecked.length === 0 && rmChecked.length === 0) {
+      return "No checklist items selected. Complete the checklists above to generate a clinical summary note.";
+    }
+
+    return lines.join("\n");
+  }, [checked, riskInfo, hrCount, rmCount]);
+
+  const displayNote = noteEdited ? customNote : generatedNote;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(displayNote);
+      setCopied(true);
+      toast.success("Note copied to clipboard");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Failed to copy");
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -278,7 +387,10 @@ export default function PrimaryPrevention() {
             </span>
           )}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+        <p className="text-xs text-muted-foreground mt-1 mb-3">
+          No fixed number required — even 1 significant modifier can tip borderline risk toward statin initiation, while ≥2 more reliably upgrade intermediate risk.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {MODIFIER_CHECKLIST.map((item) => (
             <label
               key={item.id}
@@ -295,6 +407,88 @@ export default function PrimaryPrevention() {
             </label>
           ))}
         </div>
+      </Card>
+
+      {/* ─── Risk Upgrade Interpretation ─── */}
+      <Card className={`border-border bg-card p-5 ${
+        riskInfo.severity === "high" ? "ring-1 ring-danger/30" :
+        riskInfo.severity === "moderate" ? "ring-1 ring-warning/30" :
+        riskInfo.severity === "mild" ? "ring-1 ring-primary/30" : ""
+      }`}>
+        <div className="flex items-center gap-2 mb-3">
+          <AlertTriangle className={`h-4 w-4 ${
+            riskInfo.severity === "high" ? "text-danger" :
+            riskInfo.severity === "moderate" ? "text-warning" :
+            riskInfo.severity === "mild" ? "text-primary" : "text-muted-foreground"
+          }`} />
+          <h3 className="font-display text-sm font-bold text-foreground">
+            Compounding Risk Assessment
+          </h3>
+          {riskInfo.total > 0 && (
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+              riskInfo.severity === "high" ? "bg-danger/15 text-danger" :
+              riskInfo.severity === "moderate" ? "bg-warning/15 text-warning" :
+              "bg-primary/15 text-primary"
+            }`}>
+              {riskInfo.total} factor{riskInfo.total !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
+
+        <div className={`rounded-lg px-4 py-3 mb-3 ${
+          riskInfo.severity === "high" ? "bg-danger/8" :
+          riskInfo.severity === "moderate" ? "bg-warning/8" :
+          riskInfo.severity === "mild" ? "bg-primary/8" : "bg-muted/50"
+        }`}>
+          <p className="text-sm text-foreground leading-relaxed">{riskInfo.message}</p>
+          <p className="text-sm text-foreground leading-relaxed mt-2 font-medium">{riskInfo.recommendation}</p>
+        </div>
+
+        <div className="space-y-2 text-xs text-muted-foreground">
+          <p><strong className="text-foreground">ACC/AHA:</strong> ≥1 risk-enhancing factor supports moderate-intensity statin for borderline/intermediate risk. Multiple enhancers strengthen the decision without a numeric cutoff.</p>
+          <p><strong className="text-foreground">ESC/SCORE2:</strong> 1–2 modifiers commonly suffice for reclassification; &gt;4 risks overestimation.</p>
+          <p><strong className="text-foreground">Practical:</strong> ≥2 metabolic modifiers alongside high-risk features double event rates. Consider CAC or ABI testing if uncertainty persists.</p>
+        </div>
+      </Card>
+
+      {/* ─── Exportable Clinical Note ─── */}
+      <Card className="border-border bg-card p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <FileText className="h-4 w-4 text-primary" />
+            <h3 className="font-display text-sm font-bold text-foreground">Exportable Clinical Note</h3>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopy}
+            className="gap-1.5 text-xs"
+          >
+            {copied ? <CheckCircle2 className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? "Copied" : "Copy Note"}
+          </Button>
+        </div>
+        <Textarea
+          value={displayNote}
+          onChange={(e) => {
+            setNoteEdited(true);
+            setCustomNote(e.target.value);
+          }}
+          className="font-mono text-xs leading-relaxed min-h-[280px] bg-muted/30 border-border"
+        />
+        {noteEdited && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mt-2 text-xs text-muted-foreground"
+            onClick={() => {
+              setNoteEdited(false);
+              setCustomNote("");
+            }}
+          >
+            Reset to auto-generated note
+          </Button>
+        )}
       </Card>
     </div>
   );
