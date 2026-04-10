@@ -226,7 +226,7 @@ export default function PrimaryPrevention() {
     }
 
     return lines.join("\n");
-  }, [checked, riskInfo, hrCount, rmCount]);
+  }, [checked, riskInfo, hrCount, rmCount, msCount, metsynMet]);
 
   const displayNote = noteEdited ? customNote : generatedNote;
 
