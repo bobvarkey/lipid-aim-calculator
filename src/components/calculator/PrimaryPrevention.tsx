@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ShieldCheck, AlertTriangle, Heart, Activity, Square, CheckSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { ShieldCheck, AlertTriangle, Heart, Activity, Copy, FileText, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 const STEPS = [
   {
