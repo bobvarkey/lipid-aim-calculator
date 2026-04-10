@@ -185,10 +185,17 @@ export default function PrimaryPrevention() {
     }
 
     // High-risk features
-    const hrChecked = HIGHRISK_CHECKLIST.filter((i) => checked[i.id]);
+    const hrChecked = HIGHRISK_CHECKLIST.filter((i) => checked[i.id] || (i.id === "hr_metsyn" && metsynMet));
     if (hrChecked.length > 0) {
       lines.push(`▸ HIGH-RISK FEATURES (${hrChecked.length}/${HIGHRISK_CHECKLIST.length}):`);
-      hrChecked.forEach((i) => lines.push(`  ✓ ${i.label}`));
+      hrChecked.forEach((i) => {
+        lines.push(`  ✓ ${i.label}`);
+        if (i.id === "hr_metsyn") {
+          const msChecked = METSYN_CRITERIA.filter((m) => checked[m.id]);
+          lines.push(`    Sub-criteria met (${msCount}/5 — ≥3 required):`);
+          msChecked.forEach((m) => lines.push(`      • ${m.label}`));
+        }
+      });
       lines.push("");
     }
 
