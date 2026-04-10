@@ -71,6 +71,15 @@ const ACS_CHECKLIST = [
   { id: "acs_intensify", label: "Intensify every 2 weeks until goals achieved, preferably by week 4" },
 ];
 
+// ─── Metabolic Syndrome sub-criteria (≥3 required) ───
+const METSYN_CRITERIA = [
+  { id: "ms_waist", label: "Large waistline — >40 in (102 cm) ♂, >35 in (88 cm) ♀" },
+  { id: "ms_tg", label: "High triglycerides — ≥150 mg/dL (1.7 mmol/L) or on TG medication" },
+  { id: "ms_hdl", label: "Low HDL — <40 mg/dL (1.0 mmol/L) ♂, <50 mg/dL (1.3 mmol/L) ♀, or on HDL medication" },
+  { id: "ms_bp", label: "High blood pressure — ≥130 systolic or ≥85 diastolic, or on antihypertensive" },
+  { id: "ms_glucose", label: "High fasting glucose — ≥100 mg/dL (5.6 mmol/L) or on glucose-lowering medication" },
+];
+
 // ─── High-risk features checklist ───
 const HIGHRISK_CHECKLIST = [
   { id: "hr_nafld", label: "Nonalcoholic fatty liver disease with fibrosis grades II and III" },
@@ -140,7 +149,14 @@ export default function PrimaryPrevention() {
 
   const dmCount = countChecked(DM_CHECKLIST);
   const acsCount = countChecked(ACS_CHECKLIST);
-  const hrCount = countChecked(HIGHRISK_CHECKLIST);
+  const msCount = countChecked(METSYN_CRITERIA);
+  const metsynMet = msCount >= 3;
+
+  // Auto-check/uncheck hr_metsyn based on sub-criteria
+  const hrCountRaw = countChecked(HIGHRISK_CHECKLIST);
+  const hrCount = metsynMet
+    ? (checked["hr_metsyn"] ? hrCountRaw : hrCountRaw + 1)
+    : (checked["hr_metsyn"] ? hrCountRaw - 1 : hrCountRaw);
   const rmCount = countChecked(MODIFIER_CHECKLIST);
 
   const riskInfo = useMemo(() => getRiskUpgradeInterpretation(hrCount, rmCount), [hrCount, rmCount]);
@@ -169,10 +185,17 @@ export default function PrimaryPrevention() {
     }
 
     // High-risk features
-    const hrChecked = HIGHRISK_CHECKLIST.filter((i) => checked[i.id]);
+    const hrChecked = HIGHRISK_CHECKLIST.filter((i) => checked[i.id] || (i.id === "hr_metsyn" && metsynMet));
     if (hrChecked.length > 0) {
       lines.push(`▸ HIGH-RISK FEATURES (${hrChecked.length}/${HIGHRISK_CHECKLIST.length}):`);
-      hrChecked.forEach((i) => lines.push(`  ✓ ${i.label}`));
+      hrChecked.forEach((i) => {
+        lines.push(`  ✓ ${i.label}`);
+        if (i.id === "hr_metsyn") {
+          const msChecked = METSYN_CRITERIA.filter((m) => checked[m.id]);
+          lines.push(`    Sub-criteria met (${msCount}/5 — ≥3 required):`);
+          msChecked.forEach((m) => lines.push(`      • ${m.label}`));
+        }
+      });
       lines.push("");
     }
 
@@ -203,7 +226,7 @@ export default function PrimaryPrevention() {
     }
 
     return lines.join("\n");
-  }, [checked, riskInfo, hrCount, rmCount]);
+  }, [checked, riskInfo, hrCount, rmCount, msCount, metsynMet]);
 
   const displayNote = noteEdited ? customNote : generatedNote;
 
@@ -357,19 +380,66 @@ export default function PrimaryPrevention() {
         </div>
         <div className="space-y-2 mt-3">
           {HIGHRISK_CHECKLIST.map((item) => (
-            <label
-              key={item.id}
-              className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                checked[item.id] ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50"
-              }`}
-            >
-              <Checkbox
-                checked={!!checked[item.id]}
-                onCheckedChange={() => toggle(item.id)}
-                className="mt-0.5"
-              />
-              <span className="text-sm leading-snug text-foreground">{item.label}</span>
-            </label>
+            <div key={item.id}>
+              <label
+                className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                  item.id === "hr_metsyn"
+                    ? (metsynMet ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50")
+                    : (checked[item.id] ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50")
+                }`}
+              >
+                {item.id === "hr_metsyn" ? (
+                  <>
+                    <Checkbox
+                      checked={metsynMet}
+                      disabled
+                      className="mt-0.5"
+                    />
+                    <div className="flex-1">
+                      <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                      <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                        metsynMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                      }`}>
+                        {msCount}/5 — {metsynMet ? "Criteria Met ✓" : "≥3 required"}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Checkbox
+                      checked={!!checked[item.id]}
+                      onCheckedChange={() => toggle(item.id)}
+                      className="mt-0.5"
+                    />
+                    <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                  </>
+                )}
+              </label>
+
+              {/* Metabolic Syndrome sub-checklist */}
+              {item.id === "hr_metsyn" && (
+                <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                  <p className="text-xs font-semibold text-muted-foreground mb-2">
+                    Diagnostic Criteria (at least 3 of 5 required):
+                  </p>
+                  {METSYN_CRITERIA.map((ms) => (
+                    <label
+                      key={ms.id}
+                      className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                        checked[ms.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                      }`}
+                    >
+                      <Checkbox
+                        checked={!!checked[ms.id]}
+                        onCheckedChange={() => toggle(ms.id)}
+                        className="mt-0.5"
+                      />
+                      <span className="text-sm leading-snug text-foreground">{ms.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </Card>
