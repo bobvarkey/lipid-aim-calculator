@@ -473,7 +473,12 @@ export default function PrimaryPrevention() {
                 onCheckedChange={() => toggle(item.id)}
                 className="mt-0.5"
               />
-              <span className="text-sm leading-snug text-foreground">{item.label}</span>
+              <div className="flex-1 min-w-0">
+                <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                {item.qualifier && (
+                  <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
+                )}
+              </div>
             </label>
           ))}
         </div>
