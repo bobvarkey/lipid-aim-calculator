@@ -88,7 +88,7 @@ const HIGHRISK_CHECKLIST = [
   { id: "hr_apob", label: "ApoB >130 mg/dL" },
   { id: "hr_lpa", label: "Lp(a) ≥50 mg/dL" },
   { id: "hr_cac", label: "CAC score 1–99 but <75th percentile for age, gender, and ethnic group" },
-  { id: "hr_extreme", label: "Extreme elevation of a single risk factor" },
+  { id: "hr_extreme", label: "Extreme elevation of a single risk factor", qualifier: "e.g., LDL-C ≥190 mg/dL, TG ≥500 mg/dL, BP ≥180/120 mmHg, or A1c ≥10%" },
 ];
 
 // ─── Risk modifiers checklist ───
@@ -99,11 +99,11 @@ const MODIFIER_CHECKLIST = [
   { id: "rm_ifg", label: "Impaired fasting glucose (100–125 mg/dL)" },
   { id: "rm_crp", label: "hsCRP >2 mg/L" },
   { id: "rm_air", label: "Air pollution exposure" },
-  { id: "rm_joint", label: "Inflammatory joint diseases" },
-  { id: "rm_meno", label: "Premature menopause" },
-  { id: "rm_preeclampsia", label: "Preeclampsia / Gestational diabetes" },
-  { id: "rm_pcos", label: "Polycystic ovary syndrome" },
-  { id: "rm_prs", label: "High polygenic risk score" },
+  { id: "rm_joint", label: "Inflammatory joint diseases", qualifier: "Rheumatoid arthritis, psoriatic arthritis, ankylosing spondylitis, or SLE" },
+  { id: "rm_meno", label: "Premature menopause", qualifier: "Natural or surgical menopause before age 40" },
+  { id: "rm_preeclampsia", label: "Preeclampsia / Gestational diabetes", qualifier: "History of preeclampsia, eclampsia, HELLP syndrome, or gestational diabetes in any pregnancy" },
+  { id: "rm_pcos", label: "Polycystic ovary syndrome", qualifier: "Diagnosed per Rotterdam criteria (≥2 of: oligo/anovulation, hyperandrogenism, polycystic ovaries)" },
+  { id: "rm_prs", label: "High polygenic risk score", qualifier: "Top 5–10% of population-based genomic risk distribution for ASCVD" },
   { id: "rm_hiv", label: "HIV infection" },
 ];
 
