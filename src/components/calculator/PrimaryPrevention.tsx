@@ -149,7 +149,14 @@ export default function PrimaryPrevention() {
 
   const dmCount = countChecked(DM_CHECKLIST);
   const acsCount = countChecked(ACS_CHECKLIST);
-  const hrCount = countChecked(HIGHRISK_CHECKLIST);
+  const msCount = countChecked(METSYN_CRITERIA);
+  const metsynMet = msCount >= 3;
+
+  // Auto-check/uncheck hr_metsyn based on sub-criteria
+  const hrCountRaw = countChecked(HIGHRISK_CHECKLIST);
+  const hrCount = metsynMet
+    ? (checked["hr_metsyn"] ? hrCountRaw : hrCountRaw + 1)
+    : (checked["hr_metsyn"] ? hrCountRaw - 1 : hrCountRaw);
   const rmCount = countChecked(MODIFIER_CHECKLIST);
 
   const riskInfo = useMemo(() => getRiskUpgradeInterpretation(hrCount, rmCount), [hrCount, rmCount]);
