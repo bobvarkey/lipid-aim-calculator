@@ -373,19 +373,66 @@ export default function PrimaryPrevention() {
         </div>
         <div className="space-y-2 mt-3">
           {HIGHRISK_CHECKLIST.map((item) => (
-            <label
-              key={item.id}
-              className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                checked[item.id] ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50"
-              }`}
-            >
-              <Checkbox
-                checked={!!checked[item.id]}
-                onCheckedChange={() => toggle(item.id)}
-                className="mt-0.5"
-              />
-              <span className="text-sm leading-snug text-foreground">{item.label}</span>
-            </label>
+            <div key={item.id}>
+              <label
+                className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                  item.id === "hr_metsyn"
+                    ? (metsynMet ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50")
+                    : (checked[item.id] ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50")
+                }`}
+              >
+                {item.id === "hr_metsyn" ? (
+                  <>
+                    <Checkbox
+                      checked={metsynMet}
+                      disabled
+                      className="mt-0.5"
+                    />
+                    <div className="flex-1">
+                      <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                      <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                        metsynMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                      }`}>
+                        {msCount}/5 — {metsynMet ? "Criteria Met ✓" : "≥3 required"}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Checkbox
+                      checked={!!checked[item.id]}
+                      onCheckedChange={() => toggle(item.id)}
+                      className="mt-0.5"
+                    />
+                    <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                  </>
+                )}
+              </label>
+
+              {/* Metabolic Syndrome sub-checklist */}
+              {item.id === "hr_metsyn" && (
+                <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                  <p className="text-xs font-semibold text-muted-foreground mb-2">
+                    Diagnostic Criteria (at least 3 of 5 required):
+                  </p>
+                  {METSYN_CRITERIA.map((ms) => (
+                    <label
+                      key={ms.id}
+                      className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                        checked[ms.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                      }`}
+                    >
+                      <Checkbox
+                        checked={!!checked[ms.id]}
+                        onCheckedChange={() => toggle(ms.id)}
+                        className="mt-0.5"
+                      />
+                      <span className="text-sm leading-snug text-foreground">{ms.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </Card>
