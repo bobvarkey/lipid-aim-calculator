@@ -176,12 +176,20 @@ export default function PrimaryPrevention() {
   const metsynMet = msCount >= 3;
   const todCount = countChecked(TOD_ALL);
   const todMet = todCount >= 1;
+  const ascvdCount = countChecked(ASCVD_ESTABLISHED);
+  const ascvdMet = ascvdCount >= 1;
+  const dmTodMet = todMet; // reuse TOD sub-checklist for hr_dmtod
 
-  // Auto-check/uncheck hr_metsyn based on sub-criteria
+  // Auto-check/uncheck hr_metsyn, hr_ascvd, hr_dmtod based on sub-criteria
   const hrCountRaw = countChecked(HIGHRISK_CHECKLIST);
-  const hrCount = metsynMet
-    ? (checked["hr_metsyn"] ? hrCountRaw : hrCountRaw + 1)
-    : (checked["hr_metsyn"] ? hrCountRaw - 1 : hrCountRaw);
+  let hrCount = hrCountRaw;
+  // Adjust for auto-qualified items
+  if (metsynMet && !checked["hr_metsyn"]) hrCount++;
+  if (!metsynMet && checked["hr_metsyn"]) hrCount--;
+  if (ascvdMet && !checked["hr_ascvd"]) hrCount++;
+  if (!ascvdMet && checked["hr_ascvd"]) hrCount--;
+  if (dmTodMet && !checked["hr_dmtod"]) hrCount++;
+  if (!dmTodMet && checked["hr_dmtod"]) hrCount--;
   const rmCount = countChecked(MODIFIER_CHECKLIST);
 
   const riskInfo = useMemo(() => getRiskUpgradeInterpretation(hrCount, rmCount), [hrCount, rmCount]);
