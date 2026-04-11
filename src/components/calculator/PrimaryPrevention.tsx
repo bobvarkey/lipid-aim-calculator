@@ -93,14 +93,24 @@ const METSYN_CRITERIA = [
   { id: "ms_glucose", label: "High fasting glucose — ≥100 mg/dL (5.6 mmol/L) or on glucose-lowering medication" },
 ];
 
+// ─── Established ASCVD sub-items ───
+const ASCVD_ESTABLISHED = [
+  { id: "ascvd_cad", label: "CAD / Coronary ASCVD", qualifier: "Prior MI, angina requiring revascularization, or angiographically confirmed coronary stenosis ≥50%" },
+  { id: "ascvd_stroke", label: "Ischemic stroke or TIA", qualifier: "Prior ischemic stroke confirmed by imaging, or TIA with neurovascular evidence" },
+  { id: "ascvd_pad", label: "Peripheral arterial disease (PAD)", qualifier: "ABI <0.9, claudication with imaging confirmation, or prior peripheral revascularization" },
+];
+
 // ─── High-risk features checklist ───
 const HIGHRISK_CHECKLIST = [
+  { id: "hr_ascvd", label: "Established ASCVD" },
   { id: "hr_nafld", label: "Nonalcoholic fatty liver disease with fibrosis grades II and III" },
   { id: "hr_metsyn", label: "Metabolic syndrome" },
-  { id: "hr_ckd", label: "Chronic kidney disease stage 3B/4" },
+  { id: "hr_ckd", label: "Chronic kidney disease stage 3B/4", qualifier: "Stage 3B: eGFR 30–44 mL/min/1.73 m². Stage 4: eGFR 15–29 mL/min/1.73 m². Persistently reduced eGFR with or without albuminuria." },
+  { id: "hr_fhx", label: "Family history of premature CHD", qualifier: "First-degree relative with CHD: male <55 years or female <65 years. Includes MI, coronary revascularization, or angina." },
   { id: "hr_apob", label: "ApoB >130 mg/dL" },
   { id: "hr_lpa", label: "Lp(a) ≥50 mg/dL" },
-  { id: "hr_cac", label: "CAC score 1–99 but <75th percentile for age, gender, and ethnic group" },
+  { id: "hr_cac", label: "High coronary calcium / extensive plaque burden", qualifier: "CAC ≥100 AU or ≥75th percentile for age/sex/ethnicity; or multi-territory plaque (carotid, femoral, coronary) on imaging" },
+  { id: "hr_dmtod", label: "Diabetes with target organ damage" },
   { id: "hr_extreme", label: "Extreme elevation of a single risk factor", qualifier: "e.g., LDL-C ≥190 mg/dL, TG ≥500 mg/dL, BP ≥180/120 mmHg, or A1c ≥10%" },
 ];
 
@@ -166,12 +176,20 @@ export default function PrimaryPrevention() {
   const metsynMet = msCount >= 3;
   const todCount = countChecked(TOD_ALL);
   const todMet = todCount >= 1;
+  const ascvdCount = countChecked(ASCVD_ESTABLISHED);
+  const ascvdMet = ascvdCount >= 1;
+  const dmTodMet = todMet; // reuse TOD sub-checklist for hr_dmtod
 
-  // Auto-check/uncheck hr_metsyn based on sub-criteria
+  // Auto-check/uncheck hr_metsyn, hr_ascvd, hr_dmtod based on sub-criteria
   const hrCountRaw = countChecked(HIGHRISK_CHECKLIST);
-  const hrCount = metsynMet
-    ? (checked["hr_metsyn"] ? hrCountRaw : hrCountRaw + 1)
-    : (checked["hr_metsyn"] ? hrCountRaw - 1 : hrCountRaw);
+  let hrCount = hrCountRaw;
+  // Adjust for auto-qualified items
+  if (metsynMet && !checked["hr_metsyn"]) hrCount++;
+  if (!metsynMet && checked["hr_metsyn"]) hrCount--;
+  if (ascvdMet && !checked["hr_ascvd"]) hrCount++;
+  if (!ascvdMet && checked["hr_ascvd"]) hrCount--;
+  if (dmTodMet && !checked["hr_dmtod"]) hrCount++;
+  if (!dmTodMet && checked["hr_dmtod"]) hrCount--;
   const rmCount = countChecked(MODIFIER_CHECKLIST);
 
   const riskInfo = useMemo(() => getRiskUpgradeInterpretation(hrCount, rmCount), [hrCount, rmCount]);
@@ -215,15 +233,34 @@ export default function PrimaryPrevention() {
     }
 
     // High-risk features
-    const hrChecked = HIGHRISK_CHECKLIST.filter((i) => checked[i.id] || (i.id === "hr_metsyn" && metsynMet));
+    const hrChecked = HIGHRISK_CHECKLIST.filter((i) =>
+      checked[i.id] || (i.id === "hr_metsyn" && metsynMet) || (i.id === "hr_ascvd" && ascvdMet) || (i.id === "hr_dmtod" && dmTodMet)
+    );
     if (hrChecked.length > 0) {
       lines.push(`▸ HIGH-RISK FEATURES (${hrChecked.length}/${HIGHRISK_CHECKLIST.length}):`);
       hrChecked.forEach((i) => {
         lines.push(`  ✓ ${i.label}`);
+        if (i.id === "hr_ascvd") {
+          const ascvdChecked = ASCVD_ESTABLISHED.filter((a) => checked[a.id]);
+          ascvdChecked.forEach((a) => lines.push(`      • ${a.label}`));
+        }
         if (i.id === "hr_metsyn") {
           const msChecked = METSYN_CRITERIA.filter((m) => checked[m.id]);
           lines.push(`    Sub-criteria met (${msCount}/5 — ≥3 required):`);
           msChecked.forEach((m) => lines.push(`      • ${m.label}`));
+        }
+        if (i.id === "hr_dmtod") {
+          const microChecked = TOD_MICROVASCULAR.filter((t) => checked[t.id]);
+          const macroChecked = TOD_MACROVASCULAR.filter((t) => checked[t.id]);
+          lines.push(`    Target organ damage (${todCount}/${TOD_ALL.length} — ≥1 required):`);
+          if (microChecked.length > 0) {
+            lines.push("      Microvascular:");
+            microChecked.forEach((t) => lines.push(`        • ${t.label}`));
+          }
+          if (macroChecked.length > 0) {
+            lines.push("      Macrovascular/Cardiac:");
+            macroChecked.forEach((t) => lines.push(`        • ${t.label}`));
+          }
         }
       });
       lines.push("");
@@ -256,7 +293,7 @@ export default function PrimaryPrevention() {
     }
 
     return lines.join("\n");
-  }, [checked, riskInfo, hrCount, rmCount, msCount, metsynMet, todCount, todMet]);
+  }, [checked, riskInfo, hrCount, rmCount, msCount, metsynMet, todCount, todMet, ascvdCount, ascvdMet, dmTodMet]);
 
   const displayNote = noteEdited ? customNote : generatedNote;
 
@@ -499,73 +536,174 @@ export default function PrimaryPrevention() {
           )}
         </div>
         <div className="space-y-2 mt-3">
-          {HIGHRISK_CHECKLIST.map((item) => (
-            <div key={item.id}>
-              <label
-                className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                  item.id === "hr_metsyn"
-                    ? (metsynMet ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50")
-                    : (checked[item.id] ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50")
-                }`}
-              >
-                {item.id === "hr_metsyn" ? (
-                  <>
-                    <Checkbox
-                      checked={metsynMet}
-                      disabled
-                      className="mt-0.5"
-                    />
-                    <div className="flex-1">
-                      <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                      <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                        metsynMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                      }`}>
-                        {msCount}/5 — {metsynMet ? "Criteria Met ✓" : "≥3 required"}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <Checkbox
-                      checked={!!checked[item.id]}
-                      onCheckedChange={() => toggle(item.id)}
-                      className="mt-0.5"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                      {item.qualifier && (
-                        <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
-                      )}
-                    </div>
-                  </>
-                )}
-              </label>
+          {HIGHRISK_CHECKLIST.map((item) => {
+            const isAutoItem = item.id === "hr_metsyn" || item.id === "hr_ascvd" || item.id === "hr_dmtod";
+            const isAutoMet = item.id === "hr_metsyn" ? metsynMet
+              : item.id === "hr_ascvd" ? ascvdMet
+              : item.id === "hr_dmtod" ? dmTodMet
+              : false;
+            const isChecked = isAutoItem ? isAutoMet : !!checked[item.id];
 
-              {/* Metabolic Syndrome sub-checklist */}
-              {item.id === "hr_metsyn" && (
-                <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-                  <p className="text-xs font-semibold text-muted-foreground mb-2">
-                    Diagnostic Criteria (at least 3 of 5 required):
-                  </p>
-                  {METSYN_CRITERIA.map((ms) => (
-                    <label
-                      key={ms.id}
-                      className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                        checked[ms.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                      }`}
-                    >
+            return (
+              <div key={item.id}>
+                <label
+                  className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                    isChecked ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50"
+                  }`}
+                >
+                  {isAutoItem ? (
+                    <>
+                      <Checkbox checked={isAutoMet} disabled className="mt-0.5" />
+                      <div className="flex-1">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        {item.id === "hr_metsyn" && (
+                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                            metsynMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {msCount}/5 — {metsynMet ? "Criteria Met ✓" : "≥3 required"}
+                          </span>
+                        )}
+                        {item.id === "hr_ascvd" && (
+                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                            ascvdMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {ascvdCount}/{ASCVD_ESTABLISHED.length} — {ascvdMet ? "Confirmed ✓" : "≥1 required"}
+                          </span>
+                        )}
+                        {item.id === "hr_dmtod" && (
+                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                            dmTodMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                          }`}>
+                            TOD: {todCount}/{TOD_ALL.length} — {dmTodMet ? "Qualified ✓" : "≥1 required"}
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
                       <Checkbox
-                        checked={!!checked[ms.id]}
-                        onCheckedChange={() => toggle(ms.id)}
+                        checked={!!checked[item.id]}
+                        onCheckedChange={() => toggle(item.id)}
                         className="mt-0.5"
                       />
-                      <span className="text-sm leading-snug text-foreground">{ms.label}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        {item.qualifier && (
+                          <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </label>
+
+                {/* Established ASCVD sub-checklist */}
+                {item.id === "hr_ascvd" && (
+                  <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2">
+                      Select applicable ASCVD manifestations (≥1 required):
+                    </p>
+                    {ASCVD_ESTABLISHED.map((a) => (
+                      <label
+                        key={a.id}
+                        className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                          checked[a.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={!!checked[a.id]}
+                          onCheckedChange={() => toggle(a.id)}
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm leading-snug text-foreground">{a.label}</span>
+                          <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{a.qualifier}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {/* Metabolic Syndrome sub-checklist */}
+                {item.id === "hr_metsyn" && (
+                  <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2">
+                      Diagnostic Criteria (at least 3 of 5 required):
+                    </p>
+                    {METSYN_CRITERIA.map((ms) => (
+                      <label
+                        key={ms.id}
+                        className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                          checked[ms.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={!!checked[ms.id]}
+                          onCheckedChange={() => toggle(ms.id)}
+                          className="mt-0.5"
+                        />
+                        <span className="text-sm leading-snug text-foreground">{ms.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {/* DM Target Organ Damage sub-checklist */}
+                {item.id === "hr_dmtod" && (
+                  <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
+                    </p>
+                    <div>
+                      <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">Microvascular</p>
+                      <div className="space-y-1.5">
+                        {TOD_MICROVASCULAR.map((tod) => (
+                          <label
+                            key={tod.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={!!checked[tod.id]}
+                              onCheckedChange={() => toggle(tod.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">Macrovascular / Cardiac</p>
+                      <div className="space-y-1.5">
+                        {TOD_MACROVASCULAR.map((tod) => (
+                          <label
+                            key={tod.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={!!checked[tod.id]}
+                              onCheckedChange={() => toggle(tod.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </Card>
 
