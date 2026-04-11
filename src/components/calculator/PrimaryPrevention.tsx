@@ -293,7 +293,7 @@ export default function PrimaryPrevention() {
     }
 
     return lines.join("\n");
-  }, [checked, riskInfo, hrCount, rmCount, msCount, metsynMet, todCount, todMet]);
+  }, [checked, riskInfo, hrCount, rmCount, msCount, metsynMet, todCount, todMet, ascvdCount, ascvdMet, dmTodMet]);
 
   const displayNote = noteEdited ? customNote : generatedNote;
 
