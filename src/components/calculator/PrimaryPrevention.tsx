@@ -93,14 +93,24 @@ const METSYN_CRITERIA = [
   { id: "ms_glucose", label: "High fasting glucose — ≥100 mg/dL (5.6 mmol/L) or on glucose-lowering medication" },
 ];
 
+// ─── Established ASCVD sub-items ───
+const ASCVD_ESTABLISHED = [
+  { id: "ascvd_cad", label: "CAD / Coronary ASCVD", qualifier: "Prior MI, angina requiring revascularization, or angiographically confirmed coronary stenosis ≥50%" },
+  { id: "ascvd_stroke", label: "Ischemic stroke or TIA", qualifier: "Prior ischemic stroke confirmed by imaging, or TIA with neurovascular evidence" },
+  { id: "ascvd_pad", label: "Peripheral arterial disease (PAD)", qualifier: "ABI <0.9, claudication with imaging confirmation, or prior peripheral revascularization" },
+];
+
 // ─── High-risk features checklist ───
 const HIGHRISK_CHECKLIST = [
+  { id: "hr_ascvd", label: "Established ASCVD" },
   { id: "hr_nafld", label: "Nonalcoholic fatty liver disease with fibrosis grades II and III" },
   { id: "hr_metsyn", label: "Metabolic syndrome" },
-  { id: "hr_ckd", label: "Chronic kidney disease stage 3B/4" },
+  { id: "hr_ckd", label: "Chronic kidney disease stage 3B/4", qualifier: "Stage 3B: eGFR 30–44 mL/min/1.73 m². Stage 4: eGFR 15–29 mL/min/1.73 m². Persistently reduced eGFR with or without albuminuria." },
+  { id: "hr_fhx", label: "Family history of premature CHD", qualifier: "First-degree relative with CHD: male <55 years or female <65 years. Includes MI, coronary revascularization, or angina." },
   { id: "hr_apob", label: "ApoB >130 mg/dL" },
   { id: "hr_lpa", label: "Lp(a) ≥50 mg/dL" },
-  { id: "hr_cac", label: "CAC score 1–99 but <75th percentile for age, gender, and ethnic group" },
+  { id: "hr_cac", label: "High coronary calcium / extensive plaque burden", qualifier: "CAC ≥100 AU or ≥75th percentile for age/sex/ethnicity; or multi-territory plaque (carotid, femoral, coronary) on imaging" },
+  { id: "hr_dmtod", label: "Diabetes with target organ damage" },
   { id: "hr_extreme", label: "Extreme elevation of a single risk factor", qualifier: "e.g., LDL-C ≥190 mg/dL, TG ≥500 mg/dL, BP ≥180/120 mmHg, or A1c ≥10%" },
 ];
 
