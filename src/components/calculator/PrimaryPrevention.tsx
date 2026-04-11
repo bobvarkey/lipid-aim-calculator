@@ -318,28 +318,118 @@ export default function PrimaryPrevention() {
           Initiate dyslipidemia treatment <strong className="text-foreground">on day 1</strong> of diagnosis. Targets must be attained by <strong className="text-foreground">week 12</strong>.
         </p>
         <div className="space-y-2">
-          {DM_CHECKLIST.map((item) => (
-            <label
-              key={item.id}
-              className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                checked[item.id] ? "bg-danger/8 ring-1 ring-danger/20" : "hover:bg-muted/50"
-              }`}
-            >
-              <Checkbox
-                checked={!!checked[item.id]}
-                onCheckedChange={() => toggle(item.id)}
-                className="mt-0.5"
-              />
-              <div className="flex-1 min-w-0">
-                <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                <span className={`ml-2 inline-block rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold ${
-                  checked[item.id] ? "bg-danger/15 text-danger" : "text-muted-foreground"
-                }`}>
-                  {item.target}
-                </span>
+          {DM_CHECKLIST.map((item) => {
+            const isTodItem = item.hasTod;
+            const isAutoChecked = isTodItem && todMet;
+            const isChecked = isTodItem ? (isAutoChecked || !!checked[item.id]) : !!checked[item.id];
+            return (
+              <div key={item.id}>
+                <label
+                  className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                    isChecked ? "bg-danger/8 ring-1 ring-danger/20" : "hover:bg-muted/50"
+                  }`}
+                >
+                  {isTodItem ? (
+                    <>
+                      <Checkbox
+                        checked={isChecked}
+                        onCheckedChange={() => toggle(item.id)}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                          todMet ? "bg-danger/15 text-danger" : "bg-muted text-muted-foreground"
+                        }`}>
+                          TOD: {todCount}/{TOD_ALL.length} — {todMet ? "Qualified ✓" : "≥1 required"}
+                        </span>
+                        <span className={`ml-1 inline-block rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold ${
+                          isChecked ? "bg-danger/15 text-danger" : "text-muted-foreground"
+                        }`}>
+                          {item.target}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Checkbox
+                        checked={!!checked[item.id]}
+                        onCheckedChange={() => toggle(item.id)}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        <span className={`ml-2 inline-block rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold ${
+                          checked[item.id] ? "bg-danger/15 text-danger" : "text-muted-foreground"
+                        }`}>
+                          {item.target}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </label>
+
+                {/* TOD sub-checklist — show under the first TOD item */}
+                {item.id === "dm_tod" && (
+                  <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
+                    </p>
+
+                    {/* Microvascular */}
+                    <div>
+                      <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Microvascular</p>
+                      <div className="space-y-1.5">
+                        {TOD_MICROVASCULAR.map((tod) => (
+                          <label
+                            key={tod.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={!!checked[tod.id]}
+                              onCheckedChange={() => toggle(tod.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Macrovascular */}
+                    <div>
+                      <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Macrovascular / Cardiac</p>
+                      <div className="space-y-1.5">
+                        {TOD_MACROVASCULAR.map((tod) => (
+                          <label
+                            key={tod.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={!!checked[tod.id]}
+                              onCheckedChange={() => toggle(tod.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </label>
-          ))}
+            );
+          })}
         </div>
       </Card>
 
