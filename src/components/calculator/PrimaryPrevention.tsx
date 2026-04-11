@@ -184,10 +184,25 @@ export default function PrimaryPrevention() {
     lines.push("");
 
     // Diabetes section
-    const dmChecked = DM_CHECKLIST.filter((i) => checked[i.id]);
+    const dmChecked = DM_CHECKLIST.filter((i) => checked[i.id] || (i.hasTod && todMet));
     if (dmChecked.length > 0) {
       lines.push("▸ DIABETES & DYSLIPIDEMIA — Day 1 Treatment:");
-      dmChecked.forEach((i) => lines.push(`  ✓ ${i.label} → Target: ${i.target}`));
+      dmChecked.forEach((i) => {
+        lines.push(`  ✓ ${i.label} → Target: ${i.target}`);
+        if (i.hasTod && todCount > 0) {
+          const microChecked = TOD_MICROVASCULAR.filter((t) => checked[t.id]);
+          const macroChecked = TOD_MACROVASCULAR.filter((t) => checked[t.id]);
+          lines.push(`    Target organ damage (${todCount}/${TOD_ALL.length} — ≥1 required):`);
+          if (microChecked.length > 0) {
+            lines.push("      Microvascular:");
+            microChecked.forEach((t) => lines.push(`        • ${t.label}`));
+          }
+          if (macroChecked.length > 0) {
+            lines.push("      Macrovascular/Cardiac:");
+            macroChecked.forEach((t) => lines.push(`        • ${t.label}`));
+          }
+        }
+      });
       lines.push("");
     }
 
