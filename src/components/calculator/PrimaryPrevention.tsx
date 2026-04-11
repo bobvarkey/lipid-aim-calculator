@@ -54,12 +54,25 @@ const RISK_TIERS = [
   { risk: "High (≥20%)", ldl: "<55 mg/dL", color: "text-danger", bg: "bg-danger/10" },
 ];
 
+// ─── Diabetes Target Organ Damage sub-criteria (≥1 required) ───
+const TOD_MICROVASCULAR = [
+  { id: "tod_retinopathy", label: "Diabetic retinopathy", qualifier: "Microaneurysms, hemorrhages, macular edema on fundoscopy or retinal imaging" },
+  { id: "tod_nephropathy", label: "Diabetic nephropathy", qualifier: "UACR ≥30 mg/g (micro-/macroalbuminuria) or reduced eGFR for age" },
+  { id: "tod_neuropathy", label: "Diabetic neuropathy", qualifier: "Distal symmetric polyneuropathy, autonomic neuropathy, or foot-ulcer risk (monofilament/NCS)" },
+];
+const TOD_MACROVASCULAR = [
+  { id: "tod_lvh", label: "Left-ventricular hypertrophy (LVH)", qualifier: "Increased LV mass index on echocardiography" },
+  { id: "tod_diastolic", label: "Diastolic dysfunction", qualifier: "Abnormal E/e′ ratio or impaired global longitudinal strain on echo" },
+  { id: "tod_subclinical", label: "Subclinical atherosclerosis", qualifier: "Elevated carotid IMT, carotid/femoral plaque, or coronary calcium score" },
+];
+const TOD_ALL = [...TOD_MICROVASCULAR, ...TOD_MACROVASCULAR];
+
 // ─── Diabetes checklist items ───
 const DM_CHECKLIST = [
-  { id: "dm_baseline", label: "Diabetes mellitus (baseline)", target: "<70 mg/dL" },
-  { id: "dm_tod", label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL" },
-  { id: "dm_ascvd", label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (optional)" },
-  { id: "dm_ascvd_tod", label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL" },
+  { id: "dm_baseline", label: "Diabetes mellitus (baseline)", target: "<70 mg/dL", hasTod: false },
+  { id: "dm_tod", label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL", hasTod: true },
+  { id: "dm_ascvd", label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (optional)", hasTod: false },
+  { id: "dm_ascvd_tod", label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL", hasTod: true },
 ];
 
 // ─── ACS checklist ───
