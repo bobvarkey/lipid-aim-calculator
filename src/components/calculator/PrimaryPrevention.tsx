@@ -536,73 +536,174 @@ export default function PrimaryPrevention() {
           )}
         </div>
         <div className="space-y-2 mt-3">
-          {HIGHRISK_CHECKLIST.map((item) => (
-            <div key={item.id}>
-              <label
-                className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                  item.id === "hr_metsyn"
-                    ? (metsynMet ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50")
-                    : (checked[item.id] ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50")
-                }`}
-              >
-                {item.id === "hr_metsyn" ? (
-                  <>
-                    <Checkbox
-                      checked={metsynMet}
-                      disabled
-                      className="mt-0.5"
-                    />
-                    <div className="flex-1">
-                      <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                      <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                        metsynMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                      }`}>
-                        {msCount}/5 — {metsynMet ? "Criteria Met ✓" : "≥3 required"}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <Checkbox
-                      checked={!!checked[item.id]}
-                      onCheckedChange={() => toggle(item.id)}
-                      className="mt-0.5"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                      {item.qualifier && (
-                        <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
-                      )}
-                    </div>
-                  </>
-                )}
-              </label>
+          {HIGHRISK_CHECKLIST.map((item) => {
+            const isAutoItem = item.id === "hr_metsyn" || item.id === "hr_ascvd" || item.id === "hr_dmtod";
+            const isAutoMet = item.id === "hr_metsyn" ? metsynMet
+              : item.id === "hr_ascvd" ? ascvdMet
+              : item.id === "hr_dmtod" ? dmTodMet
+              : false;
+            const isChecked = isAutoItem ? isAutoMet : !!checked[item.id];
 
-              {/* Metabolic Syndrome sub-checklist */}
-              {item.id === "hr_metsyn" && (
-                <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-                  <p className="text-xs font-semibold text-muted-foreground mb-2">
-                    Diagnostic Criteria (at least 3 of 5 required):
-                  </p>
-                  {METSYN_CRITERIA.map((ms) => (
-                    <label
-                      key={ms.id}
-                      className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                        checked[ms.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                      }`}
-                    >
+            return (
+              <div key={item.id}>
+                <label
+                  className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                    isChecked ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50"
+                  }`}
+                >
+                  {isAutoItem ? (
+                    <>
+                      <Checkbox checked={isAutoMet} disabled className="mt-0.5" />
+                      <div className="flex-1">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        {item.id === "hr_metsyn" && (
+                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                            metsynMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {msCount}/5 — {metsynMet ? "Criteria Met ✓" : "≥3 required"}
+                          </span>
+                        )}
+                        {item.id === "hr_ascvd" && (
+                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                            ascvdMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {ascvdCount}/{ASCVD_ESTABLISHED.length} — {ascvdMet ? "Confirmed ✓" : "≥1 required"}
+                          </span>
+                        )}
+                        {item.id === "hr_dmtod" && (
+                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                            dmTodMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                          }`}>
+                            TOD: {todCount}/{TOD_ALL.length} — {dmTodMet ? "Qualified ✓" : "≥1 required"}
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
                       <Checkbox
-                        checked={!!checked[ms.id]}
-                        onCheckedChange={() => toggle(ms.id)}
+                        checked={!!checked[item.id]}
+                        onCheckedChange={() => toggle(item.id)}
                         className="mt-0.5"
                       />
-                      <span className="text-sm leading-snug text-foreground">{ms.label}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        {item.qualifier && (
+                          <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </label>
+
+                {/* Established ASCVD sub-checklist */}
+                {item.id === "hr_ascvd" && (
+                  <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2">
+                      Select applicable ASCVD manifestations (≥1 required):
+                    </p>
+                    {ASCVD_ESTABLISHED.map((a) => (
+                      <label
+                        key={a.id}
+                        className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                          checked[a.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={!!checked[a.id]}
+                          onCheckedChange={() => toggle(a.id)}
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm leading-snug text-foreground">{a.label}</span>
+                          <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{a.qualifier}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {/* Metabolic Syndrome sub-checklist */}
+                {item.id === "hr_metsyn" && (
+                  <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2">
+                      Diagnostic Criteria (at least 3 of 5 required):
+                    </p>
+                    {METSYN_CRITERIA.map((ms) => (
+                      <label
+                        key={ms.id}
+                        className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                          checked[ms.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={!!checked[ms.id]}
+                          onCheckedChange={() => toggle(ms.id)}
+                          className="mt-0.5"
+                        />
+                        <span className="text-sm leading-snug text-foreground">{ms.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {/* DM Target Organ Damage sub-checklist */}
+                {item.id === "hr_dmtod" && (
+                  <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
+                    </p>
+                    <div>
+                      <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">Microvascular</p>
+                      <div className="space-y-1.5">
+                        {TOD_MICROVASCULAR.map((tod) => (
+                          <label
+                            key={tod.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={!!checked[tod.id]}
+                              onCheckedChange={() => toggle(tod.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">Macrovascular / Cardiac</p>
+                      <div className="space-y-1.5">
+                        {TOD_MACROVASCULAR.map((tod) => (
+                          <label
+                            key={tod.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={!!checked[tod.id]}
+                              onCheckedChange={() => toggle(tod.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </Card>
 
