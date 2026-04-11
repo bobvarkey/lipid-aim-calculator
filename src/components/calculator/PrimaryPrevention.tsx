@@ -54,12 +54,25 @@ const RISK_TIERS = [
   { risk: "High (≥20%)", ldl: "<55 mg/dL", color: "text-danger", bg: "bg-danger/10" },
 ];
 
+// ─── Diabetes Target Organ Damage sub-criteria (≥1 required) ───
+const TOD_MICROVASCULAR = [
+  { id: "tod_retinopathy", label: "Diabetic retinopathy", qualifier: "Microaneurysms, hemorrhages, macular edema on fundoscopy or retinal imaging" },
+  { id: "tod_nephropathy", label: "Diabetic nephropathy", qualifier: "UACR ≥30 mg/g (micro-/macroalbuminuria) or reduced eGFR for age" },
+  { id: "tod_neuropathy", label: "Diabetic neuropathy", qualifier: "Distal symmetric polyneuropathy, autonomic neuropathy, or foot-ulcer risk (monofilament/NCS)" },
+];
+const TOD_MACROVASCULAR = [
+  { id: "tod_lvh", label: "Left-ventricular hypertrophy (LVH)", qualifier: "Increased LV mass index on echocardiography" },
+  { id: "tod_diastolic", label: "Diastolic dysfunction", qualifier: "Abnormal E/e′ ratio or impaired global longitudinal strain on echo" },
+  { id: "tod_subclinical", label: "Subclinical atherosclerosis", qualifier: "Elevated carotid IMT, carotid/femoral plaque, or coronary calcium score" },
+];
+const TOD_ALL = [...TOD_MICROVASCULAR, ...TOD_MACROVASCULAR];
+
 // ─── Diabetes checklist items ───
 const DM_CHECKLIST = [
-  { id: "dm_baseline", label: "Diabetes mellitus (baseline)", target: "<70 mg/dL" },
-  { id: "dm_tod", label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL" },
-  { id: "dm_ascvd", label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (optional)" },
-  { id: "dm_ascvd_tod", label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL" },
+  { id: "dm_baseline", label: "Diabetes mellitus (baseline)", target: "<70 mg/dL", hasTod: false },
+  { id: "dm_tod", label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL", hasTod: true },
+  { id: "dm_ascvd", label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (optional)", hasTod: false },
+  { id: "dm_ascvd_tod", label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL", hasTod: true },
 ];
 
 // ─── ACS checklist ───
@@ -151,6 +164,8 @@ export default function PrimaryPrevention() {
   const acsCount = countChecked(ACS_CHECKLIST);
   const msCount = countChecked(METSYN_CRITERIA);
   const metsynMet = msCount >= 3;
+  const todCount = countChecked(TOD_ALL);
+  const todMet = todCount >= 1;
 
   // Auto-check/uncheck hr_metsyn based on sub-criteria
   const hrCountRaw = countChecked(HIGHRISK_CHECKLIST);
@@ -169,10 +184,25 @@ export default function PrimaryPrevention() {
     lines.push("");
 
     // Diabetes section
-    const dmChecked = DM_CHECKLIST.filter((i) => checked[i.id]);
+    const dmChecked = DM_CHECKLIST.filter((i) => checked[i.id] || (i.hasTod && todMet));
     if (dmChecked.length > 0) {
       lines.push("▸ DIABETES & DYSLIPIDEMIA — Day 1 Treatment:");
-      dmChecked.forEach((i) => lines.push(`  ✓ ${i.label} → Target: ${i.target}`));
+      dmChecked.forEach((i) => {
+        lines.push(`  ✓ ${i.label} → Target: ${i.target}`);
+        if (i.hasTod && todCount > 0) {
+          const microChecked = TOD_MICROVASCULAR.filter((t) => checked[t.id]);
+          const macroChecked = TOD_MACROVASCULAR.filter((t) => checked[t.id]);
+          lines.push(`    Target organ damage (${todCount}/${TOD_ALL.length} — ≥1 required):`);
+          if (microChecked.length > 0) {
+            lines.push("      Microvascular:");
+            microChecked.forEach((t) => lines.push(`        • ${t.label}`));
+          }
+          if (macroChecked.length > 0) {
+            lines.push("      Macrovascular/Cardiac:");
+            macroChecked.forEach((t) => lines.push(`        • ${t.label}`));
+          }
+        }
+      });
       lines.push("");
     }
 
@@ -226,7 +256,7 @@ export default function PrimaryPrevention() {
     }
 
     return lines.join("\n");
-  }, [checked, riskInfo, hrCount, rmCount, msCount, metsynMet]);
+  }, [checked, riskInfo, hrCount, rmCount, msCount, metsynMet, todCount, todMet]);
 
   const displayNote = noteEdited ? customNote : generatedNote;
 
@@ -303,28 +333,118 @@ export default function PrimaryPrevention() {
           Initiate dyslipidemia treatment <strong className="text-foreground">on day 1</strong> of diagnosis. Targets must be attained by <strong className="text-foreground">week 12</strong>.
         </p>
         <div className="space-y-2">
-          {DM_CHECKLIST.map((item) => (
-            <label
-              key={item.id}
-              className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                checked[item.id] ? "bg-danger/8 ring-1 ring-danger/20" : "hover:bg-muted/50"
-              }`}
-            >
-              <Checkbox
-                checked={!!checked[item.id]}
-                onCheckedChange={() => toggle(item.id)}
-                className="mt-0.5"
-              />
-              <div className="flex-1 min-w-0">
-                <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                <span className={`ml-2 inline-block rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold ${
-                  checked[item.id] ? "bg-danger/15 text-danger" : "text-muted-foreground"
-                }`}>
-                  {item.target}
-                </span>
+          {DM_CHECKLIST.map((item) => {
+            const isTodItem = item.hasTod;
+            const isAutoChecked = isTodItem && todMet;
+            const isChecked = isTodItem ? (isAutoChecked || !!checked[item.id]) : !!checked[item.id];
+            return (
+              <div key={item.id}>
+                <label
+                  className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                    isChecked ? "bg-danger/8 ring-1 ring-danger/20" : "hover:bg-muted/50"
+                  }`}
+                >
+                  {isTodItem ? (
+                    <>
+                      <Checkbox
+                        checked={isChecked}
+                        onCheckedChange={() => toggle(item.id)}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                          todMet ? "bg-danger/15 text-danger" : "bg-muted text-muted-foreground"
+                        }`}>
+                          TOD: {todCount}/{TOD_ALL.length} — {todMet ? "Qualified ✓" : "≥1 required"}
+                        </span>
+                        <span className={`ml-1 inline-block rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold ${
+                          isChecked ? "bg-danger/15 text-danger" : "text-muted-foreground"
+                        }`}>
+                          {item.target}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Checkbox
+                        checked={!!checked[item.id]}
+                        onCheckedChange={() => toggle(item.id)}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        <span className={`ml-2 inline-block rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold ${
+                          checked[item.id] ? "bg-danger/15 text-danger" : "text-muted-foreground"
+                        }`}>
+                          {item.target}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </label>
+
+                {/* TOD sub-checklist — show under the first TOD item */}
+                {item.id === "dm_tod" && (
+                  <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
+                    </p>
+
+                    {/* Microvascular */}
+                    <div>
+                      <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Microvascular</p>
+                      <div className="space-y-1.5">
+                        {TOD_MICROVASCULAR.map((tod) => (
+                          <label
+                            key={tod.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={!!checked[tod.id]}
+                              onCheckedChange={() => toggle(tod.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Macrovascular */}
+                    <div>
+                      <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Macrovascular / Cardiac</p>
+                      <div className="space-y-1.5">
+                        {TOD_MACROVASCULAR.map((tod) => (
+                          <label
+                            key={tod.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={!!checked[tod.id]}
+                              onCheckedChange={() => toggle(tod.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </label>
-          ))}
+            );
+          })}
         </div>
       </Card>
 
