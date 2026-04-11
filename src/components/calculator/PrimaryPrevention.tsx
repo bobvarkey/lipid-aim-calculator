@@ -164,6 +164,8 @@ export default function PrimaryPrevention() {
   const acsCount = countChecked(ACS_CHECKLIST);
   const msCount = countChecked(METSYN_CRITERIA);
   const metsynMet = msCount >= 3;
+  const todCount = countChecked(TOD_ALL);
+  const todMet = todCount >= 1;
 
   // Auto-check/uncheck hr_metsyn based on sub-criteria
   const hrCountRaw = countChecked(HIGHRISK_CHECKLIST);
