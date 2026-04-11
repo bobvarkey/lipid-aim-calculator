@@ -233,15 +233,34 @@ export default function PrimaryPrevention() {
     }
 
     // High-risk features
-    const hrChecked = HIGHRISK_CHECKLIST.filter((i) => checked[i.id] || (i.id === "hr_metsyn" && metsynMet));
+    const hrChecked = HIGHRISK_CHECKLIST.filter((i) =>
+      checked[i.id] || (i.id === "hr_metsyn" && metsynMet) || (i.id === "hr_ascvd" && ascvdMet) || (i.id === "hr_dmtod" && dmTodMet)
+    );
     if (hrChecked.length > 0) {
       lines.push(`▸ HIGH-RISK FEATURES (${hrChecked.length}/${HIGHRISK_CHECKLIST.length}):`);
       hrChecked.forEach((i) => {
         lines.push(`  ✓ ${i.label}`);
+        if (i.id === "hr_ascvd") {
+          const ascvdChecked = ASCVD_ESTABLISHED.filter((a) => checked[a.id]);
+          ascvdChecked.forEach((a) => lines.push(`      • ${a.label}`));
+        }
         if (i.id === "hr_metsyn") {
           const msChecked = METSYN_CRITERIA.filter((m) => checked[m.id]);
           lines.push(`    Sub-criteria met (${msCount}/5 — ≥3 required):`);
           msChecked.forEach((m) => lines.push(`      • ${m.label}`));
+        }
+        if (i.id === "hr_dmtod") {
+          const microChecked = TOD_MICROVASCULAR.filter((t) => checked[t.id]);
+          const macroChecked = TOD_MACROVASCULAR.filter((t) => checked[t.id]);
+          lines.push(`    Target organ damage (${todCount}/${TOD_ALL.length} — ≥1 required):`);
+          if (microChecked.length > 0) {
+            lines.push("      Microvascular:");
+            microChecked.forEach((t) => lines.push(`        • ${t.label}`));
+          }
+          if (macroChecked.length > 0) {
+            lines.push("      Macrovascular/Cardiac:");
+            macroChecked.forEach((t) => lines.push(`        • ${t.label}`));
+          }
         }
       });
       lines.push("");
