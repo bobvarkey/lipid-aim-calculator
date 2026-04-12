@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ShieldCheck, AlertTriangle, Heart, Activity, Copy, FileText, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, AlertTriangle, Heart, Activity, Copy, FileText, CheckCircle2, Globe } from "lucide-react";
 import { toast } from "sonner";
 
 const STEPS = [
@@ -63,7 +63,7 @@ const TOD_MICROVASCULAR = [
 const TOD_MACROVASCULAR = [
   { id: "tod_lvh", label: "Left-ventricular hypertrophy (LVH)", qualifier: "Increased LV mass index on echocardiography" },
   { id: "tod_diastolic", label: "Diastolic dysfunction", qualifier: "Abnormal E/e′ ratio or impaired global longitudinal strain on echo" },
-  { id: "tod_subclinical", label: "Subclinical atherosclerosis", qualifier: "Elevated carotid IMT, carotid/femoral plaque, or coronary calcium score" },
+  { id: "tod_subclinical_tod", label: "Subclinical atherosclerosis", qualifier: "Elevated carotid IMT, carotid/femoral plaque, or coronary calcium score" },
 ];
 const TOD_ALL = [...TOD_MICROVASCULAR, ...TOD_MACROVASCULAR];
 
@@ -96,22 +96,59 @@ const METSYN_CRITERIA = [
 // ─── Established ASCVD sub-items ───
 const ASCVD_ESTABLISHED = [
   { id: "ascvd_cad", label: "CAD / Coronary ASCVD", qualifier: "Prior MI, angina requiring revascularization, or angiographically confirmed coronary stenosis ≥50%" },
-  { id: "ascvd_stroke", label: "Ischemic stroke or TIA", qualifier: "Prior ischemic stroke confirmed by imaging, or TIA with neurovascular evidence" },
+  { id: "ascvd_stroke", label: "Ischemic stroke or TIA", qualifier: "Prior ischemic stroke confirmed by imaging, or TIA with neurovascular evidence of atherosclerotic origin" },
   { id: "ascvd_pad", label: "Peripheral arterial disease (PAD)", qualifier: "ABI <0.9, claudication with imaging confirmation, or prior peripheral revascularization" },
+];
+
+// ─── Subclinical atherosclerosis sub-items ───
+const SUBCLINICAL_ITEMS = [
+  { id: "sub_cimt", label: "Elevated carotid IMT", qualifier: "Carotid intima-media thickness >75th percentile for age/sex" },
+  { id: "sub_plaque", label: "Carotid or femoral plaque", qualifier: "Focal wall thickening ≥1.5 mm or >50% adjacent IMT on ultrasound" },
+  { id: "sub_cac", label: "Coronary calcium score (CAC >0)", qualifier: "Any detectable coronary calcium; CAC ≥100 AU or ≥75th percentile = higher risk" },
+  { id: "sub_abi", label: "ABI <0.9", qualifier: "Ankle-brachial index <0.9 indicating peripheral atherosclerosis" },
+];
+
+// ─── High CAC / extensive plaque sub-items ───
+const HIGH_CAC_ITEMS = [
+  { id: "cac_100", label: "CAC ≥100 AU or ≥75th percentile", qualifier: "Agatston score ≥100 or above 75th percentile for age/sex/ethnicity" },
+  { id: "cac_multi", label: "Multi-territory plaque burden", qualifier: "Atherosclerotic plaque in ≥2 vascular beds (carotid, femoral, coronary, aortic) on imaging" },
+  { id: "cac_stenosis", label: "Nonobstructive coronary stenosis on CCTA", qualifier: "≥1 coronary segment with plaque without hemodynamically significant stenosis" },
+];
+
+// ─── CKD 3B/4 sub-items ───
+const CKD_ITEMS = [
+  { id: "ckd_3b", label: "Stage 3B: eGFR 30–44 mL/min/1.73 m²", qualifier: "Moderately-to-severely decreased kidney function" },
+  { id: "ckd_4", label: "Stage 4: eGFR 15–29 mL/min/1.73 m²", qualifier: "Severely decreased kidney function" },
+  { id: "ckd_albumin", label: "Albuminuria: UACR ≥30 mg/g", qualifier: "Moderately increased (30–300) or severely increased (>300) albuminuria" },
+];
+
+// ─── Family history sub-items ───
+const FHX_ITEMS = [
+  { id: "fhx_male", label: "1st-degree male relative with CHD before age 55", qualifier: "Father, brother, or son with MI, coronary revascularization, or angina <55 y" },
+  { id: "fhx_female", label: "1st-degree female relative with CHD before age 65", qualifier: "Mother, sister, or daughter with MI, coronary revascularization, or angina <65 y" },
+];
+
+// ─── Extreme elevation sub-items ───
+const EXTREME_ELEVATION_ITEMS = [
+  { id: "ext_ldl", label: "LDL-C ≥190 mg/dL", qualifier: "Severe hypercholesterolemia — consider familial hypercholesterolemia workup" },
+  { id: "ext_tg", label: "Triglycerides ≥500 mg/dL", qualifier: "Severe hypertriglyceridemia — pancreatitis risk; fibrate or omega-3 FA indicated" },
+  { id: "ext_bp", label: "Blood pressure ≥180/120 mmHg", qualifier: "Hypertensive crisis — immediate evaluation and treatment required" },
+  { id: "ext_a1c", label: "HbA1c ≥10%", qualifier: "Severely uncontrolled diabetes — insulin therapy often required" },
 ];
 
 // ─── High-risk features checklist ───
 const HIGHRISK_CHECKLIST = [
   { id: "hr_ascvd", label: "Established ASCVD" },
+  { id: "hr_subclinical", label: "Subclinical atherosclerosis" },
   { id: "hr_nafld", label: "Nonalcoholic fatty liver disease with fibrosis grades II and III" },
   { id: "hr_metsyn", label: "Metabolic syndrome" },
-  { id: "hr_ckd", label: "Chronic kidney disease stage 3B/4", qualifier: "Stage 3B: eGFR 30–44 mL/min/1.73 m². Stage 4: eGFR 15–29 mL/min/1.73 m². Persistently reduced eGFR with or without albuminuria." },
-  { id: "hr_fhx", label: "Family history of premature CHD", qualifier: "First-degree relative with CHD: male <55 years or female <65 years. Includes MI, coronary revascularization, or angina." },
+  { id: "hr_ckd", label: "Chronic kidney disease stage 3B/4" },
+  { id: "hr_fhx", label: "Family history of premature CHD / ASCVD" },
   { id: "hr_apob", label: "ApoB >130 mg/dL" },
   { id: "hr_lpa", label: "Lp(a) ≥50 mg/dL" },
-  { id: "hr_cac", label: "High coronary calcium / extensive plaque burden", qualifier: "CAC ≥100 AU or ≥75th percentile for age/sex/ethnicity; or multi-territory plaque (carotid, femoral, coronary) on imaging" },
+  { id: "hr_cac", label: "High coronary calcium / extensive plaque burden" },
   { id: "hr_dmtod", label: "Diabetes with target organ damage" },
-  { id: "hr_extreme", label: "Extreme elevation of a single risk factor", qualifier: "e.g., LDL-C ≥190 mg/dL, TG ≥500 mg/dL, BP ≥180/120 mmHg, or A1c ≥10%" },
+  { id: "hr_extreme", label: "Extreme elevation of a single risk factor" },
 ];
 
 // ─── Risk modifiers checklist ───
@@ -129,6 +166,18 @@ const MODIFIER_CHECKLIST = [
   { id: "rm_prs", label: "High polygenic risk score", qualifier: "Top 5–10% of population-based genomic risk distribution for ASCVD" },
   { id: "rm_hiv", label: "HIV infection" },
 ];
+
+// All sub-checklist collections for auto-qualification
+const SUB_CHECKLISTS: Record<string, { id: string }[]> = {
+  hr_ascvd: ASCVD_ESTABLISHED,
+  hr_subclinical: SUBCLINICAL_ITEMS,
+  hr_ckd: CKD_ITEMS,
+  hr_fhx: FHX_ITEMS,
+  hr_cac: HIGH_CAC_ITEMS,
+  hr_extreme: EXTREME_ELEVATION_ITEMS,
+  hr_metsyn: METSYN_CRITERIA,
+  hr_dmtod: TOD_ALL,
+};
 
 // ─── Risk upgrade interpretation ───
 function getRiskUpgradeInterpretation(hrCount: number, rmCount: number) {
@@ -158,40 +207,109 @@ function getRiskUpgradeInterpretation(hrCount: number, rmCount: number) {
   return { severity, message, recommendation, total };
 }
 
+// Helper to count checked items
+function countCheckedItems(items: { id: string }[], checked: Record<string, boolean>) {
+  return items.filter((i) => checked[i.id]).length;
+}
+
+// Render a sub-checklist block
+function SubChecklist({
+  items,
+  checked,
+  toggle,
+  title,
+  colorClass = "warning",
+}: {
+  items: { id: string; label: string; qualifier?: string }[];
+  checked: Record<string, boolean>;
+  toggle: (id: string) => void;
+  title: string;
+  colorClass?: string;
+}) {
+  return (
+    <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+      <p className="text-xs font-semibold text-muted-foreground mb-2">{title}</p>
+      {items.map((item) => (
+        <label
+          key={item.id}
+          className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+            checked[item.id] ? `bg-${colorClass}/10 ring-1 ring-${colorClass}/15` : "hover:bg-muted/50"
+          }`}
+        >
+          <Checkbox
+            checked={!!checked[item.id]}
+            onCheckedChange={() => toggle(item.id)}
+            className="mt-0.5"
+          />
+          <div className="flex-1 min-w-0">
+            <span className="text-sm leading-snug text-foreground">{item.label}</span>
+            {item.qualifier && (
+              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
+            )}
+          </div>
+        </label>
+      ))}
+    </div>
+  );
+}
+
 export default function PrimaryPrevention() {
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [noteEdited, setNoteEdited] = useState(false);
   const [customNote, setCustomNote] = useState("");
   const [copied, setCopied] = useState(false);
+  const [indianEthnicity, setIndianEthnicity] = useState(false);
 
   const toggle = (id: string) =>
     setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  const countChecked = (items: { id: string }[]) =>
-    items.filter((i) => checked[i.id]).length;
+  const guideline = indianEthnicity
+    ? "LAI 2023 — Lipid Association of India Consensus Statement IV"
+    : "2026 ACC/AHA Guideline on the Management of Dyslipidemia";
 
-  const dmCount = countChecked(DM_CHECKLIST);
-  const acsCount = countChecked(ACS_CHECKLIST);
-  const msCount = countChecked(METSYN_CRITERIA);
+  const dmCount = countCheckedItems(DM_CHECKLIST, checked);
+  const acsCount = countCheckedItems(ACS_CHECKLIST, checked);
+  const msCount = countCheckedItems(METSYN_CRITERIA, checked);
   const metsynMet = msCount >= 3;
-  const todCount = countChecked(TOD_ALL);
+  const todCount = countCheckedItems(TOD_ALL, checked);
   const todMet = todCount >= 1;
-  const ascvdCount = countChecked(ASCVD_ESTABLISHED);
+  const ascvdCount = countCheckedItems(ASCVD_ESTABLISHED, checked);
   const ascvdMet = ascvdCount >= 1;
-  const dmTodMet = todMet; // reuse TOD sub-checklist for hr_dmtod
+  const subclinicalCount = countCheckedItems(SUBCLINICAL_ITEMS, checked);
+  const subclinicalMet = subclinicalCount >= 1;
+  const ckdCount = countCheckedItems(CKD_ITEMS, checked);
+  const ckdMet = ckdCount >= 1;
+  const fhxCount = countCheckedItems(FHX_ITEMS, checked);
+  const fhxMet = fhxCount >= 1;
+  const cacCount = countCheckedItems(HIGH_CAC_ITEMS, checked);
+  const cacMet = cacCount >= 1;
+  const extremeCount = countCheckedItems(EXTREME_ELEVATION_ITEMS, checked);
+  const extremeMet = extremeCount >= 1;
+  const dmTodMet = todMet;
 
-  // Auto-check/uncheck hr_metsyn, hr_ascvd, hr_dmtod based on sub-criteria
-  const hrCountRaw = countChecked(HIGHRISK_CHECKLIST);
-  let hrCount = hrCountRaw;
-  // Adjust for auto-qualified items
-  if (metsynMet && !checked["hr_metsyn"]) hrCount++;
-  if (!metsynMet && checked["hr_metsyn"]) hrCount--;
-  if (ascvdMet && !checked["hr_ascvd"]) hrCount++;
-  if (!ascvdMet && checked["hr_ascvd"]) hrCount--;
-  if (dmTodMet && !checked["hr_dmtod"]) hrCount++;
-  if (!dmTodMet && checked["hr_dmtod"]) hrCount--;
-  const rmCount = countChecked(MODIFIER_CHECKLIST);
+  // Auto-qualified high-risk items
+  const autoQualMap: Record<string, boolean> = {
+    hr_ascvd: ascvdMet,
+    hr_subclinical: subclinicalMet,
+    hr_metsyn: metsynMet,
+    hr_ckd: ckdMet,
+    hr_fhx: fhxMet,
+    hr_cac: cacMet,
+    hr_dmtod: dmTodMet,
+    hr_extreme: extremeMet,
+  };
+  const autoQualIds = new Set(Object.keys(autoQualMap));
 
+  let hrCount = 0;
+  HIGHRISK_CHECKLIST.forEach((item) => {
+    if (autoQualIds.has(item.id)) {
+      if (autoQualMap[item.id]) hrCount++;
+    } else {
+      if (checked[item.id]) hrCount++;
+    }
+  });
+
+  const rmCount = countCheckedItems(MODIFIER_CHECKLIST, checked);
   const riskInfo = useMemo(() => getRiskUpgradeInterpretation(hrCount, rmCount), [hrCount, rmCount]);
 
   // ─── Generate exportable note ───
@@ -199,6 +317,8 @@ export default function PrimaryPrevention() {
     const lines: string[] = [];
     lines.push("═══ PRIMARY PREVENTION — CLINICAL SUMMARY ═══");
     lines.push(`Date: ${new Date().toLocaleDateString()}`);
+    lines.push(`Guideline: ${guideline}`);
+    lines.push(`Ethnicity: ${indianEthnicity ? "Indian / South Asian" : "Not specified as Indian"}`);
     lines.push("");
 
     // Diabetes section
@@ -234,32 +354,35 @@ export default function PrimaryPrevention() {
 
     // High-risk features
     const hrChecked = HIGHRISK_CHECKLIST.filter((i) =>
-      checked[i.id] || (i.id === "hr_metsyn" && metsynMet) || (i.id === "hr_ascvd" && ascvdMet) || (i.id === "hr_dmtod" && dmTodMet)
+      autoQualIds.has(i.id) ? autoQualMap[i.id] : checked[i.id]
     );
     if (hrChecked.length > 0) {
       lines.push(`▸ HIGH-RISK FEATURES (${hrChecked.length}/${HIGHRISK_CHECKLIST.length}):`);
       hrChecked.forEach((i) => {
         lines.push(`  ✓ ${i.label}`);
-        if (i.id === "hr_ascvd") {
-          const ascvdChecked = ASCVD_ESTABLISHED.filter((a) => checked[a.id]);
-          ascvdChecked.forEach((a) => lines.push(`      • ${a.label}`));
-        }
-        if (i.id === "hr_metsyn") {
-          const msChecked = METSYN_CRITERIA.filter((m) => checked[m.id]);
-          lines.push(`    Sub-criteria met (${msCount}/5 — ≥3 required):`);
-          msChecked.forEach((m) => lines.push(`      • ${m.label}`));
-        }
-        if (i.id === "hr_dmtod") {
-          const microChecked = TOD_MICROVASCULAR.filter((t) => checked[t.id]);
-          const macroChecked = TOD_MACROVASCULAR.filter((t) => checked[t.id]);
-          lines.push(`    Target organ damage (${todCount}/${TOD_ALL.length} — ≥1 required):`);
-          if (microChecked.length > 0) {
-            lines.push("      Microvascular:");
-            microChecked.forEach((t) => lines.push(`        • ${t.label}`));
-          }
-          if (macroChecked.length > 0) {
-            lines.push("      Macrovascular/Cardiac:");
-            macroChecked.forEach((t) => lines.push(`        • ${t.label}`));
+        // Emit sub-items for each qualified feature
+        const subList = SUB_CHECKLISTS[i.id];
+        if (subList) {
+          const subChecked = subList.filter((s) => checked[s.id]);
+          if (subChecked.length > 0) {
+            if (i.id === "hr_dmtod") {
+              const microChecked = TOD_MICROVASCULAR.filter((t) => checked[t.id]);
+              const macroChecked = TOD_MACROVASCULAR.filter((t) => checked[t.id]);
+              lines.push(`    Target organ damage (${todCount}/${TOD_ALL.length} — ≥1 required):`);
+              if (microChecked.length > 0) {
+                lines.push("      Microvascular:");
+                microChecked.forEach((t) => lines.push(`        • ${t.label}`));
+              }
+              if (macroChecked.length > 0) {
+                lines.push("      Macrovascular/Cardiac:");
+                macroChecked.forEach((t) => lines.push(`        • ${t.label}`));
+              }
+            } else if (i.id === "hr_metsyn") {
+              lines.push(`    Sub-criteria met (${msCount}/5 — ≥3 required):`);
+              subChecked.forEach((s) => lines.push(`      • ${(s as any).label}`));
+            } else {
+              subChecked.forEach((s) => lines.push(`      • ${(s as any).label}`));
+            }
           }
         }
       });
@@ -283,6 +406,7 @@ export default function PrimaryPrevention() {
 
     // Guideline references
     lines.push("▸ GUIDELINE FRAMEWORK:");
+    lines.push(`  • Active guideline: ${guideline}`);
     lines.push("  • ACC/AHA: ≥1 risk-enhancing factor supports moderate-intensity statin for borderline/intermediate risk.");
     lines.push("  • ESC/SCORE2: 1–2 modifiers commonly suffice for reclassification; >4 risks overestimation.");
     lines.push("  • Practical: ≥2 metabolic modifiers alongside high-risk features double event rates.");
@@ -293,7 +417,7 @@ export default function PrimaryPrevention() {
     }
 
     return lines.join("\n");
-  }, [checked, riskInfo, hrCount, rmCount, msCount, metsynMet, todCount, todMet, ascvdCount, ascvdMet, dmTodMet]);
+  }, [checked, riskInfo, hrCount, rmCount, msCount, todCount, todMet, guideline, indianEthnicity, autoQualMap]);
 
   const displayNote = noteEdited ? customNote : generatedNote;
 
@@ -308,8 +432,44 @@ export default function PrimaryPrevention() {
     }
   };
 
+  // Helper to get status badge for auto-qualified items
+  const getStatusBadge = (id: string) => {
+    const subItems = SUB_CHECKLISTS[id];
+    if (!subItems) return null;
+    const met = autoQualMap[id];
+    const count = countCheckedItems(subItems, checked);
+    const total = subItems.length;
+    const minReq = id === "hr_metsyn" ? "≥3" : "≥1";
+    return (
+      <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+        met ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+      }`}>
+        {count}/{total} — {met ? "Qualified ✓" : `${minReq} required`}
+      </span>
+    );
+  };
+
   return (
     <div className="space-y-4">
+      {/* ─── Indian Ethnicity / Guideline Toggle ─── */}
+      <Card className="border-border bg-card p-4">
+        <label className="flex cursor-pointer items-center gap-3">
+          <Checkbox
+            checked={indianEthnicity}
+            onCheckedChange={() => setIndianEthnicity(!indianEthnicity)}
+          />
+          <Globe className="h-4 w-4 text-primary" />
+          <div className="flex-1">
+            <span className="text-sm font-semibold text-foreground">Indian / South Asian Ethnicity</span>
+            <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+              {indianEthnicity
+                ? "LAI 2023 guidelines applied (Lipid Association of India — Consensus IV)"
+                : "2026 ACC/AHA Guideline on the Management of Dyslipidemia (default)"}
+            </p>
+          </div>
+        </label>
+      </Card>
+
       {/* LDL-C Targets by 10-Year Risk */}
       <Card className="border-border bg-card p-5">
         <div className="flex items-center gap-2 mb-4">
@@ -421,14 +581,12 @@ export default function PrimaryPrevention() {
                   )}
                 </label>
 
-                {/* TOD sub-checklist — show under the first TOD item */}
+                {/* TOD sub-checklist */}
                 {item.id === "dm_tod" && (
                   <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
                     <p className="text-xs font-semibold text-muted-foreground">
                       Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
                     </p>
-
-                    {/* Microvascular */}
                     <div>
                       <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Microvascular</p>
                       <div className="space-y-1.5">
@@ -439,11 +597,7 @@ export default function PrimaryPrevention() {
                               checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
                             }`}
                           >
-                            <Checkbox
-                              checked={!!checked[tod.id]}
-                              onCheckedChange={() => toggle(tod.id)}
-                              className="mt-0.5"
-                            />
+                            <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
                             <div className="flex-1 min-w-0">
                               <span className="text-sm leading-snug text-foreground">{tod.label}</span>
                               <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
@@ -452,8 +606,6 @@ export default function PrimaryPrevention() {
                         ))}
                       </div>
                     </div>
-
-                    {/* Macrovascular */}
                     <div>
                       <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Macrovascular / Cardiac</p>
                       <div className="space-y-1.5">
@@ -464,11 +616,7 @@ export default function PrimaryPrevention() {
                               checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
                             }`}
                           >
-                            <Checkbox
-                              checked={!!checked[tod.id]}
-                              onCheckedChange={() => toggle(tod.id)}
-                              className="mt-0.5"
-                            />
+                            <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
                             <div className="flex-1 min-w-0">
                               <span className="text-sm leading-snug text-foreground">{tod.label}</span>
                               <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
@@ -506,21 +654,12 @@ export default function PrimaryPrevention() {
                 checked[item.id] ? "bg-primary/8 ring-1 ring-primary/20" : "hover:bg-muted/50"
               }`}
             >
-              <Checkbox
-                checked={!!checked[item.id]}
-                onCheckedChange={() => toggle(item.id)}
-                className="mt-0.5"
-              />
+              <Checkbox checked={!!checked[item.id]} onCheckedChange={() => toggle(item.id)} className="mt-0.5" />
               <span className="text-sm leading-snug text-foreground">{item.label}</span>
             </label>
           ))}
         </div>
       </Card>
-
-      {/* Subclinical Atherosclerosis */}
-      <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground leading-relaxed">
-        <strong>Subclinical Atherosclerosis:</strong> Any form — including nonobstructive carotid, femoral, or coronary plaques or ABI &lt;0.9 — is considered <strong>equivalent to ASCVD</strong>, with similar LDL-C targets as for clinically manifest ASCVD.
-      </div>
 
       {/* ─── High-Risk Features (Checklist) ─── */}
       <Card className="border-border bg-card p-5">
@@ -537,12 +676,8 @@ export default function PrimaryPrevention() {
         </div>
         <div className="space-y-2 mt-3">
           {HIGHRISK_CHECKLIST.map((item) => {
-            const isAutoItem = item.id === "hr_metsyn" || item.id === "hr_ascvd" || item.id === "hr_dmtod";
-            const isAutoMet = item.id === "hr_metsyn" ? metsynMet
-              : item.id === "hr_ascvd" ? ascvdMet
-              : item.id === "hr_dmtod" ? dmTodMet
-              : false;
-            const isChecked = isAutoItem ? isAutoMet : !!checked[item.id];
+            const isAuto = autoQualIds.has(item.id);
+            const isChecked = isAuto ? autoQualMap[item.id] : !!checked[item.id];
 
             return (
               <div key={item.id}>
@@ -551,100 +686,106 @@ export default function PrimaryPrevention() {
                     isChecked ? "bg-warning/8 ring-1 ring-warning/20" : "hover:bg-muted/50"
                   }`}
                 >
-                  {isAutoItem ? (
+                  {isAuto ? (
                     <>
-                      <Checkbox checked={isAutoMet} disabled className="mt-0.5" />
+                      <Checkbox checked={isChecked} disabled className="mt-0.5" />
                       <div className="flex-1">
                         <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                        {item.id === "hr_metsyn" && (
-                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                            metsynMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                          }`}>
-                            {msCount}/5 — {metsynMet ? "Criteria Met ✓" : "≥3 required"}
-                          </span>
-                        )}
-                        {item.id === "hr_ascvd" && (
-                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                            ascvdMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                          }`}>
-                            {ascvdCount}/{ASCVD_ESTABLISHED.length} — {ascvdMet ? "Confirmed ✓" : "≥1 required"}
-                          </span>
-                        )}
-                        {item.id === "hr_dmtod" && (
-                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                            dmTodMet ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                          }`}>
-                            TOD: {todCount}/{TOD_ALL.length} — {dmTodMet ? "Qualified ✓" : "≥1 required"}
-                          </span>
-                        )}
+                        {getStatusBadge(item.id)}
                       </div>
                     </>
                   ) : (
                     <>
-                      <Checkbox
-                        checked={!!checked[item.id]}
-                        onCheckedChange={() => toggle(item.id)}
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                        {item.qualifier && (
-                          <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
-                        )}
-                      </div>
+                      <Checkbox checked={!!checked[item.id]} onCheckedChange={() => toggle(item.id)} className="mt-0.5" />
+                      <span className="text-sm leading-snug text-foreground">{item.label}</span>
                     </>
                   )}
                 </label>
 
                 {/* Established ASCVD sub-checklist */}
                 {item.id === "hr_ascvd" && (
+                  <SubChecklist
+                    items={ASCVD_ESTABLISHED}
+                    checked={checked}
+                    toggle={toggle}
+                    title="Select applicable ASCVD manifestations (≥1 required):"
+                  />
+                )}
+
+                {/* Subclinical atherosclerosis sub-checklist */}
+                {item.id === "hr_subclinical" && (
+                  <SubChecklist
+                    items={SUBCLINICAL_ITEMS}
+                    checked={checked}
+                    toggle={toggle}
+                    title="Select applicable subclinical findings (≥1 required). Any form is considered equivalent to ASCVD with similar LDL-C targets:"
+                  />
+                )}
+
+                {/* CKD sub-checklist */}
+                {item.id === "hr_ckd" && (
+                  <SubChecklist
+                    items={CKD_ITEMS}
+                    checked={checked}
+                    toggle={toggle}
+                    title="Select CKD stage and albuminuria status (≥1 required):"
+                  />
+                )}
+
+                {/* Family history sub-checklist */}
+                {item.id === "hr_fhx" && (
                   <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-                    <p className="text-xs font-semibold text-muted-foreground mb-2">
-                      Select applicable ASCVD manifestations (≥1 required):
+                    <p className="text-xs font-semibold text-muted-foreground mb-1">
+                      Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):
                     </p>
-                    {ASCVD_ESTABLISHED.map((a) => (
+                    <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
+                      "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
+                    </p>
+                    {FHX_ITEMS.map((f) => (
                       <label
-                        key={a.id}
+                        key={f.id}
                         className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                          checked[a.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                          checked[f.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
                         }`}
                       >
-                        <Checkbox
-                          checked={!!checked[a.id]}
-                          onCheckedChange={() => toggle(a.id)}
-                          className="mt-0.5"
-                        />
+                        <Checkbox checked={!!checked[f.id]} onCheckedChange={() => toggle(f.id)} className="mt-0.5" />
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm leading-snug text-foreground">{a.label}</span>
-                          <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{a.qualifier}</p>
+                          <span className="text-sm leading-snug text-foreground">{f.label}</span>
+                          <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{f.qualifier}</p>
                         </div>
                       </label>
                     ))}
                   </div>
                 )}
 
+                {/* High CAC / extensive plaque sub-checklist */}
+                {item.id === "hr_cac" && (
+                  <SubChecklist
+                    items={HIGH_CAC_ITEMS}
+                    checked={checked}
+                    toggle={toggle}
+                    title="Select applicable high CAC / plaque burden findings (≥1 required):"
+                  />
+                )}
+
+                {/* Extreme elevation sub-checklist */}
+                {item.id === "hr_extreme" && (
+                  <SubChecklist
+                    items={EXTREME_ELEVATION_ITEMS}
+                    checked={checked}
+                    toggle={toggle}
+                    title="Select applicable extreme risk factor elevations (≥1 required):"
+                  />
+                )}
+
                 {/* Metabolic Syndrome sub-checklist */}
                 {item.id === "hr_metsyn" && (
-                  <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-                    <p className="text-xs font-semibold text-muted-foreground mb-2">
-                      Diagnostic Criteria (at least 3 of 5 required):
-                    </p>
-                    {METSYN_CRITERIA.map((ms) => (
-                      <label
-                        key={ms.id}
-                        className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                          checked[ms.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                        }`}
-                      >
-                        <Checkbox
-                          checked={!!checked[ms.id]}
-                          onCheckedChange={() => toggle(ms.id)}
-                          className="mt-0.5"
-                        />
-                        <span className="text-sm leading-snug text-foreground">{ms.label}</span>
-                      </label>
-                    ))}
-                  </div>
+                  <SubChecklist
+                    items={METSYN_CRITERIA}
+                    checked={checked}
+                    toggle={toggle}
+                    title="Diagnostic Criteria (at least 3 of 5 required):"
+                  />
                 )}
 
                 {/* DM Target Organ Damage sub-checklist */}
@@ -663,11 +804,7 @@ export default function PrimaryPrevention() {
                               checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
                             }`}
                           >
-                            <Checkbox
-                              checked={!!checked[tod.id]}
-                              onCheckedChange={() => toggle(tod.id)}
-                              className="mt-0.5"
-                            />
+                            <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
                             <div className="flex-1 min-w-0">
                               <span className="text-sm leading-snug text-foreground">{tod.label}</span>
                               <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
@@ -686,11 +823,7 @@ export default function PrimaryPrevention() {
                               checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
                             }`}
                           >
-                            <Checkbox
-                              checked={!!checked[tod.id]}
-                              onCheckedChange={() => toggle(tod.id)}
-                              className="mt-0.5"
-                            />
+                            <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
                             <div className="flex-1 min-w-0">
                               <span className="text-sm leading-snug text-foreground">{tod.label}</span>
                               <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
@@ -731,11 +864,7 @@ export default function PrimaryPrevention() {
                 checked[item.id] ? "bg-primary/8 ring-1 ring-primary/20" : "hover:bg-muted/50"
               }`}
             >
-              <Checkbox
-                checked={!!checked[item.id]}
-                onCheckedChange={() => toggle(item.id)}
-                className="mt-0.5"
-              />
+              <Checkbox checked={!!checked[item.id]} onCheckedChange={() => toggle(item.id)} className="mt-0.5" />
               <div className="flex-1 min-w-0">
                 <span className="text-sm leading-snug text-foreground">{item.label}</span>
                 {item.qualifier && (
