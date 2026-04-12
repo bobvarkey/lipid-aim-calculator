@@ -15,16 +15,15 @@ import {
   TestTube, ChevronDown, Stethoscope, FileText,
 } from "lucide-react";
 import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
-import ClinicalGuidance from "@/components/calculator/ClinicalGuidance";
+
 import EducationSection from "@/components/calculator/EducationSection";
 import { calculatePrevent, type PreventResult } from "@/lib/prevent";
 
-type TabKey = "calculator" | "primary" | "flowchart" | "education";
+type TabKey = "calculator" | "primary" | "education";
 
 const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
   { key: "calculator", label: "Calculator", icon: <Target className="h-4 w-4" /> },
   { key: "primary", label: "Prevention", icon: <ShieldCheck className="h-4 w-4" /> },
-  { key: "flowchart", label: "Flowchart", icon: <Activity className="h-4 w-4" /> },
   { key: "education", label: "Education", icon: <Heart className="h-4 w-4" /> },
 ];
 
@@ -789,7 +788,6 @@ export default function LipidCalculator() {
         )}
 
         {activeTab === "primary" && <PrimaryPrevention />}
-        {activeTab === "flowchart" && <ClinicalGuidance />}
         {activeTab === "education" && <EducationSection />}
 
         <p className="mt-8 text-center text-xs text-muted-foreground pb-6">
