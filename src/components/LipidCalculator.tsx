@@ -353,7 +353,7 @@ export default function LipidCalculator() {
       lines.push("");
     }
     lines.push("═══════════════════════════════════════════════════");
-    lines.push("Ref: Lipid Association of India 2023 — Consensus Statement IV");
+    lines.push("Ref: 2026 ACC/AHA Guideline on Management of Dyslipidemia · LAI 2023 Consensus IV");
     return lines.join("\n");
   }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, creatinine, egfr, egfrAuto, hscrp, age, sex, height, weight, bmi, bmiAuto, ckdStage, preventResult, sbp, totalChol, bpMed, onStatin]);
 
@@ -393,10 +393,10 @@ export default function LipidCalculator() {
             </div>
             <div className="min-w-0 flex-1">
               <h1 className="font-display text-base font-bold tracking-tight text-foreground truncate">
-                LAI Extreme Risk Predictor
+                Lipid Risk Predictor
               </h1>
               <p className="text-[10px] text-muted-foreground truncate">
-                Lipid Association of India 2023 — Consensus IV
+                Cardiovascular Risk Assessment & Management
               </p>
             </div>
             <Button variant="ghost" size="sm" className="no-print shrink-0" onClick={reset}>
@@ -791,7 +791,7 @@ export default function LipidCalculator() {
         {activeTab === "education" && <EducationSection />}
 
         <p className="mt-8 text-center text-xs text-muted-foreground pb-6">
-          Reference: Lipid Association of India 2023 Update — Consensus Statement IV
+          Reference: 2026 ACC/AHA Guideline on Management of Dyslipidemia · LAI 2023 Consensus IV
         </p>
       </div>
     </div>
