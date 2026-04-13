@@ -59,7 +59,31 @@ const RISK_TIERS = [
   { risk: "High (≥20%)", ldl: "<55 mg/dL", color: "text-danger", bg: "bg-danger/10" },
 ];
 
-// Constants imported from @/lib/clinicalConstants
+// ─── Diabetes checklist items ───
+const DM_CHECKLIST = [
+  { id: "dm_baseline", label: "Diabetes mellitus (baseline)", target: "<70 mg/dL", hasTod: false },
+  { id: "dm_tod", label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL", hasTod: true },
+  { id: "dm_ascvd", label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (optional)", hasTod: false },
+  { id: "dm_ascvd_tod", label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL", hasTod: true },
+];
+
+// ─── ACS checklist ───
+const ACS_CHECKLIST = [
+  { id: "acs_ldl50", label: "All ASCVD patients must achieve LDL-C <50 mg/dL" },
+  { id: "acs_recurrent", label: "Recurrent ACS or polyvascular disease (Extreme Risk B): target ≤30 mg/dL" },
+  { id: "acs_triage", label: "Lipid profile at emergency triage, repeat within 2 weeks of initiating therapy" },
+  { id: "acs_combo", label: "Start combination therapy (high-intensity statin + ezetimibe) at presentation to ED" },
+  { id: "acs_intensify", label: "Intensify every 2 weeks until goals achieved, preferably by week 4" },
+];
+
+// ─── Metabolic Syndrome sub-criteria (≥3 required) ───
+const METSYN_CRITERIA = [
+  { id: "ms_waist", label: "Large waistline — >40 in (102 cm) ♂, >35 in (88 cm) ♀" },
+  { id: "ms_tg", label: "High triglycerides — ≥150 mg/dL (1.7 mmol/L) or on TG medication" },
+  { id: "ms_hdl", label: "Low HDL — <40 mg/dL (1.0 mmol/L) ♂, <50 mg/dL (1.3 mmol/L) ♀, or on HDL medication" },
+  { id: "ms_bp", label: "High blood pressure — ≥130 systolic or ≥85 diastolic, or on antihypertensive" },
+  { id: "ms_glucose", label: "High fasting glucose — ≥100 mg/dL (5.6 mmol/L) or on glucose-lowering medication" },
+];
 
 // ─── High-risk features checklist ───
 const HIGHRISK_CHECKLIST = [
