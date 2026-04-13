@@ -5,6 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ShieldCheck, AlertTriangle, Heart, Activity, Copy, FileText, CheckCircle2, Globe } from "lucide-react";
 import { toast } from "sonner";
+import {
+  ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
+  FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
+  TOD_ALL, countCheckedItems,
+} from "@/lib/clinicalConstants";
 
 const STEPS = [
   {
@@ -54,87 +59,7 @@ const RISK_TIERS = [
   { risk: "High (≥20%)", ldl: "<55 mg/dL", color: "text-danger", bg: "bg-danger/10" },
 ];
 
-// ─── Diabetes Target Organ Damage sub-criteria (≥1 required) ───
-const TOD_MICROVASCULAR = [
-  { id: "tod_retinopathy", label: "Diabetic retinopathy", qualifier: "Microaneurysms, hemorrhages, macular edema on fundoscopy or retinal imaging" },
-  { id: "tod_nephropathy", label: "Diabetic nephropathy", qualifier: "UACR ≥30 mg/g (micro-/macroalbuminuria) or reduced eGFR for age" },
-  { id: "tod_neuropathy", label: "Diabetic neuropathy", qualifier: "Distal symmetric polyneuropathy, autonomic neuropathy, or foot-ulcer risk (monofilament/NCS)" },
-];
-const TOD_MACROVASCULAR = [
-  { id: "tod_lvh", label: "Left-ventricular hypertrophy (LVH)", qualifier: "Increased LV mass index on echocardiography" },
-  { id: "tod_diastolic", label: "Diastolic dysfunction", qualifier: "Abnormal E/e′ ratio or impaired global longitudinal strain on echo" },
-  { id: "tod_subclinical_tod", label: "Subclinical atherosclerosis", qualifier: "Elevated carotid IMT, carotid/femoral plaque, or coronary calcium score" },
-];
-const TOD_ALL = [...TOD_MICROVASCULAR, ...TOD_MACROVASCULAR];
-
-// ─── Diabetes checklist items ───
-const DM_CHECKLIST = [
-  { id: "dm_baseline", label: "Diabetes mellitus (baseline)", target: "<70 mg/dL", hasTod: false },
-  { id: "dm_tod", label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL", hasTod: true },
-  { id: "dm_ascvd", label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (optional)", hasTod: false },
-  { id: "dm_ascvd_tod", label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL", hasTod: true },
-];
-
-// ─── ACS checklist ───
-const ACS_CHECKLIST = [
-  { id: "acs_ldl50", label: "All ASCVD patients must achieve LDL-C <50 mg/dL" },
-  { id: "acs_recurrent", label: "Recurrent ACS or polyvascular disease (Extreme Risk B): target ≤30 mg/dL" },
-  { id: "acs_triage", label: "Lipid profile at emergency triage, repeat within 2 weeks of initiating therapy" },
-  { id: "acs_combo", label: "Start combination therapy (high-intensity statin + ezetimibe) at presentation to ED" },
-  { id: "acs_intensify", label: "Intensify every 2 weeks until goals achieved, preferably by week 4" },
-];
-
-// ─── Metabolic Syndrome sub-criteria (≥3 required) ───
-const METSYN_CRITERIA = [
-  { id: "ms_waist", label: "Large waistline — >40 in (102 cm) ♂, >35 in (88 cm) ♀" },
-  { id: "ms_tg", label: "High triglycerides — ≥150 mg/dL (1.7 mmol/L) or on TG medication" },
-  { id: "ms_hdl", label: "Low HDL — <40 mg/dL (1.0 mmol/L) ♂, <50 mg/dL (1.3 mmol/L) ♀, or on HDL medication" },
-  { id: "ms_bp", label: "High blood pressure — ≥130 systolic or ≥85 diastolic, or on antihypertensive" },
-  { id: "ms_glucose", label: "High fasting glucose — ≥100 mg/dL (5.6 mmol/L) or on glucose-lowering medication" },
-];
-
-// ─── Established ASCVD sub-items ───
-const ASCVD_ESTABLISHED = [
-  { id: "ascvd_cad", label: "CAD / Coronary ASCVD", qualifier: "Prior MI, angina requiring revascularization, or angiographically confirmed coronary stenosis ≥50%" },
-  { id: "ascvd_stroke", label: "Ischemic stroke or TIA", qualifier: "Prior ischemic stroke confirmed by imaging, or TIA with neurovascular evidence of atherosclerotic origin" },
-  { id: "ascvd_pad", label: "Peripheral arterial disease (PAD)", qualifier: "ABI <0.9, claudication with imaging confirmation, or prior peripheral revascularization" },
-];
-
-// ─── Subclinical atherosclerosis sub-items ───
-const SUBCLINICAL_ITEMS = [
-  { id: "sub_cimt", label: "Elevated carotid IMT", qualifier: "Carotid intima-media thickness >75th percentile for age/sex" },
-  { id: "sub_plaque", label: "Carotid or femoral plaque", qualifier: "Focal wall thickening ≥1.5 mm or >50% adjacent IMT on ultrasound" },
-  { id: "sub_cac", label: "Coronary calcium score (CAC >0)", qualifier: "Any detectable coronary calcium; CAC ≥100 AU or ≥75th percentile = higher risk" },
-  { id: "sub_abi", label: "ABI <0.9", qualifier: "Ankle-brachial index <0.9 indicating peripheral atherosclerosis" },
-];
-
-// ─── High CAC / extensive plaque sub-items ───
-const HIGH_CAC_ITEMS = [
-  { id: "cac_100", label: "CAC ≥100 AU or ≥75th percentile", qualifier: "Agatston score ≥100 or above 75th percentile for age/sex/ethnicity" },
-  { id: "cac_multi", label: "Multi-territory plaque burden", qualifier: "Atherosclerotic plaque in ≥2 vascular beds (carotid, femoral, coronary, aortic) on imaging" },
-  { id: "cac_stenosis", label: "Nonobstructive coronary stenosis on CCTA", qualifier: "≥1 coronary segment with plaque without hemodynamically significant stenosis" },
-];
-
-// ─── CKD 3B/4 sub-items ───
-const CKD_ITEMS = [
-  { id: "ckd_3b", label: "Stage 3B: eGFR 30–44 mL/min/1.73 m²", qualifier: "Moderately-to-severely decreased kidney function" },
-  { id: "ckd_4", label: "Stage 4: eGFR 15–29 mL/min/1.73 m²", qualifier: "Severely decreased kidney function" },
-  { id: "ckd_albumin", label: "Albuminuria: UACR ≥30 mg/g", qualifier: "Moderately increased (30–300) or severely increased (>300) albuminuria" },
-];
-
-// ─── Family history sub-items ───
-const FHX_ITEMS = [
-  { id: "fhx_male", label: "1st-degree male relative with CHD before age 55", qualifier: "Father, brother, or son with MI, coronary revascularization, or angina <55 y" },
-  { id: "fhx_female", label: "1st-degree female relative with CHD before age 65", qualifier: "Mother, sister, or daughter with MI, coronary revascularization, or angina <65 y" },
-];
-
-// ─── Extreme elevation sub-items ───
-const EXTREME_ELEVATION_ITEMS = [
-  { id: "ext_ldl", label: "LDL-C ≥190 mg/dL", qualifier: "Severe hypercholesterolemia — consider familial hypercholesterolemia workup" },
-  { id: "ext_tg", label: "Triglycerides ≥500 mg/dL", qualifier: "Severe hypertriglyceridemia — pancreatitis risk; fibrate or omega-3 FA indicated" },
-  { id: "ext_bp", label: "Blood pressure ≥180/120 mmHg", qualifier: "Hypertensive crisis — immediate evaluation and treatment required" },
-  { id: "ext_a1c", label: "HbA1c ≥10%", qualifier: "Severely uncontrolled diabetes — insulin therapy often required" },
-];
+// Constants imported from @/lib/clinicalConstants
 
 // ─── High-risk features checklist ───
 const HIGHRISK_CHECKLIST = [
@@ -207,10 +132,7 @@ function getRiskUpgradeInterpretation(hrCount: number, rmCount: number) {
   return { severity, message, recommendation, total };
 }
 
-// Helper to count checked items
-function countCheckedItems(items: { id: string }[], checked: Record<string, boolean>) {
-  return items.filter((i) => checked[i.id]).length;
-}
+// countCheckedItems imported from @/lib/clinicalConstants
 
 // Render a sub-checklist block
 function SubChecklist({
