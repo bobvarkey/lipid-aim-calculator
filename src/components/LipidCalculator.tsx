@@ -50,16 +50,13 @@ const MAJOR_RF_LABELS: Record<string, string> = {
 
 // ─── ASCVD history & extreme-risk modifiers ───
 const MODIFIER_KEYS = [
-  "ascvd", "cad", "stroke", "pad", "polyvascular",
+  "ascvd", "polyvascular",
   "tod", "fh", "hofh", "subclinical", "ckd34",
   "recurrent50", "acs12", "sequelae30",
 ] as const;
 
 const MODIFIER_LABELS: Record<string, string> = {
   ascvd: "Established ASCVD",
-  cad: "CAD / coronary ASCVD",
-  stroke: "Ischemic stroke or TIA of atherosclerotic origin",
-  pad: "PAD",
   polyvascular: "Polyvascular disease (≥2 arterial territories: CAD, cerebrovascular, PAD)",
   tod: "Diabetes target organ damage",
   fh: "Familial hypercholesterolemia / strong family history",
