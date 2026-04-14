@@ -528,11 +528,49 @@ export default function LipidCalculator() {
                     BMI {bmiAuto && <span className="text-[10px] font-normal text-primary">auto</span>}
                   </label>
                   <Input type="number" placeholder="26" value={bmi} onChange={(e) => { setBmi(e.target.value); setBmiAuto(false); setHeight(""); setWeight(""); }} className={bmiAuto ? "bg-muted" : ""} />
-                  {!isNaN(parseFloat(bmi)) && parseFloat(bmi) >= 25 && (
-                    <p className="mt-0.5 text-[10px] font-medium text-danger">≥25 → Obesity (Asian cut-off)</p>
-                  )}
+                  {(() => {
+                    const bmiVal = parseFloat(bmi);
+                    if (isNaN(bmiVal) || bmiVal <= 0) return null;
+                    const asian = getAsianBmiClass(bmiVal);
+                    const who = getWhoBmiClass(bmiVal);
+                    return (
+                      <div className="mt-1.5 space-y-1">
+                        <p className={`text-[10px] font-medium ${asian.color}`}>
+                          Asian: {asian.label} (BMI {bmiVal.toFixed(1)})
+                        </p>
+                        <p className={`text-[10px] font-medium ${who.color}`}>
+                          WHO: {who.label}
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
+              {/* Asian BMI Classification Reference */}
+              {!isNaN(parseFloat(bmi)) && (
+                <div className="mt-3 rounded-lg border border-border bg-muted/30 p-3">
+                  <p className="text-[10px] font-semibold text-muted-foreground mb-2">
+                    Asian-Specific BMI Cut-offs (WHO Asia-Pacific Guidelines)
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+                    {[
+                      { range: "18.5–22.9", label: "Normal", color: "text-success" },
+                      { range: "23–24.9", label: "Overweight", color: "text-warning" },
+                      { range: "25–27.4", label: "Obese I", color: "text-danger" },
+                      { range: "≥27.5", label: "Obese II", color: "text-danger" },
+                    ].map((tier) => (
+                      <div key={tier.label} className={`rounded px-2 py-1.5 bg-muted/50 ${tier.color}`}>
+                        <span className="font-bold">{tier.label}</span>
+                        <br />
+                        <span className="text-muted-foreground">{tier.range}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-2 leading-snug">
+                    Asian populations face higher metabolic risks at lower BMI. India: overweight ≥23, obesity ≥25. Japan: obesity ≥25. China: obesity ≥28.
+                  </p>
+                </div>
+              )}
             </Section>
 
             {/* ── Section 2: Lab Values ── */}
