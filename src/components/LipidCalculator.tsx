@@ -15,6 +15,11 @@ import {
   TestTube, ChevronDown, Stethoscope, FileText,
 } from "lucide-react";
 import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
+import {
+  ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
+  FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
+  TOD_ALL, countCheckedItems, type SubItem,
+} from "@/lib/clinicalConstants";
 
 import EducationSection from "@/components/calculator/EducationSection";
 import { calculatePrevent, type PreventResult } from "@/lib/prevent";
