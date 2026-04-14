@@ -15,6 +15,11 @@ import {
   TestTube, ChevronDown, Stethoscope, FileText,
 } from "lucide-react";
 import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
+import {
+  ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
+  FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
+  TOD_ALL, countCheckedItems, type SubItem,
+} from "@/lib/clinicalConstants";
 
 import EducationSection from "@/components/calculator/EducationSection";
 import { calculatePrevent, type PreventResult } from "@/lib/prevent";
@@ -65,6 +70,30 @@ const MODIFIER_LABELS: Record<string, string> = {
   acs12: "Recurrent ACS within 12 months despite being on LDL goal",
   sequelae30: "Ongoing ASCVD sequelae despite LDL-C ≤30 mg/dL and intensive therapy",
 };
+
+// Modifiers that have sub-checklists for auto-qualification
+const MOD_SUB_MAP: Record<string, { items: SubItem[]; title: string }> = {
+  ascvd: { items: ASCVD_ESTABLISHED, title: "Select applicable ASCVD manifestations (≥1 required):" },
+  subclinical: { items: HIGH_CAC_ITEMS, title: "Select applicable high CAC / plaque burden findings (≥1 required):" },
+  ckd34: { items: CKD_ITEMS, title: "Select CKD stage and albuminuria status (≥1 required):" },
+  fh: { items: FHX_ITEMS, title: "Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):" },
+};
+
+// Asian BMI classification helper
+function getAsianBmiClass(bmiVal: number): { label: string; color: string } {
+  if (bmiVal < 18.5) return { label: "Underweight", color: "text-primary" };
+  if (bmiVal < 23) return { label: "Normal", color: "text-success" };
+  if (bmiVal < 25) return { label: "Overweight (At Risk)", color: "text-warning" };
+  if (bmiVal < 27.5) return { label: "Obese I", color: "text-danger" };
+  return { label: "Obese II", color: "text-danger" };
+}
+
+function getWhoBmiClass(bmiVal: number): { label: string; color: string } {
+  if (bmiVal < 18.5) return { label: "Underweight", color: "text-primary" };
+  if (bmiVal < 25) return { label: "Normal", color: "text-success" };
+  if (bmiVal < 30) return { label: "Overweight", color: "text-warning" };
+  return { label: "Obese", color: "text-danger" };
+}
 
 // ─── Result buckets ───
 interface CategoryResult {
@@ -190,6 +219,37 @@ export default function LipidCalculator() {
   const [modChecked, setModChecked] = useState<Record<string, boolean>>(
     Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false]))
   );
+
+  // ─── Sub-checklist state for modifier auto-qualification ───
+  const [subChecked, setSubChecked] = useState<Record<string, boolean>>({});
+  const toggleSub = (id: string) =>
+    setSubChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  // Auto-qualification: if any sub-item is checked, parent modifier is auto-qualified
+  const modAutoQual = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    for (const [modKey, config] of Object.entries(MOD_SUB_MAP)) {
+      map[modKey] = countCheckedItems(config.items, subChecked) >= 1;
+    }
+    // TOD auto-qual
+    map.tod = countCheckedItems(TOD_ALL, subChecked) >= 1;
+    return map;
+  }, [subChecked]);
+
+  // Auto-sync modChecked when sub-checklists qualify
+  useEffect(() => {
+    setModChecked((prev) => {
+      let next = { ...prev };
+      let changed = false;
+      for (const [key, qualified] of Object.entries(modAutoQual)) {
+        if (qualified && !prev[key]) {
+          next[key] = true;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [modAutoQual]);
 
   const [copied, setCopied] = useState(false);
 
@@ -325,7 +385,12 @@ export default function LipidCalculator() {
     lines.push("── DEMOGRAPHICS ──");
     lines.push("Age: " + (age || "—") + " | Sex: " + (sex === "male" ? "Male" : "Female"));
     if (height || weight || bmi) {
-      lines.push("Height: " + (height ? height + " cm" : "—") + " | Weight: " + (weight ? weight + " kg" : "—") + " | BMI: " + (bmi ? bmi + " kg/m²" + (bmiAuto ? " (auto)" : "") : "—"));
+      const bmiVal = parseFloat(bmi);
+      let bmiNote = "Height: " + (height ? height + " cm" : "—") + " | Weight: " + (weight ? weight + " kg" : "—") + " | BMI: " + (bmi ? bmi + " kg/m²" + (bmiAuto ? " (auto)" : "") : "—");
+      if (!isNaN(bmiVal)) {
+        bmiNote += " → Asian: " + getAsianBmiClass(bmiVal).label + " | WHO: " + getWhoBmiClass(bmiVal).label;
+      }
+      lines.push(bmiNote);
     }
     lines.push("");
     lines.push("── LAB VALUES ──");
@@ -337,12 +402,31 @@ export default function LipidCalculator() {
     MAJOR_RF_KEYS.forEach((k) => lines.push("  " + (rfChecked[k] ? "✓" : "✗") + " " + MAJOR_RF_LABELS[k]));
     lines.push("");
     lines.push("── ASCVD HISTORY & EXTREME-RISK MODIFIERS ──");
-    MODIFIER_KEYS.forEach((k) => lines.push("  " + (modChecked[k] ? "✓" : "✗") + " " + MODIFIER_LABELS[k]));
+    MODIFIER_KEYS.forEach((k) => {
+      lines.push("  " + (modChecked[k] ? "✓" : "✗") + " " + MODIFIER_LABELS[k]);
+      // Emit sub-checklist details
+      const subConfig = MOD_SUB_MAP[k];
+      if (modChecked[k] && subConfig) {
+        subConfig.items.filter((s) => subChecked[s.id]).forEach((s) => lines.push("      • " + s.label));
+      }
+      if (modChecked[k] && k === "tod") {
+        const micro = TOD_MICROVASCULAR.filter((t) => subChecked[t.id]);
+        const macro = TOD_MACROVASCULAR.filter((t) => subChecked[t.id]);
+        if (micro.length > 0) {
+          lines.push("      Microvascular:");
+          micro.forEach((t) => lines.push("        • " + t.label));
+        }
+        if (macro.length > 0) {
+          lines.push("      Macrovascular/Cardiac:");
+          macro.forEach((t) => lines.push("        • " + t.label));
+        }
+      }
+    });
     lines.push("");
     lines.push("── QUALIFIERS ──");
     lines.push("  Established ASCVD: " + (modChecked.ascvd ? "YES" : "No"));
     lines.push("  Family Hx premature CHD: " + (rfChecked.fhx ? "YES" : "No"));
-    lines.push("  Obesity: " + (rfChecked.obesity ? "YES" + (bmi ? " (BMI " + bmi + ")" : "") : "No"));
+    lines.push("  Obesity: " + (rfChecked.obesity ? "YES" + (bmi ? " (BMI " + bmi + " — Asian: " + getAsianBmiClass(parseFloat(bmi)).label + ")" : "") : "No"));
     lines.push("  High coronary calcium: " + (modChecked.subclinical ? "YES" : "No"));
     lines.push("  CKD: " + (rfChecked.ckd ? "YES" + (ckdStage ? " — " + ckdStage : "") : "No"));
     lines.push("  CKD Stage 3B/4: " + (modChecked.ckd34 ? "YES" : "No"));
@@ -355,7 +439,7 @@ export default function LipidCalculator() {
     lines.push("═══════════════════════════════════════════════════");
     lines.push("Ref: 2026 ACC/AHA Guideline on Management of Dyslipidemia · LAI 2023 Consensus IV");
     return lines.join("\n");
-  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, creatinine, egfr, egfrAuto, hscrp, age, sex, height, weight, bmi, bmiAuto, ckdStage, preventResult, sbp, totalChol, bpMed, onStatin]);
+  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, creatinine, egfr, egfrAuto, hscrp, age, sex, height, weight, bmi, bmiAuto, ckdStage, preventResult, sbp, totalChol, bpMed, onStatin, subChecked]);
 
   const copyNote = async () => {
     try { await navigator.clipboard.writeText(generateNote()); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch {}
@@ -368,6 +452,7 @@ export default function LipidCalculator() {
     setSbp(""); setTotalChol(""); setBpMed(false); setOnStatin(false);
     setRfChecked(Object.fromEntries(MAJOR_RF_KEYS.map((k) => [k, false])));
     setModChecked(Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false])));
+    setSubChecked({});
   };
 
   // ─── Goal checks ───
@@ -468,11 +553,49 @@ export default function LipidCalculator() {
                     BMI {bmiAuto && <span className="text-[10px] font-normal text-primary">auto</span>}
                   </label>
                   <Input type="number" placeholder="26" value={bmi} onChange={(e) => { setBmi(e.target.value); setBmiAuto(false); setHeight(""); setWeight(""); }} className={bmiAuto ? "bg-muted" : ""} />
-                  {!isNaN(parseFloat(bmi)) && parseFloat(bmi) >= 25 && (
-                    <p className="mt-0.5 text-[10px] font-medium text-danger">≥25 → Obesity (Asian cut-off)</p>
-                  )}
+                  {(() => {
+                    const bmiVal = parseFloat(bmi);
+                    if (isNaN(bmiVal) || bmiVal <= 0) return null;
+                    const asian = getAsianBmiClass(bmiVal);
+                    const who = getWhoBmiClass(bmiVal);
+                    return (
+                      <div className="mt-1.5 space-y-1">
+                        <p className={`text-[10px] font-medium ${asian.color}`}>
+                          Asian: {asian.label} (BMI {bmiVal.toFixed(1)})
+                        </p>
+                        <p className={`text-[10px] font-medium ${who.color}`}>
+                          WHO: {who.label}
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
+              {/* Asian BMI Classification Reference */}
+              {!isNaN(parseFloat(bmi)) && (
+                <div className="mt-3 rounded-lg border border-border bg-muted/30 p-3">
+                  <p className="text-[10px] font-semibold text-muted-foreground mb-2">
+                    Asian-Specific BMI Cut-offs (WHO Asia-Pacific Guidelines)
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+                    {[
+                      { range: "18.5–22.9", label: "Normal", color: "text-success" },
+                      { range: "23–24.9", label: "Overweight", color: "text-warning" },
+                      { range: "25–27.4", label: "Obese I", color: "text-danger" },
+                      { range: "≥27.5", label: "Obese II", color: "text-danger" },
+                    ].map((tier) => (
+                      <div key={tier.label} className={`rounded px-2 py-1.5 bg-muted/50 ${tier.color}`}>
+                        <span className="font-bold">{tier.label}</span>
+                        <br />
+                        <span className="text-muted-foreground">{tier.range}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-2 leading-snug">
+                    Asian populations face higher metabolic risks at lower BMI. India: overweight ≥23, obesity ≥25. Japan: obesity ≥25. China: obesity ≥28.
+                  </p>
+                </div>
+              )}
             </Section>
 
             {/* ── Section 2: Lab Values ── */}
@@ -659,12 +782,103 @@ export default function LipidCalculator() {
                 Tick all that apply. Auto-classifies C → B → A → VHR.
               </p>
               <div className="space-y-2.5">
-                {MODIFIER_KEYS.map((key) => (
-                  <label key={key} className="flex cursor-pointer items-start gap-3">
-                    <Checkbox checked={modChecked[key]} onCheckedChange={() => toggleMod(key)} className="mt-0.5" />
-                    <span className="text-sm leading-snug text-foreground">{MODIFIER_LABELS[key]}</span>
-                  </label>
-                ))}
+                {MODIFIER_KEYS.map((key) => {
+                  const hasSubMap = key in MOD_SUB_MAP;
+                  const hasTod = key === "tod";
+                  const isAutoQualified = modAutoQual[key];
+                  const subConfig = MOD_SUB_MAP[key];
+
+                  return (
+                    <div key={key}>
+                      <label className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2 transition-colors ${
+                        modChecked[key] ? "bg-primary/8 ring-1 ring-primary/20" : "hover:bg-muted/50"
+                      }`}>
+                        <Checkbox
+                          checked={modChecked[key]}
+                          onCheckedChange={() => toggleMod(key)}
+                          disabled={!!isAutoQualified}
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1">
+                          <span className="text-sm leading-snug text-foreground">{MODIFIER_LABELS[key]}</span>
+                          {(hasSubMap || hasTod) && (() => {
+                            const items = hasTod ? TOD_ALL : subConfig!.items;
+                            const count = countCheckedItems(items, subChecked);
+                            const qualified = isAutoQualified;
+                            return (
+                              <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                                qualified ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                              }`}>
+                                {count}/{items.length} — {qualified ? "Qualified ✓" : "≥1 required"}
+                              </span>
+                            );
+                          })()}
+                        </div>
+                      </label>
+
+                      {/* Sub-checklists */}
+                      {hasSubMap && (
+                        <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                          <p className="text-xs font-semibold text-muted-foreground mb-2">{subConfig!.title}</p>
+                          {key === "fh" && (
+                            <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
+                              "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
+                            </p>
+                          )}
+                          {subConfig!.items.map((item) => (
+                            <label
+                              key={item.id}
+                              className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                              }`}
+                            >
+                              <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                                {item.qualifier && (
+                                  <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
+                                )}
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* TOD sub-checklist */}
+                      {hasTod && (
+                        <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                          <p className="text-xs font-semibold text-muted-foreground">
+                            Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
+                          </p>
+                          {([
+                            { title: "Microvascular", items: TOD_MICROVASCULAR },
+                            { title: "Macrovascular / Cardiac", items: TOD_MACROVASCULAR },
+                          ] as const).map(({ title, items }) => (
+                            <div key={title}>
+                              <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">{title}</p>
+                              <div className="space-y-1.5">
+                                {items.map((tod) => (
+                                  <label
+                                    key={tod.id}
+                                    className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                      subChecked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                                    }`}
+                                  >
+                                    <Checkbox checked={!!subChecked[tod.id]} onCheckedChange={() => toggleSub(tod.id)} className="mt-0.5" />
+                                    <div className="flex-1 min-w-0">
+                                      <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                                      <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                                    </div>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <div className="mt-3 rounded-lg bg-muted/50 px-3 py-2">
                 <p className="text-xs text-muted-foreground">
