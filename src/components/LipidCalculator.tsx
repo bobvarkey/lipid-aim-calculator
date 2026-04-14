@@ -385,7 +385,12 @@ export default function LipidCalculator() {
     lines.push("── DEMOGRAPHICS ──");
     lines.push("Age: " + (age || "—") + " | Sex: " + (sex === "male" ? "Male" : "Female"));
     if (height || weight || bmi) {
-      lines.push("Height: " + (height ? height + " cm" : "—") + " | Weight: " + (weight ? weight + " kg" : "—") + " | BMI: " + (bmi ? bmi + " kg/m²" + (bmiAuto ? " (auto)" : "") : "—"));
+      const bmiVal = parseFloat(bmi);
+      let bmiNote = "Height: " + (height ? height + " cm" : "—") + " | Weight: " + (weight ? weight + " kg" : "—") + " | BMI: " + (bmi ? bmi + " kg/m²" + (bmiAuto ? " (auto)" : "") : "—");
+      if (!isNaN(bmiVal)) {
+        bmiNote += " → Asian: " + getAsianBmiClass(bmiVal).label + " | WHO: " + getWhoBmiClass(bmiVal).label;
+      }
+      lines.push(bmiNote);
     }
     lines.push("");
     lines.push("── LAB VALUES ──");
@@ -397,12 +402,31 @@ export default function LipidCalculator() {
     MAJOR_RF_KEYS.forEach((k) => lines.push("  " + (rfChecked[k] ? "✓" : "✗") + " " + MAJOR_RF_LABELS[k]));
     lines.push("");
     lines.push("── ASCVD HISTORY & EXTREME-RISK MODIFIERS ──");
-    MODIFIER_KEYS.forEach((k) => lines.push("  " + (modChecked[k] ? "✓" : "✗") + " " + MODIFIER_LABELS[k]));
+    MODIFIER_KEYS.forEach((k) => {
+      lines.push("  " + (modChecked[k] ? "✓" : "✗") + " " + MODIFIER_LABELS[k]);
+      // Emit sub-checklist details
+      const subConfig = MOD_SUB_MAP[k];
+      if (modChecked[k] && subConfig) {
+        subConfig.items.filter((s) => subChecked[s.id]).forEach((s) => lines.push("      • " + s.label));
+      }
+      if (modChecked[k] && k === "tod") {
+        const micro = TOD_MICROVASCULAR.filter((t) => subChecked[t.id]);
+        const macro = TOD_MACROVASCULAR.filter((t) => subChecked[t.id]);
+        if (micro.length > 0) {
+          lines.push("      Microvascular:");
+          micro.forEach((t) => lines.push("        • " + t.label));
+        }
+        if (macro.length > 0) {
+          lines.push("      Macrovascular/Cardiac:");
+          macro.forEach((t) => lines.push("        • " + t.label));
+        }
+      }
+    });
     lines.push("");
     lines.push("── QUALIFIERS ──");
     lines.push("  Established ASCVD: " + (modChecked.ascvd ? "YES" : "No"));
     lines.push("  Family Hx premature CHD: " + (rfChecked.fhx ? "YES" : "No"));
-    lines.push("  Obesity: " + (rfChecked.obesity ? "YES" + (bmi ? " (BMI " + bmi + ")" : "") : "No"));
+    lines.push("  Obesity: " + (rfChecked.obesity ? "YES" + (bmi ? " (BMI " + bmi + " — Asian: " + getAsianBmiClass(parseFloat(bmi)).label + ")" : "") : "No"));
     lines.push("  High coronary calcium: " + (modChecked.subclinical ? "YES" : "No"));
     lines.push("  CKD: " + (rfChecked.ckd ? "YES" + (ckdStage ? " — " + ckdStage : "") : "No"));
     lines.push("  CKD Stage 3B/4: " + (modChecked.ckd34 ? "YES" : "No"));
