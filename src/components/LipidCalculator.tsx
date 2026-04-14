@@ -71,6 +71,30 @@ const MODIFIER_LABELS: Record<string, string> = {
   sequelae30: "Ongoing ASCVD sequelae despite LDL-C ≤30 mg/dL and intensive therapy",
 };
 
+// Modifiers that have sub-checklists for auto-qualification
+const MOD_SUB_MAP: Record<string, { items: SubItem[]; title: string }> = {
+  ascvd: { items: ASCVD_ESTABLISHED, title: "Select applicable ASCVD manifestations (≥1 required):" },
+  subclinical: { items: HIGH_CAC_ITEMS, title: "Select applicable high CAC / plaque burden findings (≥1 required):" },
+  ckd34: { items: CKD_ITEMS, title: "Select CKD stage and albuminuria status (≥1 required):" },
+  fh: { items: FHX_ITEMS, title: "Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):" },
+};
+
+// Asian BMI classification helper
+function getAsianBmiClass(bmiVal: number): { label: string; color: string } {
+  if (bmiVal < 18.5) return { label: "Underweight", color: "text-primary" };
+  if (bmiVal < 23) return { label: "Normal", color: "text-success" };
+  if (bmiVal < 25) return { label: "Overweight (At Risk)", color: "text-warning" };
+  if (bmiVal < 27.5) return { label: "Obese I", color: "text-danger" };
+  return { label: "Obese II", color: "text-danger" };
+}
+
+function getWhoBmiClass(bmiVal: number): { label: string; color: string } {
+  if (bmiVal < 18.5) return { label: "Underweight", color: "text-primary" };
+  if (bmiVal < 25) return { label: "Normal", color: "text-success" };
+  if (bmiVal < 30) return { label: "Overweight", color: "text-warning" };
+  return { label: "Obese", color: "text-danger" };
+}
+
 // ─── Result buckets ───
 interface CategoryResult {
   category: string;
