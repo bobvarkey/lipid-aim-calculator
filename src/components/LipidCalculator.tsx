@@ -757,12 +757,103 @@ export default function LipidCalculator() {
                 Tick all that apply. Auto-classifies C → B → A → VHR.
               </p>
               <div className="space-y-2.5">
-                {MODIFIER_KEYS.map((key) => (
-                  <label key={key} className="flex cursor-pointer items-start gap-3">
-                    <Checkbox checked={modChecked[key]} onCheckedChange={() => toggleMod(key)} className="mt-0.5" />
-                    <span className="text-sm leading-snug text-foreground">{MODIFIER_LABELS[key]}</span>
-                  </label>
-                ))}
+                {MODIFIER_KEYS.map((key) => {
+                  const hasSubMap = key in MOD_SUB_MAP;
+                  const hasTod = key === "tod";
+                  const isAutoQualified = modAutoQual[key];
+                  const subConfig = MOD_SUB_MAP[key];
+
+                  return (
+                    <div key={key}>
+                      <label className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2 transition-colors ${
+                        modChecked[key] ? "bg-primary/8 ring-1 ring-primary/20" : "hover:bg-muted/50"
+                      }`}>
+                        <Checkbox
+                          checked={modChecked[key]}
+                          onCheckedChange={() => toggleMod(key)}
+                          disabled={!!isAutoQualified}
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1">
+                          <span className="text-sm leading-snug text-foreground">{MODIFIER_LABELS[key]}</span>
+                          {(hasSubMap || hasTod) && (() => {
+                            const items = hasTod ? TOD_ALL : subConfig!.items;
+                            const count = countCheckedItems(items, subChecked);
+                            const qualified = isAutoQualified;
+                            return (
+                              <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                                qualified ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                              }`}>
+                                {count}/{items.length} — {qualified ? "Qualified ✓" : "≥1 required"}
+                              </span>
+                            );
+                          })()}
+                        </div>
+                      </label>
+
+                      {/* Sub-checklists */}
+                      {hasSubMap && (
+                        <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                          <p className="text-xs font-semibold text-muted-foreground mb-2">{subConfig!.title}</p>
+                          {key === "fh" && (
+                            <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
+                              "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
+                            </p>
+                          )}
+                          {subConfig!.items.map((item) => (
+                            <label
+                              key={item.id}
+                              className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                              }`}
+                            >
+                              <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                                {item.qualifier && (
+                                  <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
+                                )}
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* TOD sub-checklist */}
+                      {hasTod && (
+                        <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                          <p className="text-xs font-semibold text-muted-foreground">
+                            Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
+                          </p>
+                          {([
+                            { title: "Microvascular", items: TOD_MICROVASCULAR },
+                            { title: "Macrovascular / Cardiac", items: TOD_MACROVASCULAR },
+                          ] as const).map(({ title, items }) => (
+                            <div key={title}>
+                              <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">{title}</p>
+                              <div className="space-y-1.5">
+                                {items.map((tod) => (
+                                  <label
+                                    key={tod.id}
+                                    className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                      subChecked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                                    }`}
+                                  >
+                                    <Checkbox checked={!!subChecked[tod.id]} onCheckedChange={() => toggleSub(tod.id)} className="mt-0.5" />
+                                    <div className="flex-1 min-w-0">
+                                      <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                                      <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                                    </div>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <div className="mt-3 rounded-lg bg-muted/50 px-3 py-2">
                 <p className="text-xs text-muted-foreground">
