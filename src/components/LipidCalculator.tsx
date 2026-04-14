@@ -50,7 +50,7 @@ const MAJOR_RF_LABELS: Record<string, string> = {
 
 // ─── ASCVD history & extreme-risk modifiers ───
 const MODIFIER_KEYS = [
-  "ascvd", "cad", "stroke", "pad", "polyvascular",
+  "ascvd", "polyvascular",
   "tod", "fh", "hofh", "subclinical", "ckd34",
   "recurrent50", "acs12", "sequelae30",
 ] as const;
