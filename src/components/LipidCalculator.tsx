@@ -220,6 +220,37 @@ export default function LipidCalculator() {
     Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false]))
   );
 
+  // ─── Sub-checklist state for modifier auto-qualification ───
+  const [subChecked, setSubChecked] = useState<Record<string, boolean>>({});
+  const toggleSub = (id: string) =>
+    setSubChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  // Auto-qualification: if any sub-item is checked, parent modifier is auto-qualified
+  const modAutoQual = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    for (const [modKey, config] of Object.entries(MOD_SUB_MAP)) {
+      map[modKey] = countCheckedItems(config.items, subChecked) >= 1;
+    }
+    // TOD auto-qual
+    map.tod = countCheckedItems(TOD_ALL, subChecked) >= 1;
+    return map;
+  }, [subChecked]);
+
+  // Auto-sync modChecked when sub-checklists qualify
+  useEffect(() => {
+    setModChecked((prev) => {
+      let next = { ...prev };
+      let changed = false;
+      for (const [key, qualified] of Object.entries(modAutoQual)) {
+        if (qualified && !prev[key]) {
+          next[key] = true;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [modAutoQual]);
+
   const [copied, setCopied] = useState(false);
 
   // ─── Auto-derive age risk ───
