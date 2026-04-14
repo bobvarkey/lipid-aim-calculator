@@ -57,9 +57,6 @@ const MODIFIER_KEYS = [
 
 const MODIFIER_LABELS: Record<string, string> = {
   ascvd: "Established ASCVD",
-  cad: "CAD / coronary ASCVD",
-  stroke: "Ischemic stroke or TIA of atherosclerotic origin",
-  pad: "PAD",
   polyvascular: "Polyvascular disease (≥2 arterial territories: CAD, cerebrovascular, PAD)",
   tod: "Diabetes target organ damage",
   fh: "Familial hypercholesterolemia / strong family history",
