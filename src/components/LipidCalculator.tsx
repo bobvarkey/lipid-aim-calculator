@@ -92,6 +92,23 @@ function getWhoBmiClass(bmiVal: number): { label: string; color: string } {
   return { label: "Obese", color: "text-danger" };
 }
 
+/** Collapsible qualifier text */
+function QualifierText({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
+      className="text-left w-full"
+    >
+      <span className="text-[11px] text-muted-foreground leading-snug mt-0.5 flex items-center gap-1 cursor-pointer hover:text-foreground/70 transition-colors">
+        <ChevronDown className={`h-3 w-3 shrink-0 transition-transform duration-200 ${open ? "rotate-0" : "-rotate-90"}`} />
+        <span className={open ? "" : "line-clamp-1"}>{text}</span>
+      </span>
+    </button>
+  );
+}
+
 // ─── Result buckets ───
 interface CategoryResult {
   category: string;
