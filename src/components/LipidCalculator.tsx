@@ -415,6 +415,11 @@ export default function LipidCalculator() {
         bmiNote += " → Asian: " + getAsianBmiClass(bmiVal).label + " | WHO: " + getWhoBmiClass(bmiVal).label;
       }
       lines.push(bmiNote);
+      if (waistCirc) {
+        const wc = parseFloat(waistCirc);
+        const threshold = sex === "male" ? 90 : 80;
+        lines.push("Waist circumference: " + waistCirc + " cm" + (wc >= threshold ? " ⚠ Above Asian cutoff (≥" + threshold + " cm)" : ""));
+      }
     }
     lines.push("");
     lines.push("── LAB VALUES ──");
