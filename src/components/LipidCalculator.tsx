@@ -12,7 +12,7 @@ import {
 import {
   Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity,
   Printer, Target, Copy, ClipboardCheck, TrendingUp, User,
-  TestTube, ChevronDown, Stethoscope, FileText,
+  TestTube, ChevronDown, Stethoscope, FileText, Home,
 } from "lucide-react";
 import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
 import {
@@ -237,8 +237,13 @@ export default function LipidCalculator() {
 
   // ─── Sub-checklist state for modifier auto-qualification ───
   const [subChecked, setSubChecked] = useState<Record<string, boolean>>({});
+  const [subListOpen, setSubListOpen] = useState<Record<string, boolean>>({});
+  
   const toggleSub = (id: string) =>
     setSubChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+  
+  const toggleSubList = (key: string) =>
+    setSubListOpen((prev) => ({ ...prev, [key]: !prev[key] }));
 
   // Auto-qualification for Major RF "fhx" from FHX sub-items
   const fhxAutoQual = useMemo(() => countCheckedItems(FHX_ITEMS, subChecked) >= 1, [subChecked]);
@@ -392,83 +397,19 @@ export default function LipidCalculator() {
   const generateNote = useCallback(() => {
     const lines: string[] = [];
     lines.push("═══════════════════════════════════════════════════");
-    lines.push("       LAI EXTREME RISK ASSESSMENT");
+    lines.push("       LIPID RISK PREDICTOR");
     lines.push("═══════════════════════════════════════════════════");
     lines.push("");
-    lines.push("PREDICTED CATEGORY: " + (result?.category || "Lower than VHR / not classifiable"));
+    lines.push("CATEGORY: " + (result?.category || "Lower than VHR / not classifiable"));
+    lines.push("");
     lines.push("LDL-C Target: " + (result?.ldlTarget || "Use standard LAI primary-prevention pathway"));
     lines.push("Non-HDL-C Target: " + (result?.nonHdlTarget || "—"));
     lines.push("ApoB Target: " + (result?.apoBTarget || "—"));
-    if (preventResult?.valid) {
-      lines.push("── PREVENT 10-YEAR ASCVD RISK ──");
-      lines.push("10-Year Risk: " + preventResult.riskPct + "% (" + preventResult.category + " Risk)");
-      lines.push("SBP: " + (sbp || "—") + " mmHg | Total Chol: " + (totalChol || "—") + " mg/dL");
-      lines.push("BP Medication: " + (bpMed ? "Yes" : "No") + " | Statin: " + (onStatin ? "Yes" : "No"));
-      lines.push("");
-    }
-    lines.push("── DEMOGRAPHICS ──");
-    lines.push("Age: " + (age || "—") + " | Sex: " + (sex === "male" ? "Male" : "Female"));
-    if (height || weight || bmi) {
-      const bmiVal = parseFloat(bmi);
-      let bmiNote = "Height: " + (height ? height + " cm" : "—") + " | Weight: " + (weight ? weight + " kg" : "—") + " | BMI: " + (bmi ? bmi + " kg/m²" + (bmiAuto ? " (auto)" : "") : "—");
-      if (!isNaN(bmiVal)) {
-        bmiNote += " → Asian: " + getAsianBmiClass(bmiVal).label + " | WHO: " + getWhoBmiClass(bmiVal).label;
-      }
-      lines.push(bmiNote);
-      if (waistCirc) {
-        const wc = parseFloat(waistCirc);
-        const threshold = sex === "male" ? 90 : 80;
-        lines.push("Waist circumference: " + waistCirc + " cm" + (wc >= threshold ? " ⚠ Above Asian cutoff (≥" + threshold + " cm)" : ""));
-      }
-    }
     lines.push("");
-    lines.push("── LAB VALUES ──");
-    lines.push("LDL-C: " + (ldl || "—") + " mg/dL | Non-HDL-C: " + (nonhdl || "—") + " mg/dL | HDL-C: " + (hdl || "—") + " mg/dL");
-    lines.push("ApoB: " + (apob || "—") + " mg/dL | Lp(a): " + (lpa || "—") + " mg/dL | HbA1c: " + (hba1c || "—") + "%");
-    lines.push("Creatinine: " + (creatinine || "—") + " mg/dL | eGFR: " + (egfr || "—") + " mL/min/1.73m²" + (egfrAuto ? " (auto)" : "") + (ckdStage ? " → CKD " + ckdStage : "") + " | hsCRP: " + (hscrp || "—") + " mg/L");
-    lines.push("");
-    lines.push("── MAJOR ASCVD RISK FACTORS (" + rfCount + "/" + MAJOR_RF_KEYS.length + ") ──");
-    MAJOR_RF_KEYS.forEach((k) => lines.push("  " + (rfChecked[k] ? "✓" : "✗") + " " + MAJOR_RF_LABELS[k]));
-    lines.push("");
-    lines.push("── ASCVD HISTORY & EXTREME-RISK MODIFIERS ──");
-    MODIFIER_KEYS.forEach((k) => {
-      lines.push("  " + (modChecked[k] ? "✓" : "✗") + " " + MODIFIER_LABELS[k]);
-      // Emit sub-checklist details
-      const subConfig = MOD_SUB_MAP[k];
-      if (modChecked[k] && subConfig) {
-        subConfig.items.filter((s) => subChecked[s.id]).forEach((s) => lines.push("      • " + s.label));
-      }
-      if (modChecked[k] && k === "tod") {
-        const micro = TOD_MICROVASCULAR.filter((t) => subChecked[t.id]);
-        const macro = TOD_MACROVASCULAR.filter((t) => subChecked[t.id]);
-        if (micro.length > 0) {
-          lines.push("      Microvascular:");
-          micro.forEach((t) => lines.push("        • " + t.label));
-        }
-        if (macro.length > 0) {
-          lines.push("      Macrovascular/Cardiac:");
-          macro.forEach((t) => lines.push("        • " + t.label));
-        }
-      }
-    });
-    lines.push("");
-    lines.push("── QUALIFIERS ──");
-    lines.push("  Established ASCVD: " + (modChecked.ascvd ? "YES" : "No"));
-    lines.push("  Family Hx premature CHD: " + (rfChecked.fhx ? "YES" : "No"));
-    lines.push("  Obesity: " + (rfChecked.obesity ? "YES" + (bmi ? " (BMI " + bmi + " — Asian: " + getAsianBmiClass(parseFloat(bmi)).label + ")" : "") : "No"));
-    lines.push("  High coronary calcium: " + (modChecked.subclinical ? "YES" : "No"));
-    lines.push("  CKD: " + (rfChecked.ckd ? "YES" + (ckdStage ? " — " + ckdStage : "") : "No"));
-    lines.push("  CKD Stage 3B/4: " + (modChecked.ckd34 ? "YES" : "No"));
-    lines.push("");
-    if (result?.why.length) {
-      lines.push("── RATIONALE ──");
-      result.why.forEach((w) => lines.push("  • " + w));
-      lines.push("");
-    }
     lines.push("═══════════════════════════════════════════════════");
     lines.push("Ref: 2026 ACC/AHA Guideline on Management of Dyslipidemia · LAI 2023 Consensus IV");
     return lines.join("\n");
-  }, [result, modChecked, rfChecked, rfCount, ldl, nonhdl, hdl, apob, lpa, hba1c, creatinine, egfr, egfrAuto, hscrp, age, sex, height, weight, bmi, bmiAuto, ckdStage, preventResult, sbp, totalChol, bpMed, onStatin, subChecked]);
+  }, [result]);
 
   const copyNote = async () => {
     try { await navigator.clipboard.writeText(generateNote()); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch {}
@@ -513,9 +454,14 @@ export default function LipidCalculator() {
                 Cardiovascular Risk Assessment & Management
               </p>
             </div>
-            <Button variant="ghost" size="sm" className="no-print shrink-0" onClick={reset}>
-              <RotateCcw className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-1.5 no-print shrink-0">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/")} title="Back to Home">
+                <Home className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="sm" onClick={reset} title="Reset Form">
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           <div className="flex gap-0.5 pb-2 overflow-x-auto no-print">
             {TABS.map((tab) => (
@@ -902,28 +848,35 @@ export default function LipidCalculator() {
                       </div>
                     </label>
                     {key === "fhx" && (
-                      <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-                        <p className="text-xs font-semibold text-muted-foreground mb-2">
-                          Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):
-                        </p>
-                        <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
-                          "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
-                        </p>
-                        {FHX_ITEMS.map((item) => (
-                          <label
-                            key={item.id}
-                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                              subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                            }`}
-                          >
-                            <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                              {item.qualifier && <QualifierText text={item.qualifier} />}
-                            </div>
-                          </label>
-                        ))}
-                      </div>
+                      <Collapsible open={subListOpen["rf_fhx"]} onOpenChange={() => toggleSubList("rf_fhx")} className="ml-8 mt-2 mb-1">
+                        <CollapsibleTrigger asChild>
+                          <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                            <span className="text-xs font-semibold text-muted-foreground">
+                              Premature CHD / ASCVD ({countCheckedItems(FHX_ITEMS, subChecked)}/{FHX_ITEMS.length})
+                            </span>
+                            <ChevronDown className={`h-4 w-4 transition-transform ${subListOpen["rf_fhx"] ? "rotate-180" : ""}`} />
+                          </button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-1.5 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
+                          <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
+                            "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
+                          </p>
+                          {FHX_ITEMS.map((item) => (
+                            <label
+                              key={item.id}
+                              className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                              }`}
+                            >
+                              <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                                {item.qualifier && <QualifierText text={item.qualifier} />}
+                              </div>
+                            </label>
+                          ))}
+                        </CollapsibleContent>
+                      </Collapsible>
                     )}
                   </div>
                 ))}
@@ -981,61 +934,77 @@ export default function LipidCalculator() {
 
                       {/* Sub-checklists */}
                       {hasSubMap && (
-                        <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-                          <p className="text-xs font-semibold text-muted-foreground mb-2">{subConfig!.title}</p>
-                          {key === "fh" && (
-                            <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
-                              "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
-                            </p>
-                          )}
-                          {subConfig!.items.map((item) => (
-                            <label
-                              key={item.id}
-                              className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                                subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                              }`}
-                            >
-                              <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
-                              <div className="flex-1 min-w-0">
-                                <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                                {item.qualifier && <QualifierText text={item.qualifier} />}
-                              </div>
-                            </label>
-                          ))}
-                        </div>
+                        <Collapsible open={subListOpen[key]} onOpenChange={() => toggleSubList(key)} className="ml-8 mt-2 mb-1">
+                          <CollapsibleTrigger asChild>
+                            <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                              <span className="text-xs font-semibold text-muted-foreground">
+                                {subConfig!.title.split("(")[0].trim()} ({countCheckedItems(subConfig!.items, subChecked)}/{subConfig!.items.length})
+                              </span>
+                              <ChevronDown className={`h-4 w-4 transition-transform ${subListOpen[key] ? "rotate-180" : ""}`} />
+                            </button>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="space-y-1.5 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
+                            {key === "fh" && (
+                              <p className="text-[11px] text-muted-foreground leading-snug">
+                                "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
+                              </p>
+                            )}
+                            {subConfig!.items.map((item) => (
+                              <label
+                                key={item.id}
+                                className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                  subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                                }`}
+                              >
+                                <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
+                                <div className="flex-1 min-w-0">
+                                  <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                                  {item.qualifier && <QualifierText text={item.qualifier} />}
+                                </div>
+                              </label>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
                       )}
 
                       {/* TOD sub-checklist */}
                       {hasTod && (
-                        <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
-                          <p className="text-xs font-semibold text-muted-foreground">
-                            Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
-                          </p>
-                          {([
-                            { title: "Microvascular", items: TOD_MICROVASCULAR },
-                            { title: "Macrovascular / Cardiac", items: TOD_MACROVASCULAR },
-                          ] as const).map(({ title, items }) => (
-                            <div key={title}>
-                              <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">{title}</p>
-                              <div className="space-y-1.5">
-                                {items.map((tod) => (
-                                  <label
-                                    key={tod.id}
-                                    className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                                      subChecked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                                    }`}
-                                  >
-                                    <Checkbox checked={!!subChecked[tod.id]} onCheckedChange={() => toggleSub(tod.id)} className="mt-0.5" />
-                                    <div className="flex-1 min-w-0">
-                                      <span className="text-sm leading-snug text-foreground">{tod.label}</span>
-                                      {tod.qualifier && <QualifierText text={tod.qualifier} />}
-                                    </div>
-                                  </label>
-                                ))}
+                        <Collapsible open={subListOpen.tod} onOpenChange={() => toggleSubList("tod")} className="ml-8 mt-2 mb-1">
+                          <CollapsibleTrigger asChild>
+                            <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                              <span className="text-xs font-semibold text-muted-foreground">
+                                Target Organ Damage Criteria ({countCheckedItems(TOD_ALL, subChecked)}/${TOD_ALL.length})
+                              </span>
+                              <ChevronDown className={`h-4 w-4 transition-transform ${subListOpen.tod ? "rotate-180" : ""}`} />
+                            </button>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="space-y-3 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
+                            {([
+                              { title: "Microvascular", items: TOD_MICROVASCULAR },
+                              { title: "Macrovascular / Cardiac", items: TOD_MACROVASCULAR },
+                            ] as const).map(({ title, items }) => (
+                              <div key={title}>
+                                <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">{title}</p>
+                                <div className="space-y-1.5">
+                                  {items.map((tod) => (
+                                    <label
+                                      key={tod.id}
+                                      className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                        subChecked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                                      }`}
+                                    >
+                                      <Checkbox checked={!!subChecked[tod.id]} onCheckedChange={() => toggleSub(tod.id)} className="mt-0.5" />
+                                      <div className="flex-1 min-w-0">
+                                        <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                                        {tod.qualifier && <QualifierText text={tod.qualifier} />}
+                                      </div>
+                                    </label>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
                       )}
                     </div>
                   );

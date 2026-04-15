@@ -3,6 +3,7 @@ import { Heart } from "lucide-react";
 import cvRiskMeasures from "@/assets/cv-risk-measures.png";
 import lipoproteinParticles from "@/assets/lipoprotein-particles.png";
 import cprFramework from "@/assets/cpr-framework.png";
+import MermaidChart from "@/components/MermaidChart";
 
 export default function EducationSection() {
   return (
@@ -401,6 +402,40 @@ export default function EducationSection() {
         <p className="mt-3 text-sm text-muted-foreground italic">
           ApoB is "sticky cholesterol" — it reflects the total number of atherogenic particles (LDL + Lp(a) + others).
         </p>
+      </Card>
+
+      {/* Risk Stratification Flowchart */}
+      <Card className="border-border bg-card p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+            <Heart className="h-4 w-4 text-primary" />
+          </div>
+          <h3 className="font-display text-base font-bold text-foreground">Lipid Risk Stratification Algorithm</h3>
+        </div>
+        <p className="text-sm text-foreground leading-relaxed mb-4">
+          This flowchart illustrates the decision tree for classifying patients into risk categories based on clinical criteria and LDL-C targets.
+        </p>
+        <MermaidChart
+          chart={`flowchart TD
+    A[Patient Assessment] --> B{ASCVD Present?}
+    B -->|Yes| C{Sequelae despite LDL ≤30?}
+    C -->|Yes| D[Extreme Risk C<br/>LDL 10-15 mg/dL]
+    C -->|No| E{CAD + VHR features<br/>OR Recurrent/Progressive<br/>OR ACS within 12m<br/>OR HoFH?}
+    E -->|Yes| F[Extreme Risk B<br/>LDL ≤30 mg/dL]
+    E -->|No| G{ASCVD + VHR features<br/>OR Subclinical atherosclerosis?}
+    G -->|Yes| H[Extreme Risk A<br/>LDL <50 mg/dL<br/>optional ≤30]
+    G -->|No| I[Very High Risk<br/>LDL <50 mg/dL]
+    B -->|No| J{Diabetes + ≥3 RF<br/>OR Target Organ Damage?}
+    J -->|Yes| I
+    J -->|No| K[Lower than VHR<br/>Use primary prevention pathway]
+    
+    style D fill:#fee2e2,stroke:#dc2626
+    style F fill:#fed7aa,stroke:#ea580c
+    style H fill:#fed7aa,stroke:#ea580c
+    style I fill:#fef3c7,stroke:#d97706
+    style K fill:#d1fae5,stroke:#059669`}
+          className="w-full"
+        />
       </Card>
     </div>
   );

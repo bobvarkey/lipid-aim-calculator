@@ -3,7 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Activity, ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ShieldCheck } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Activity, ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ShieldCheck, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -14,31 +19,41 @@ import {
 
 // ─── Sub-checklist renderer ───
 function SubChecklist({
-  items, checked, toggle, title,
+  items, checked, toggle, title, defaultOpen = false,
 }: {
   items: SubItem[]; checked: Record<string, boolean>;
-  toggle: (id: string) => void; title: string;
+  toggle: (id: string) => void; title: string; defaultOpen?: boolean;
 }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const checkedCount = items.filter((item) => checked[item.id]).length;
+
   return (
-    <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-      <p className="text-xs font-semibold text-muted-foreground mb-2">{title}</p>
-      {items.map((item) => (
-        <label
-          key={item.id}
-          className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-            checked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-          }`}
-        >
-          <Checkbox checked={!!checked[item.id]} onCheckedChange={() => toggle(item.id)} className="mt-0.5" />
-          <div className="flex-1 min-w-0">
-            <span className="text-sm leading-snug text-foreground">{item.label}</span>
-            {item.qualifier && (
-              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
-            )}
-          </div>
-        </label>
-      ))}
-    </div>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="ml-8 mt-2 mb-1">
+      <CollapsibleTrigger asChild>
+        <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+          <span className="text-xs font-semibold text-muted-foreground">{title} {checkedCount > 0 && `(${checkedCount}/${items.length})`}</span>
+          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-1.5 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0 mt-0">
+        {items.map((item) => (
+          <label
+            key={item.id}
+            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+              checked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+            }`}
+          >
+            <Checkbox checked={!!checked[item.id]} onCheckedChange={() => toggle(item.id)} className="mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <span className="text-sm leading-snug text-foreground">{item.label}</span>
+              {item.qualifier && (
+                <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
+              )}
+            </div>
+          </label>
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -48,36 +63,46 @@ function TodSubChecklist({
 }: {
   checked: Record<string, boolean>; toggle: (id: string) => void; colorClass?: string;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const microCount = TOD_MICROVASCULAR.filter((t) => checked[t.id]).length;
+  const macroCount = TOD_MACROVASCULAR.filter((t) => checked[t.id]).length;
+  const totalCount = microCount + macroCount;
+
   return (
-    <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
-      <p className="text-xs font-semibold text-muted-foreground">
-        Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
-      </p>
-      {([
-        { title: "Microvascular", items: TOD_MICROVASCULAR },
-        { title: "Macrovascular / Cardiac", items: TOD_MACROVASCULAR },
-      ] as const).map(({ title, items }) => (
-        <div key={title}>
-          <p className={`text-[11px] font-bold text-${colorClass}/80 uppercase tracking-wide mb-1.5`}>{title}</p>
-          <div className="space-y-1.5">
-            {items.map((tod) => (
-              <label
-                key={tod.id}
-                className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                  checked[tod.id] ? `bg-${colorClass}/10 ring-1 ring-${colorClass}/15` : "hover:bg-muted/50"
-                }`}
-              >
-                <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm leading-snug text-foreground">{tod.label}</span>
-                  <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
-                </div>
-              </label>
-            ))}
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="ml-8 mt-2 mb-1">
+      <CollapsibleTrigger asChild>
+        <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+          <span className="text-xs font-semibold text-muted-foreground">Target Organ Damage Criteria {totalCount > 0 && `(${totalCount}/2+)`}</span>
+          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-3 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
+        {([
+          { title: "Microvascular", items: TOD_MICROVASCULAR },
+          { title: "Macrovascular / Cardiac", items: TOD_MACROVASCULAR },
+        ] as const).map(({ title, items }) => (
+          <div key={title}>
+            <p className={`text-[11px] font-bold text-${colorClass}/80 uppercase tracking-wide mb-1.5`}>{title}</p>
+            <div className="space-y-1.5">
+              {items.map((tod) => (
+                <label
+                  key={tod.id}
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                    checked[tod.id] ? `bg-${colorClass}/10 ring-1 ring-${colorClass}/15` : "hover:bg-muted/50"
+                  }`}
+                >
+                  <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                    <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -121,6 +146,7 @@ export default function AscvdEmr() {
     ldl: 140, hdl: 38, hba1c: 7.5,
   });
   const [qChecked, setQChecked] = useState<Record<string, boolean>>({});
+  const [fhxOpen, setFhxOpen] = useState(false);
 
   const toggleQ = (id: string) =>
     setQChecked((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -246,7 +272,7 @@ export default function AscvdEmr() {
       <div className="mx-auto max-w-3xl space-y-6">
         <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1.5">
           <ArrowLeft className="h-4 w-4" />
-          Back to Calculator
+          Back Home
         </Button>
 
         <div className="text-center mb-6">
@@ -373,28 +399,35 @@ export default function AscvdEmr() {
                       title="Select applicable extreme risk factor elevations (≥1 required):" />
                   )}
                   {item.subKey === "fhx" && (
-                    <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-                      <p className="text-xs font-semibold text-muted-foreground mb-1">
-                        Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
-                        "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>.
-                      </p>
-                      {FHX_ITEMS.map((f) => (
-                        <label
-                          key={f.id}
-                          className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                            qChecked[f.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                          }`}
-                        >
-                          <Checkbox checked={!!qChecked[f.id]} onCheckedChange={() => toggleQ(f.id)} className="mt-0.5" />
-                          <div className="flex-1 min-w-0">
-                            <span className="text-sm leading-snug text-foreground">{f.label}</span>
-                            <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{f.qualifier}</p>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
+                    <Collapsible open={fhxOpen} onOpenChange={setFhxOpen} className="ml-8 mt-2 mb-1">
+                      <CollapsibleTrigger asChild>
+                        <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                          <span className="text-xs font-semibold text-muted-foreground">
+                            Premature CHD / ASCVD {FHX_ITEMS.filter((f) => qChecked[f.id]).length > 0 && `(${FHX_ITEMS.filter((f) => qChecked[f.id]).length}/${FHX_ITEMS.length})`}
+                          </span>
+                          <ChevronDown className={`h-4 w-4 transition-transform ${fhxOpen ? "rotate-180" : ""}`} />
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-1.5 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
+                        <p className="text-[11px] text-muted-foreground leading-snug">
+                          "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>.
+                        </p>
+                        {FHX_ITEMS.map((f) => (
+                          <label
+                            key={f.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              qChecked[f.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox checked={!!qChecked[f.id]} onCheckedChange={() => toggleQ(f.id)} className="mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{f.label}</span>
+                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{f.qualifier}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
                   )}
                   {item.subKey === "dmtod" && (
                     <TodSubChecklist checked={qChecked} toggle={toggleQ} />

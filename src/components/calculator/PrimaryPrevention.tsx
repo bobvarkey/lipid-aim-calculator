@@ -3,7 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ShieldCheck, AlertTriangle, Heart, Activity, Copy, FileText, CheckCircle2, Globe } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ShieldCheck, AlertTriangle, Heart, Activity, Copy, FileText, CheckCircle2, Globe, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import {
   ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
@@ -165,37 +170,49 @@ function SubChecklist({
   toggle,
   title,
   colorClass = "warning",
+  defaultOpen = false,
 }: {
   items: { id: string; label: string; qualifier?: string }[];
   checked: Record<string, boolean>;
   toggle: (id: string) => void;
   title: string;
   colorClass?: string;
+  defaultOpen?: boolean;
 }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const checkedCount = items.filter((item) => checked[item.id]).length;
+
   return (
-    <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-      <p className="text-xs font-semibold text-muted-foreground mb-2">{title}</p>
-      {items.map((item) => (
-        <label
-          key={item.id}
-          className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-            checked[item.id] ? `bg-${colorClass}/10 ring-1 ring-${colorClass}/15` : "hover:bg-muted/50"
-          }`}
-        >
-          <Checkbox
-            checked={!!checked[item.id]}
-            onCheckedChange={() => toggle(item.id)}
-            className="mt-0.5"
-          />
-          <div className="flex-1 min-w-0">
-            <span className="text-sm leading-snug text-foreground">{item.label}</span>
-            {item.qualifier && (
-              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
-            )}
-          </div>
-        </label>
-      ))}
-    </div>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="ml-8 mt-2 mb-1">
+      <CollapsibleTrigger asChild>
+        <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+          <span className="text-xs font-semibold text-muted-foreground">{title} {checkedCount > 0 && `(${checkedCount}/${items.length})`}</span>
+          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-1.5 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0 mt-0">
+        {items.map((item) => (
+          <label
+            key={item.id}
+            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+              checked[item.id] ? `bg-${colorClass}/10 ring-1 ring-${colorClass}/15` : "hover:bg-muted/50"
+            }`}
+          >
+            <Checkbox
+              checked={!!checked[item.id]}
+              onCheckedChange={() => toggle(item.id)}
+              className="mt-0.5"
+            />
+            <div className="flex-1 min-w-0">
+              <span className="text-sm leading-snug text-foreground">{item.label}</span>
+              {item.qualifier && (
+                <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
+              )}
+            </div>
+          </label>
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -205,6 +222,9 @@ export default function PrimaryPrevention() {
   const [customNote, setCustomNote] = useState("");
   const [copied, setCopied] = useState(false);
   const [indianEthnicity, setIndianEthnicity] = useState(false);
+  const [dmTodOpen, setDmTodOpen] = useState(false);
+  const [hrDmTodOpen, setHrDmTodOpen] = useState(false);
+  const [hrFhxOpen, setHrFhxOpen] = useState(false);
 
   const toggle = (id: string) =>
     setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -529,49 +549,54 @@ export default function PrimaryPrevention() {
 
                 {/* TOD sub-checklist */}
                 {item.id === "dm_tod" && (
-                  <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
-                    <p className="text-xs font-semibold text-muted-foreground">
-                      Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
-                    </p>
-                    <div>
-                      <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Microvascular</p>
-                      <div className="space-y-1.5">
-                        {TOD_MICROVASCULAR.map((tod) => (
-                          <label
-                            key={tod.id}
-                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                              checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
-                            }`}
-                          >
-                            <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
-                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
-                            </div>
-                          </label>
-                        ))}
+                  <Collapsible open={dmTodOpen} onOpenChange={setDmTodOpen} className="ml-8 mt-2 mb-1">
+                    <CollapsibleTrigger asChild>
+                      <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                        <span className="text-xs font-semibold text-muted-foreground">Target Organ Damage Criteria {todCount > 0 && `(${todCount}/${TOD_ALL.length})`}</span>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${dmTodOpen ? "rotate-180" : ""}`} />
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-3 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
+                      <div>
+                        <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Microvascular</p>
+                        <div className="space-y-1.5">
+                          {TOD_MICROVASCULAR.map((tod) => (
+                            <label
+                              key={tod.id}
+                              className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
+                              }`}
+                            >
+                              <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                                <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Macrovascular / Cardiac</p>
-                      <div className="space-y-1.5">
-                        {TOD_MACROVASCULAR.map((tod) => (
-                          <label
-                            key={tod.id}
-                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                              checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
-                            }`}
-                          >
-                            <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
-                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
-                            </div>
-                          </label>
-                        ))}
+                      <div>
+                        <p className="text-[11px] font-bold text-danger/80 uppercase tracking-wide mb-1.5">Macrovascular / Cardiac</p>
+                        <div className="space-y-1.5">
+                          {TOD_MACROVASCULAR.map((tod) => (
+                            <label
+                              key={tod.id}
+                              className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                checked[tod.id] ? "bg-danger/10 ring-1 ring-danger/15" : "hover:bg-muted/50"
+                              }`}
+                            >
+                              <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                                <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 )}
               </div>
             );
@@ -680,28 +705,33 @@ export default function PrimaryPrevention() {
 
                 {/* Family history sub-checklist */}
                 {item.id === "hr_fhx" && (
-                  <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
-                    <p className="text-xs font-semibold text-muted-foreground mb-1">
-                      Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):
-                    </p>
-                    <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
-                      "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
-                    </p>
-                    {FHX_ITEMS.map((f) => (
-                      <label
-                        key={f.id}
-                        className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                          checked[f.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                        }`}
-                      >
-                        <Checkbox checked={!!checked[f.id]} onCheckedChange={() => toggle(f.id)} className="mt-0.5" />
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm leading-snug text-foreground">{f.label}</span>
-                          <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{f.qualifier}</p>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
+                  <Collapsible open={hrFhxOpen} onOpenChange={setHrFhxOpen} className="ml-8 mt-2 mb-1">
+                    <CollapsibleTrigger asChild>
+                      <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                        <span className="text-xs font-semibold text-muted-foreground">Premature CHD / ASCVD {fhxCount > 0 && `(${fhxCount}/${FHX_ITEMS.length})`}</span>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${hrFhxOpen ? "rotate-180" : ""}`} />
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-1.5 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
+                      <p className="text-[11px] text-muted-foreground leading-snug">
+                        "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
+                      </p>
+                      {FHX_ITEMS.map((f) => (
+                        <label
+                          key={f.id}
+                          className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                            checked[f.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                          }`}
+                        >
+                          <Checkbox checked={!!checked[f.id]} onCheckedChange={() => toggle(f.id)} className="mt-0.5" />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm leading-snug text-foreground">{f.label}</span>
+                            <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{f.qualifier}</p>
+                          </div>
+                        </label>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
                 )}
 
                 {/* High CAC / extensive plaque sub-checklist */}
@@ -736,49 +766,54 @@ export default function PrimaryPrevention() {
 
                 {/* DM Target Organ Damage sub-checklist */}
                 {item.id === "hr_dmtod" && (
-                  <div className="ml-8 mt-2 mb-1 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
-                    <p className="text-xs font-semibold text-muted-foreground">
-                      Target Organ Damage Criteria (≥1 microvascular or macrovascular required):
-                    </p>
-                    <div>
-                      <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">Microvascular</p>
-                      <div className="space-y-1.5">
-                        {TOD_MICROVASCULAR.map((tod) => (
-                          <label
-                            key={tod.id}
-                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                              checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                            }`}
-                          >
-                            <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
-                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
-                            </div>
-                          </label>
-                        ))}
+                  <Collapsible open={hrDmTodOpen} onOpenChange={setHrDmTodOpen} className="ml-8 mt-2 mb-1">
+                    <CollapsibleTrigger asChild>
+                      <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                        <span className="text-xs font-semibold text-muted-foreground">DM Target Organ Damage {todCount > 0 && `(${todCount}/${TOD_ALL.length})`}</span>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${hrDmTodOpen ? "rotate-180" : ""}`} />
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-3 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
+                      <div>
+                        <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">Microvascular</p>
+                        <div className="space-y-1.5">
+                          {TOD_MICROVASCULAR.map((tod) => (
+                            <label
+                              key={tod.id}
+                              className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                              }`}
+                            >
+                              <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                                <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">Macrovascular / Cardiac</p>
-                      <div className="space-y-1.5">
-                        {TOD_MACROVASCULAR.map((tod) => (
-                          <label
-                            key={tod.id}
-                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                              checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                            }`}
-                          >
-                            <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <span className="text-sm leading-snug text-foreground">{tod.label}</span>
-                              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
-                            </div>
-                          </label>
-                        ))}
+                      <div>
+                        <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">Macrovascular / Cardiac</p>
+                        <div className="space-y-1.5">
+                          {TOD_MACROVASCULAR.map((tod) => (
+                            <label
+                              key={tod.id}
+                              className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                                checked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                              }`}
+                            >
+                              <Checkbox checked={!!checked[tod.id]} onCheckedChange={() => toggle(tod.id)} className="mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm leading-snug text-foreground">{tod.label}</span>
+                                <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 )}
               </div>
             );
