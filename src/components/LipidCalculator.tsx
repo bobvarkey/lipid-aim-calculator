@@ -220,6 +220,7 @@ export default function LipidCalculator() {
   const [weight, setWeight] = useState("");
   const [bmi, setBmi] = useState("");
   const [bmiAuto, setBmiAuto] = useState(false);
+  const [waistCirc, setWaistCirc] = useState("");
   // ─── PREVENT inputs ───
   const [sbp, setSbp] = useState("");
   const [totalChol, setTotalChol] = useState("");
@@ -414,6 +415,11 @@ export default function LipidCalculator() {
         bmiNote += " → Asian: " + getAsianBmiClass(bmiVal).label + " | WHO: " + getWhoBmiClass(bmiVal).label;
       }
       lines.push(bmiNote);
+      if (waistCirc) {
+        const wc = parseFloat(waistCirc);
+        const threshold = sex === "male" ? 90 : 80;
+        lines.push("Waist circumference: " + waistCirc + " cm" + (wc >= threshold ? " ⚠ Above Asian cutoff (≥" + threshold + " cm)" : ""));
+      }
     }
     lines.push("");
     lines.push("── LAB VALUES ──");
@@ -471,7 +477,7 @@ export default function LipidCalculator() {
   const reset = () => {
     setAge(""); setSex("male"); setLdl(""); setNonhdl(""); setApob(""); setLpa("");
     setHba1c(""); setEgfr(""); setCreatinine(""); setEgfrAuto(false); setHscrp(""); setHdl("");
-    setHeight(""); setWeight(""); setBmi(""); setBmiAuto(false);
+    setHeight(""); setWeight(""); setBmi(""); setBmiAuto(false); setWaistCirc("");
     setSbp(""); setTotalChol(""); setBpMed(false); setOnStatin(false);
     setRfChecked(Object.fromEntries(MAJOR_RF_KEYS.map((k) => [k, false])));
     setModChecked(Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false])));
@@ -654,6 +660,65 @@ export default function LipidCalculator() {
                   </CollapsibleContent>
                 </Collapsible>
               )}
+
+              {/* Waist Circumference */}
+              <div className="mt-3 grid grid-cols-2 gap-3 items-end">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-foreground">Waist Circumference (cm)</label>
+                  <Input type="number" placeholder="e.g. 88" value={waistCirc} onChange={(e) => setWaistCirc(e.target.value)} />
+                  {(() => {
+                    const wc = parseFloat(waistCirc);
+                    if (isNaN(wc) || wc <= 0) return null;
+                    const maleHigh = wc >= 90;
+                    const femaleHigh = wc >= 80;
+                    const isHigh = sex === "male" ? maleHigh : femaleHigh;
+                    const threshold = sex === "male" ? "≥90 cm" : "≥80 cm";
+                    return (
+                      <p className={`mt-1 text-[10px] font-medium ${isHigh ? "text-danger" : "text-success"}`}>
+                        {isHigh ? `⚠ Above Asian cutoff (${threshold})` : `Below Asian cutoff (${threshold})`}
+                      </p>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Waist Circumference Reference — Collapsible */}
+              <Collapsible>
+                <CollapsibleTrigger className="w-full mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground/70 transition-colors cursor-pointer">
+                  <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 [&[data-state=open]]:rotate-0 -rotate-90 shrink-0" />
+                  Waist Circumference — Asian Cutoffs &amp; Clinical Role
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="mt-2 rounded-lg border border-border bg-muted/30 p-3 space-y-2.5 text-[10px] text-muted-foreground leading-snug">
+                    <p>WC assesses central/abdominal obesity, complementing BMI due to higher visceral fat and metabolic risks at lower BMIs in Asians. Predicts CV and diabetes risks better than BMI alone.</p>
+                    <div>
+                      <p className="font-bold text-foreground uppercase tracking-wide mb-1">Measurement</p>
+                      <p>Midpoint between lower rib margin and iliac crest, midway in axilla, relaxed abdomen. Non-stretch tape at minimal tension. Avoid post-meal.</p>
+                    </div>
+                    <div>
+                      <p className="font-bold text-foreground uppercase tracking-wide mb-1">Asian Cutoffs</p>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-[10px] border-collapse">
+                          <thead>
+                            <tr className="border-b border-border">
+                              <th className="text-left py-1 pr-2 font-bold text-foreground">Population</th>
+                              <th className="text-center py-1 px-2 font-bold text-foreground">Men (cm)</th>
+                              <th className="text-center py-1 pl-2 font-bold text-foreground">Women (cm)</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-muted-foreground">
+                            <tr className="border-b border-border/50"><td className="py-1 pr-2">🇮🇳 India — Action Level 1</td><td className="text-center py-1 px-2">≥78</td><td className="text-center py-1 pl-2">≥72</td></tr>
+                            <tr className="border-b border-border/50"><td className="py-1 pr-2">🇮🇳 India — Action Level 2</td><td className="text-center py-1 px-2">≥90</td><td className="text-center py-1 pl-2">≥80</td></tr>
+                            <tr className="border-b border-border/50"><td className="py-1 pr-2">IDF South Asians</td><td className="text-center py-1 px-2">≥90</td><td className="text-center py-1 pl-2">≥80</td></tr>
+                            <tr><td className="py-1 pr-2">🇨🇳 Chinese</td><td className="text-center py-1 px-2">≥90</td><td className="text-center py-1 pl-2">≥80</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <p>WC identifies abdominal obesity even at "normal" BMI (18.5–22.9) in Asians. Combine with BMI: overweight/obesity if BMI ≥23 or WC above cutoffs.</p>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             </Section>
 
             {/* ── Section 2: Lab Values ── */}
