@@ -92,6 +92,23 @@ function getWhoBmiClass(bmiVal: number): { label: string; color: string } {
   return { label: "Obese", color: "text-danger" };
 }
 
+/** Collapsible qualifier text */
+function QualifierText({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
+      className="text-left w-full"
+    >
+      <span className="text-[11px] text-muted-foreground leading-snug mt-0.5 flex items-center gap-1 cursor-pointer hover:text-foreground/70 transition-colors">
+        <ChevronDown className={`h-3 w-3 shrink-0 transition-transform duration-200 ${open ? "rotate-0" : "-rotate-90"}`} />
+        <span className={open ? "" : "line-clamp-1"}>{text}</span>
+      </span>
+    </button>
+  );
+}
+
 // ─── Result buckets ───
 interface CategoryResult {
   category: string;
@@ -577,30 +594,65 @@ export default function LipidCalculator() {
                   })()}
                 </div>
               </div>
-              {/* Asian BMI Classification Reference */}
+              {/* BMI Classification Reference — Collapsible */}
               {!isNaN(parseFloat(bmi)) && (
-                <div className="mt-3 rounded-lg border border-border bg-muted/30 p-3">
-                  <p className="text-[10px] font-semibold text-muted-foreground mb-2">
-                    Asian-Specific BMI Cut-offs (WHO Asia-Pacific Guidelines)
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
-                    {[
-                      { range: "18.5–22.9", label: "Normal", color: "text-success" },
-                      { range: "23–24.9", label: "Overweight", color: "text-warning" },
-                      { range: "25–27.4", label: "Obese I", color: "text-danger" },
-                      { range: "≥27.5", label: "Obese II", color: "text-danger" },
-                    ].map((tier) => (
-                      <div key={tier.label} className={`rounded px-2 py-1.5 bg-muted/50 ${tier.color}`}>
-                        <span className="font-bold">{tier.label}</span>
-                        <br />
-                        <span className="text-muted-foreground">{tier.range}</span>
+                <Collapsible>
+                  <CollapsibleTrigger className="w-full mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground/70 transition-colors cursor-pointer">
+                    <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 [&[data-state=open]]:rotate-0 -rotate-90 shrink-0" />
+                    BMI Classification Criteria (WHO &amp; Asian Guidelines)
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="mt-2 rounded-lg border border-border bg-muted/30 p-3 space-y-3">
+                      {/* WHO Standard */}
+                      <div>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1">WHO Standard Criteria</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+                          {[
+                            { range: "<18.5", label: "Underweight", color: "text-primary" },
+                            { range: "18.5–24.9", label: "Normal", color: "text-success" },
+                            { range: "25–29.9", label: "Overweight", color: "text-warning" },
+                            { range: "≥30", label: "Obese", color: "text-danger" },
+                          ].map((t) => (
+                            <div key={t.label} className={`rounded px-2 py-1.5 bg-muted/50 ${t.color}`}>
+                              <span className="font-bold">{t.label}</span><br />
+                              <span className="text-muted-foreground">{t.range} kg/m²</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-2 leading-snug">
-                    Asian populations face higher metabolic risks at lower BMI. India: overweight ≥23, obesity ≥25. Japan: obesity ≥25. China: obesity ≥28.
-                  </p>
-                </div>
+                      {/* Asian Criteria */}
+                      <div>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1">Asian-Specific Cut-offs (WHO Asia-Pacific)</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+                          {[
+                            { range: "18.5–22.9", label: "Normal", color: "text-success" },
+                            { range: "23–24.9", label: "Overweight", color: "text-warning" },
+                            { range: "25–27.4", label: "Obese I", color: "text-danger" },
+                            { range: "≥27.5", label: "Obese II", color: "text-danger" },
+                          ].map((t) => (
+                            <div key={t.label} className={`rounded px-2 py-1.5 bg-muted/50 ${t.color}`}>
+                              <span className="font-bold">{t.label}</span><br />
+                              <span className="text-muted-foreground">{t.range} kg/m²</span>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-1.5 leading-snug">
+                          Asian populations face higher metabolic risks at lower BMI. WHO action points: ≥23 (public health), ≥27.5 (high risk).
+                        </p>
+                      </div>
+                      {/* Country Examples */}
+                      <div>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1">Country-Specific Variations</p>
+                        <div className="space-y-1 text-[10px] text-muted-foreground leading-snug">
+                          <p>🇮🇳 <strong className="text-foreground">India</strong>: Overweight 23–24.9, Obesity ≥25 kg/m²</p>
+                          <p>🇯🇵 <strong className="text-foreground">Japan</strong>: Obesity ≥25 kg/m²</p>
+                          <p>🇰🇷 <strong className="text-foreground">Korea</strong>: Overweight/Pre-obese ≥23, Obesity ≥25 kg/m²</p>
+                          <p>🇨🇳 <strong className="text-foreground">China</strong>: Overweight ≥24, Obesity ≥28 kg/m²</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               )}
             </Section>
 
@@ -802,9 +854,7 @@ export default function LipidCalculator() {
                             <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
                             <div className="flex-1 min-w-0">
                               <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                              {item.qualifier && (
-                                <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
-                              )}
+                              {item.qualifier && <QualifierText text={item.qualifier} />}
                             </div>
                           </label>
                         ))}
@@ -883,9 +933,7 @@ export default function LipidCalculator() {
                               <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
                               <div className="flex-1 min-w-0">
                                 <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                                {item.qualifier && (
-                                  <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
-                                )}
+                                {item.qualifier && <QualifierText text={item.qualifier} />}
                               </div>
                             </label>
                           ))}
@@ -915,7 +963,7 @@ export default function LipidCalculator() {
                                     <Checkbox checked={!!subChecked[tod.id]} onCheckedChange={() => toggleSub(tod.id)} className="mt-0.5" />
                                     <div className="flex-1 min-w-0">
                                       <span className="text-sm leading-snug text-foreground">{tod.label}</span>
-                                      <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{tod.qualifier}</p>
+                                      {tod.qualifier && <QualifierText text={tod.qualifier} />}
                                     </div>
                                   </label>
                                 ))}
