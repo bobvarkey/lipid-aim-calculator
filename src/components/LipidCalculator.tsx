@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -90,6 +97,25 @@ function getWhoBmiClass(bmiVal: number): { label: string; color: string } {
   if (bmiVal < 25) return { label: "Normal", color: "text-success" };
   if (bmiVal < 30) return { label: "Overweight", color: "text-warning" };
   return { label: "Obese", color: "text-danger" };
+}
+
+function getIndianBmiClass(bmiVal: number): { label: string; color: string } {
+  if (bmiVal < 18.5) return { label: "Underweight", color: "text-primary" };
+  if (bmiVal < 23) return { label: "Normal", color: "text-success" };
+  if (bmiVal < 25) return { label: "Overweight (At Risk)", color: "text-warning" };
+  if (bmiVal < 27) return { label: "Obese I", color: "text-danger" };
+  return { label: "Obese II", color: "text-danger" };
+}
+
+function getBmiClass(bmiVal: number, ethnicity: string): { label: string; color: string } {
+  if (ethnicity === "asian") return getAsianBmiClass(bmiVal);
+  if (ethnicity === "indian") return getIndianBmiClass(bmiVal);
+  return getWhoBmiClass(bmiVal);
+}
+
+function getObesityThreshold(ethnicity: string): number {
+  if (ethnicity === "asian" || ethnicity === "indian") return 25;
+  return 30;
 }
 
 /** Collapsible qualifier text */
@@ -221,6 +247,7 @@ export default function LipidCalculator() {
   const [bmi, setBmi] = useState("");
   const [bmiAuto, setBmiAuto] = useState(false);
   const [waistCirc, setWaistCirc] = useState("");
+  const [ethnicity, setEthnicity] = useState<"caucasian" | "asian" | "indian" | "other">("caucasian");
   // ─── PREVENT inputs ───
   const [sbp, setSbp] = useState("");
   const [totalChol, setTotalChol] = useState("");
@@ -304,9 +331,10 @@ export default function LipidCalculator() {
   useEffect(() => {
     const v = parseFloat(bmi);
     if (isNaN(v)) return;
-    const isObese = v >= 25;
+    const threshold = getObesityThreshold(ethnicity);
+    const isObese = v >= threshold;
     setRfChecked((prev) => (prev.obesity === isObese ? prev : { ...prev, obesity: isObese }));
-  }, [bmi]);
+  }, [bmi, ethnicity]);
 
   // ─── Auto-calculate eGFR (CKD-EPI 2021) ───
   useEffect(() => {
@@ -514,6 +542,20 @@ export default function LipidCalculator() {
                   </select>
                 </div>
               </div>
+              <div className="mb-3">
+                <label className="mb-1 block text-xs font-semibold text-foreground">Ethnicity</label>
+                <Select value={ethnicity} onValueChange={(v) => setEthnicity(v as "caucasian" | "asian" | "indian" | "other")}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select ethnicity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="caucasian">Caucasian</SelectItem>
+                    <SelectItem value="asian">Asian</SelectItem>
+                    <SelectItem value="indian">Indian</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-foreground">Height (cm)</label>
@@ -531,15 +573,15 @@ export default function LipidCalculator() {
                   {(() => {
                     const bmiVal = parseFloat(bmi);
                     if (isNaN(bmiVal) || bmiVal <= 0) return null;
-                    const asian = getAsianBmiClass(bmiVal);
-                    const who = getWhoBmiClass(bmiVal);
+                    const bmiClass = getBmiClass(bmiVal, ethnicity);
+                    const threshold = getObesityThreshold(ethnicity);
                     return (
                       <div className="mt-1.5 space-y-1">
-                        <p className={`text-[10px] font-medium ${asian.color}`}>
-                          Asian: {asian.label} (BMI {bmiVal.toFixed(1)})
+                        <p className={`text-[10px] font-medium ${bmiClass.color}`}>
+                          {ethnicity === "caucasian" ? "WHO" : ethnicity.charAt(0).toUpperCase() + ethnicity.slice(1)}: {bmiClass.label} (BMI {bmiVal.toFixed(1)})
                         </p>
-                        <p className={`text-[10px] font-medium ${who.color}`}>
-                          WHO: {who.label}
+                        <p className="text-[10px] text-muted-foreground">
+                          Obesity threshold: ≥{threshold} kg/m²
                         </p>
                       </div>
                     );

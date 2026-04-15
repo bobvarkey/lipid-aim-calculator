@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Heart, Shield, BookOpen, ActivitySquare, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ArteryHeroGraphic from "@/components/ArteryHeroGraphic";
+import heroImage from "@/assets/Lipids Gemini_Generated_Image_4o82814o82814o82.png";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -69,9 +69,9 @@ const Home = () => {
       {/* Header/Hero Section */}
       <div className="relative pt-12 pb-8 md:pt-20 md:pb-12">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          {/* Logo/Icon */}
-          <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500/20 to-pink-500/20 backdrop-blur-xl border border-red-500/30 shadow-lg">
-            <Heart className="h-7 w-7 text-red-500" />
+          {/* Logo/Icon - Enhanced Glassmorphism */}
+          <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_rgba(255,255,255,0.15)]">
+            <Heart className="h-7 w-7 text-red-500 drop-shadow-[0_2px_8px_rgba(239,68,68,0.6)]" />
           </div>
 
           {/* Title */}
@@ -104,9 +104,8 @@ const Home = () => {
 
           <div className="mt-12 flex justify-center px-4 sm:px-0">
             <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-slate-900/10 backdrop-blur-xl max-w-5xl w-full">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(248,113,113,0.18),transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.16),transparent_40%)]" />
               <div className="relative rounded-[2rem] overflow-hidden">
-                <ArteryHeroGraphic className="h-[380px] w-full md:h-[420px]" />
+                <img src={heroImage} alt="Lipid visualization" className="h-[380px] w-full md:h-[420px] object-cover" />
               </div>
             </div>
           </div>
@@ -151,14 +150,15 @@ const Home = () => {
                     {/* Top accent line */}
                     <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
-                    {/* Icon Container */}
+                    {/* Icon Container - Enhanced Glassmorphism */}
                     <div
                       className={`mb-4 inline-flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-xl 
-                        bg-white/10 backdrop-blur-sm border border-white/20
-                        group-hover:scale-110 group-hover:shadow-lg 
+                        bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/30
+                        shadow-[0_8px_32px_rgba(255,255,255,0.1)]
+                        group-hover:scale-110 group-hover:shadow-[0_12px_48px_rgba(255,255,255,0.2)] group-hover:border-white/50
                         transition-all duration-500`}
                     >
-                      <Icon className="h-6 w-6 md:h-7 md:w-7 text-foreground" />
+                      <Icon className="h-6 w-6 md:h-7 md:w-7 text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.5)]" />
                     </div>
 
                     {/* Content */}

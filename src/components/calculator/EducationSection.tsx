@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Heart } from "lucide-react";
+import { Heart, TrendingUp, AlertTriangle, Dna, Activity } from "lucide-react";
 import cvRiskMeasures from "@/assets/cv-risk-measures.png";
 import lipoproteinParticles from "@/assets/lipoprotein-particles.png";
 import cprFramework from "@/assets/cpr-framework.png";
@@ -350,25 +350,87 @@ export default function EducationSection() {
 
       {/* Lp(a) Section */}
       <Card className="border-border bg-card p-5">
-        <h3 className="font-display text-base font-bold text-foreground mb-3">Lp(a) — Lipoprotein(a)</h3>
-        <div className="space-y-2 text-sm text-foreground leading-relaxed">
-          <p>• <strong>Optimal:</strong> ≤14 mg/dL</p>
-          <p>• <strong>Normal:</strong> ≤30 mg/dL</p>
-          <p>• <strong>Elevated:</strong> &gt;50 mg/dL</p>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-md border border-blue-500/30">
+            <Dna className="h-5 w-5 text-blue-500" />
+          </div>
+          <h3 className="font-display text-lg font-bold text-foreground">Lp(a) — Lipoprotein(a)</h3>
         </div>
-        <div className="mt-4 space-y-1.5 text-sm text-foreground leading-relaxed">
-          <p>• Lp(a) 10–49 mg/dL → <strong>28% higher</strong> cardiovascular risk</p>
-          <p>• Lp(a) 50–99 mg/dL → <strong>44% higher</strong> cardiovascular risk</p>
-          <p>• Lp(a) &gt;100 mg/dL → <strong>114% higher</strong> cardiovascular risk</p>
+        
+        {/* Lp(a) Levels with Color-Coded Icons */}
+        <div className="space-y-3 mb-4">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-success/5 border border-success/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-success/20">
+              <Heart className="h-4 w-4 text-success" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-success">Optimal: ≤14 mg/dL</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/20">
+              <Heart className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-primary">Normal: ≤30 mg/dL</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-danger/5 border border-danger/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-danger/20">
+              <AlertTriangle className="h-4 w-4 text-danger" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-danger">Elevated: &gt;50 mg/dL</p>
+            </div>
+          </div>
         </div>
-        <p className="mt-3 text-sm text-muted-foreground italic">
+
+        {/* Risk Progression */}
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/20">
+              <TrendingUp className="h-3 w-3 text-primary" />
+            </div>
+            <p className="text-sm text-foreground">
+              Lp(a) 10–49 mg/dL → <strong className="text-primary">28% higher</strong> cardiovascular risk
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-warning/20">
+              <TrendingUp className="h-3 w-3 text-warning" />
+            </div>
+            <p className="text-sm text-foreground">
+              Lp(a) 50–99 mg/dL → <strong className="text-warning">44% higher</strong> cardiovascular risk
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-danger/20">
+              <TrendingUp className="h-3 w-3 text-danger" />
+            </div>
+            <p className="text-sm text-foreground">
+              Lp(a) &gt;100 mg/dL → <strong className="text-danger font-bold">114% higher</strong> cardiovascular risk
+            </p>
+          </div>
+        </div>
+
+        <p className="text-sm text-muted-foreground italic">
           Lp(a) confers a genetic risk — it represents a specific, highly inherited subset of particles that are particularly dangerous.
         </p>
       </Card>
 
       {/* Lp(a) Risk Table */}
       <Card className="border-border bg-card p-5">
-        <h3 className="font-display text-base font-bold text-foreground mb-3">Lp(a) & Relative ASCVD Risk</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-md border border-orange-500/30">
+            <Activity className="h-5 w-5 text-orange-500" />
+          </div>
+          <h3 className="font-display text-lg font-bold text-foreground">Lp(a) & Relative ASCVD Risk</h3>
+        </div>
+        
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -378,12 +440,84 @@ export default function EducationSection() {
               </tr>
             </thead>
             <tbody className="text-foreground">
-              <tr className="border-b border-border/50"><td className="py-2 pr-4">&lt;75 nmol/L (&lt;30 mg/dL)</td><td className="py-2">Reference (low)</td></tr>
-              <tr className="border-b border-border/50"><td className="py-2 pr-4">75–124 nmol/L (30–49 mg/dL)</td><td className="py-2 font-semibold">1.2×</td></tr>
-              <tr className="border-b border-border/50"><td className="py-2 pr-4">≥125 nmol/L (≥50 mg/dL)</td><td className="py-2 font-semibold text-warning">1.4×</td></tr>
-              <tr className="border-b border-border/50"><td className="py-2 pr-4">≥250 nmol/L (≥100 mg/dL)</td><td className="py-2 font-semibold text-danger">2×</td></tr>
-              <tr className="border-b border-border/50"><td className="py-2 pr-4">≥350 nmol/L (≥150 mg/dL)</td><td className="py-2 font-semibold text-danger">3×</td></tr>
-              <tr><td className="py-2 pr-4">≥430 nmol/L (≥180 mg/dL)</td><td className="py-2 font-semibold text-danger">4×</td></tr>
+              <tr className="border-b border-border/50">
+                <td className="py-3 pr-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-success/20">
+                      <Heart className="h-3 w-3 text-success" />
+                    </div>
+                    <span>&lt;75 nmol/L (&lt;30 mg/dL)</span>
+                  </div>
+                </td>
+                <td className="py-3">
+                  <span className="font-semibold text-success">Reference (low)</span>
+                </td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-3 pr-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/20">
+                      <Heart className="h-3 w-3 text-primary" />
+                    </div>
+                    <span>75–124 nmol/L (30–49 mg/dL)</span>
+                  </div>
+                </td>
+                <td className="py-3">
+                  <span className="font-semibold text-primary">1.2×</span>
+                </td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-3 pr-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-warning/20">
+                      <AlertTriangle className="h-4 w-4 text-warning" />
+                    </div>
+                    <span>≥125 nmol/L (≥50 mg/dL)</span>
+                  </div>
+                </td>
+                <td className="py-3">
+                  <span className="font-semibold text-warning">1.4×</span>
+                </td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-3 pr-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-danger/20">
+                      <AlertTriangle className="h-5 w-5 text-danger" />
+                    </div>
+                    <span>≥250 nmol/L (≥100 mg/dL)</span>
+                  </div>
+                </td>
+                <td className="py-3">
+                  <span className="font-bold text-danger">2×</span>
+                </td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-3 pr-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-md bg-danger/30">
+                      <AlertTriangle className="h-6 w-6 text-danger" />
+                    </div>
+                    <span>≥350 nmol/L (≥150 mg/dL)</span>
+                  </div>
+                </td>
+                <td className="py-3">
+                  <span className="font-bold text-danger">3×</span>
+                </td>
+              </tr>
+              <tr>
+                <td className="py-3 pr-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-danger/40">
+                      <AlertTriangle className="h-7 w-7 text-danger" />
+                    </div>
+                    <span>≥430 nmol/L (≥180 mg/dL)</span>
+                  </div>
+                </td>
+                <td className="py-3">
+                  <span className="font-bold text-danger">4×</span>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -391,51 +525,63 @@ export default function EducationSection() {
 
       {/* ApoB Section */}
       <Card className="border-border bg-card p-5">
-        <h3 className="font-display text-base font-bold text-foreground mb-3">ApoB — Apolipoprotein B</h3>
-        <div className="space-y-2.5 text-sm text-foreground leading-relaxed">
-          <p>• LDL is sometimes <strong>calculated</strong>; ApoB is always <strong>measured</strong>.</p>
-          <p>• LDL is just one of three atherogenic particles. <strong>ApoB counts all of them.</strong></p>
-          <p>• ApoB is a <strong>more accurate predictor</strong> of cardiovascular events than LDL-C.</p>
-          <p>• When ApoB and LDL-C disagree, <strong>ApoB is the better predictor of risk</strong>.</p>
-          <p>• Young adults with high ApoB but normal LDL-C had a <strong>55% higher risk</strong> of developing coronary artery calcification 25 years later.</p>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-md border border-purple-500/30">
+            <Activity className="h-5 w-5 text-purple-500" />
+          </div>
+          <h3 className="font-display text-lg font-bold text-foreground">ApoB — Apolipoprotein B</h3>
+        </div>
+        
+        <div className="space-y-3">
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-purple-500/20 flex-shrink-0">
+              <Dna className="h-4 w-4 text-purple-500" />
+            </div>
+            <p className="text-sm text-foreground">
+              LDL is sometimes <strong className="text-purple-500">calculated</strong>; ApoB is always <strong className="text-purple-500">measured</strong>.
+            </p>
+          </div>
+          
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-500/20 flex-shrink-0">
+              <Activity className="h-4 w-4 text-blue-500" />
+            </div>
+            <p className="text-sm text-foreground">
+              LDL is just one of three atherogenic particles. <strong className="text-blue-500">ApoB counts all of them.</strong>
+            </p>
+          </div>
+          
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-cyan-500/5 border border-cyan-500/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-cyan-500/20 flex-shrink-0">
+              <TrendingUp className="h-4 w-4 text-cyan-500" />
+            </div>
+            <p className="text-sm text-foreground">
+              ApoB is a <strong className="text-cyan-500">more accurate predictor</strong> of cardiovascular events than LDL-C.
+            </p>
+          </div>
+          
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-500/20 flex-shrink-0">
+              <Heart className="h-4 w-4 text-emerald-500" />
+            </div>
+            <p className="text-sm text-foreground">
+              When ApoB and LDL-C disagree, <strong className="text-emerald-500">ApoB is the better predictor of risk</strong>.
+            </p>
+          </div>
+          
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-500/20 flex-shrink-0">
+              <AlertTriangle className="h-4 w-4 text-amber-500" />
+            </div>
+            <p className="text-sm text-foreground">
+              Young adults with high ApoB but normal LDL-C had a <strong className="text-amber-500 font-bold">55% higher risk</strong> of developing coronary artery calcification 25 years later.
+            </p>
+          </div>
+          </div>
         </div>
         <p className="mt-3 text-sm text-muted-foreground italic">
           ApoB is "sticky cholesterol" — it reflects the total number of atherogenic particles (LDL + Lp(a) + others).
         </p>
-      </Card>
-
-      {/* Risk Stratification Flowchart */}
-      <Card className="border-border bg-card p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-            <Heart className="h-4 w-4 text-primary" />
-          </div>
-          <h3 className="font-display text-base font-bold text-foreground">Lipid Risk Stratification Algorithm</h3>
-        </div>
-        <p className="text-sm text-foreground leading-relaxed mb-4">
-          This flowchart illustrates the decision tree for classifying patients into risk categories based on clinical criteria and LDL-C targets.
-        </p>
-        <MermaidChart
-          chart={`flowchart TD
-    A[Patient Assessment] --> B{ASCVD Present?}
-    B -->|Yes| C{Sequelae despite LDL ≤30?}
-    C -->|Yes| D[Extreme Risk C<br/>LDL 10-15 mg/dL]
-    C -->|No| E{CAD + VHR features<br/>OR Recurrent/Progressive<br/>OR ACS within 12m<br/>OR HoFH?}
-    E -->|Yes| F[Extreme Risk B<br/>LDL ≤30 mg/dL]
-    E -->|No| G{ASCVD + VHR features<br/>OR Subclinical atherosclerosis?}
-    G -->|Yes| H[Extreme Risk A<br/>LDL <50 mg/dL<br/>optional ≤30]
-    G -->|No| I[Very High Risk<br/>LDL <50 mg/dL]
-    B -->|No| J{Diabetes + ≥3 RF<br/>OR Target Organ Damage?}
-    J -->|Yes| I
-    J -->|No| K[Lower than VHR<br/>Use primary prevention pathway]
-    
-    style D fill:#fee2e2,stroke:#dc2626
-    style F fill:#fed7aa,stroke:#ea580c
-    style H fill:#fed7aa,stroke:#ea580c
-    style I fill:#fef3c7,stroke:#d97706
-    style K fill:#d1fae5,stroke:#059669`}
-          className="w-full"
-        />
       </Card>
     </div>
   );
