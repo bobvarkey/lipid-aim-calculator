@@ -220,6 +220,7 @@ export default function LipidCalculator() {
   const [weight, setWeight] = useState("");
   const [bmi, setBmi] = useState("");
   const [bmiAuto, setBmiAuto] = useState(false);
+  const [waistCirc, setWaistCirc] = useState("");
   // ─── PREVENT inputs ───
   const [sbp, setSbp] = useState("");
   const [totalChol, setTotalChol] = useState("");
