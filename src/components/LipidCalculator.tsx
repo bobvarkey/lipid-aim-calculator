@@ -222,6 +222,15 @@ export default function LipidCalculator() {
   const toggleSub = (id: string) =>
     setSubChecked((prev) => ({ ...prev, [id]: !prev[id] }));
 
+  // Auto-qualification for Major RF "fhx" from FHX sub-items
+  const fhxAutoQual = useMemo(() => countCheckedItems(FHX_ITEMS, subChecked) >= 1, [subChecked]);
+
+  useEffect(() => {
+    if (fhxAutoQual && !rfChecked.fhx) {
+      setRfChecked((prev) => ({ ...prev, fhx: true }));
+    }
+  }, [fhxAutoQual, rfChecked.fhx]);
+
   // Auto-qualification: if any sub-item is checked, parent modifier is auto-qualified
   const modAutoQual = useMemo(() => {
     const map: Record<string, boolean> = {};
@@ -756,10 +765,52 @@ export default function LipidCalculator() {
               <p className="mb-3 text-[10px] text-muted-foreground">CKD, age, low HDL, obesity auto-derived from inputs</p>
               <div className="space-y-2.5">
                 {MAJOR_RF_KEYS.map((key) => (
-                  <label key={key} className="flex cursor-pointer items-start gap-3">
-                    <Checkbox checked={rfChecked[key]} onCheckedChange={() => toggleRf(key)} className="mt-0.5" />
-                    <span className="text-sm leading-snug text-foreground">{MAJOR_RF_LABELS[key]}</span>
-                  </label>
+                  <div key={key}>
+                    <label className="flex cursor-pointer items-start gap-3">
+                      <Checkbox
+                        checked={rfChecked[key]}
+                        onCheckedChange={() => toggleRf(key)}
+                        disabled={key === "fhx" && fhxAutoQual}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm leading-snug text-foreground">{MAJOR_RF_LABELS[key]}</span>
+                        {key === "fhx" && (
+                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                            fhxAutoQual ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {countCheckedItems(FHX_ITEMS, subChecked)}/{FHX_ITEMS.length} — {fhxAutoQual ? "Qualified ✓" : "≥1 required"}
+                          </span>
+                        )}
+                      </div>
+                    </label>
+                    {key === "fhx" && (
+                      <div className="ml-8 mt-2 mb-1 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                        <p className="text-xs font-semibold text-muted-foreground mb-2">
+                          Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):
+                        </p>
+                        <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
+                          "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
+                        </p>
+                        {FHX_ITEMS.map((item) => (
+                          <label
+                            key={item.id}
+                            className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
+                              subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                              {item.qualifier && (
+                                <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.qualifier}</p>
+                              )}
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
               {rfCount >= 3 && (
