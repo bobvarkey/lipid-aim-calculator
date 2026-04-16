@@ -577,7 +577,6 @@ export default function EducationSection() {
               Young adults with high ApoB but normal LDL-C had a <strong className="text-amber-500 font-bold">55% higher risk</strong> of developing coronary artery calcification 25 years later.
             </p>
           </div>
-          </div>
         </div>
         <p className="mt-3 text-sm text-muted-foreground italic">
           ApoB is "sticky cholesterol" — it reflects the total number of atherogenic particles (LDL + Lp(a) + others).
