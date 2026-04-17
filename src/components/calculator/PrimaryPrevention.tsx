@@ -851,31 +851,26 @@ export default function PrimaryPrevention() {
           ))}
         </div>
       </SectionCard>
-      <Card className={`border-border bg-card p-5 ${
-        riskInfo.severity === "high" ? "ring-1 ring-danger/30" :
-        riskInfo.severity === "moderate" ? "ring-1 ring-warning/30" :
-        riskInfo.severity === "mild" ? "ring-1 ring-primary/30" : ""
-      }`}>
-        <div className="flex items-center gap-2 mb-3">
-          <AlertTriangle className={`h-4 w-4 ${
-            riskInfo.severity === "high" ? "text-danger" :
-            riskInfo.severity === "moderate" ? "text-warning" :
-            riskInfo.severity === "mild" ? "text-primary" : "text-muted-foreground"
-          }`} />
-          <h3 className="font-display text-sm font-bold text-foreground">
-            Compounding Risk Assessment
-          </h3>
-          {riskInfo.total > 0 && (
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-              riskInfo.severity === "high" ? "bg-danger/15 text-danger" :
-              riskInfo.severity === "moderate" ? "bg-warning/15 text-warning" :
-              "bg-primary/15 text-primary"
-            }`}>
-              {riskInfo.total} factor{riskInfo.total !== 1 ? "s" : ""}
-            </span>
-          )}
-        </div>
-
+      <SectionCard
+        title="Compounding Risk Assessment"
+        tone={
+          riskInfo.severity === "high" ? "danger"
+          : riskInfo.severity === "moderate" ? "warning"
+          : riskInfo.severity === "mild" ? "primary"
+          : "neutral"
+        }
+        icon={<AlertTriangle className="h-4 w-4" />}
+        collapsible={false}
+        badge={riskInfo.total > 0 ? (
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+            riskInfo.severity === "high" ? "bg-danger/15 text-danger" :
+            riskInfo.severity === "moderate" ? "bg-warning/15 text-warning" :
+            "bg-primary/15 text-primary"
+          }`}>
+            {riskInfo.total} factor{riskInfo.total !== 1 ? "s" : ""}
+          </span>
+        ) : undefined}
+      >
         <div className={`rounded-lg px-4 py-3 mb-3 ${
           riskInfo.severity === "high" ? "bg-danger/8" :
           riskInfo.severity === "moderate" ? "bg-warning/8" :
@@ -890,7 +885,7 @@ export default function PrimaryPrevention() {
           <p><strong className="text-foreground">ESC/SCORE2:</strong> 1–2 modifiers commonly suffice for reclassification; &gt;4 risks overestimation.</p>
           <p><strong className="text-foreground">Practical:</strong> ≥2 metabolic modifiers alongside high-risk features double event rates. Consider CAC or ABI testing if uncertainty persists.</p>
         </div>
-      </Card>
+      </SectionCard>
 
       {/* ─── Exportable Clinical Note ─── */}
       <SectionCard
