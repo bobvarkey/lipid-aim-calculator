@@ -535,7 +535,23 @@ export default function LipidCalculator() {
                 Cardiovascular Risk Assessment & Management
               </p>
             </div>
-            <div className="flex gap-1.5 no-print shrink-0">
+            <div className="flex items-center gap-2 no-print shrink-0">
+              {preventResult?.valid && (
+                <div className={`hidden sm:flex flex-col items-end rounded-lg border px-2.5 py-1 leading-none ${
+                  preventResult.category === "High" ? "border-danger/30 bg-danger/5"
+                  : preventResult.category === "Intermediate" ? "border-warning/30 bg-warning/5"
+                  : preventResult.category === "Borderline" ? "border-primary/30 bg-primary/5"
+                  : "border-accent/30 bg-accent/5"
+                }`}>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground">Risk Index</span>
+                  <span className={`font-display text-sm font-bold ${
+                    preventResult.category === "High" ? "text-danger"
+                    : preventResult.category === "Intermediate" ? "text-warning"
+                    : preventResult.category === "Borderline" ? "text-primary"
+                    : "text-accent"
+                  }`}>{preventResult.riskPct}<span className="text-[10px]">%</span></span>
+                </div>
+              )}
               <Button variant="ghost" size="sm" onClick={() => navigate("/")} title="Back to Home">
                 <Home className="h-4 w-4" />
               </Button>
