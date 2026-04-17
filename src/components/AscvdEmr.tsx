@@ -8,7 +8,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Activity, ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ShieldCheck, ChevronDown } from "lucide-react";
+import { Activity, ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ShieldCheck, ChevronDown, User, TestTube, FileText, TrendingUp } from "lucide-react";
+import { SectionCard } from "@/components/ui/section-card";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -284,8 +285,12 @@ export default function AscvdEmr() {
           </p>
         </div>
 
-        {/* Patient Header */}
-        <Card className="border-border bg-card p-5">
+        <SectionCard
+          title="Patient Profile"
+          tone="primary"
+          icon={<User className="h-4 w-4" />}
+          collapsible={false}
+        >
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {(["name", "mrn"] as const).map((k) => (
               <div key={k}>
@@ -302,7 +307,84 @@ export default function AscvdEmr() {
               <Input value={patient.sex} onChange={(e) => setPatient({ ...patient, sex: e.target.value })} />
             </div>
           </div>
-        </Card>
+        </SectionCard>
+
+        {/* Conditions */}
+        <SectionCard
+          title="Conditions"
+          tone="danger"
+          icon={<Heart className="h-4 w-4" />}
+          collapsible={false}
+        >
+          <div className="flex gap-3 flex-wrap">
+            {toggles.map((k) => (
+              <label key={k} className="flex cursor-pointer items-center gap-2">
+                <Checkbox checked={data[k] as boolean} onCheckedChange={() => setData({ ...data, [k]: !data[k] })} />
+                <span className="text-sm font-medium text-foreground">{k.toUpperCase()}</span>
+              </label>
+            ))}
+          </div>
+        </SectionCard>
+
+        {/* Labs */}
+        <SectionCard
+          title="Lab Values"
+          tone="indigo"
+          icon={<TestTube className="h-4 w-4" />}
+          collapsible={false}
+        >
+          <div className="grid grid-cols-3 gap-4">
+            {labs.map((lab) => (
+              <div key={lab}>
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">{lab.toUpperCase()}</label>
+                <Input type="number" value={data[lab] as number} onChange={(e) => setData({ ...data, [lab]: +e.target.value })} />
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+
+        {/* Risk Card */}
+        <SectionCard
+          title={`10-Year ASCVD Risk — ${category}`}
+          tone={category === "HIGH" ? "danger" : category === "LOW" ? "accent" : "warning"}
+          icon={<TrendingUp className="h-4 w-4" />}
+          collapsible={false}
+          badge={
+            <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+              category === "HIGH" ? "bg-danger/15 text-danger"
+              : category === "LOW" ? "bg-accent/15 text-accent"
+              : "bg-warning/15 text-warning"
+            }`}>
+              {risk.toFixed(1)}%
+            </span>
+          }
+        >
+          <div className={`rounded-lg px-4 py-3 ${
+            category === "HIGH" ? "bg-danger/8"
+            : category === "LOW" ? "bg-accent/8"
+            : "bg-warning/8"
+          }`}>
+            <div className="text-sm">
+              <span className="font-semibold text-foreground">LDL Target:</span> <span className="text-foreground">{ldlTarget}</span>
+            </div>
+            <div className="text-sm mt-1">
+              <span className="font-semibold text-foreground">Plan:</span> <span className="text-foreground">{treatment}</span>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* ─── ASCVD History & Extreme Risk Modifiers ─── */}
+        <SectionCard
+          title="ASCVD History & Extreme Risk Modifiers"
+          tone="warning"
+          icon={<AlertTriangle className="h-4 w-4" />}
+          collapsible={false}
+          badge={qualifiedCount > 0 ? (
+            <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[10px] font-bold text-warning">
+              {qualifiedCount}/{ASCVD_HISTORY_ITEMS.length}
+            </span>
+          ) : undefined}
+        >
 
         {/* Quick Toggles */}
         <Card className="border-border bg-card p-5">
