@@ -931,7 +931,7 @@ export default function PrimaryPrevention() {
             Reset to auto-generated note
           </Button>
         )}
-      </Card>
+      </SectionCard>
     </div>
   );
 }
