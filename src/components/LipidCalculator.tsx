@@ -191,6 +191,54 @@ function getCkdStage(egfrVal: number): string {
   return "Stage 5 (<15)";
 }
 
+// ─── Section tone palette (color-coded cards) ───
+type SectionTone = "primary" | "accent" | "danger" | "warning" | "neutral" | "indigo";
+
+const TONE_STYLES: Record<SectionTone, { card: string; header: string; iconWrap: string; title: string; ring: string }> = {
+  primary: {
+    card: "border-primary/25 bg-primary/[0.04]",
+    header: "bg-primary/8 hover:bg-primary/12",
+    iconWrap: "bg-primary/15 text-primary",
+    title: "text-primary",
+    ring: "ring-primary/20",
+  },
+  accent: {
+    card: "border-accent/25 bg-accent/[0.04]",
+    header: "bg-accent/8 hover:bg-accent/12",
+    iconWrap: "bg-accent/15 text-accent",
+    title: "text-accent",
+    ring: "ring-accent/20",
+  },
+  danger: {
+    card: "border-danger/25 bg-danger/[0.04]",
+    header: "bg-danger/8 hover:bg-danger/12",
+    iconWrap: "bg-danger/15 text-danger",
+    title: "text-danger",
+    ring: "ring-danger/20",
+  },
+  warning: {
+    card: "border-warning/30 bg-warning/[0.05]",
+    header: "bg-warning/10 hover:bg-warning/15",
+    iconWrap: "bg-warning/20 text-warning",
+    title: "text-warning",
+    ring: "ring-warning/20",
+  },
+  indigo: {
+    card: "border-[hsl(245_70%_55%)]/25 bg-[hsl(245_70%_55%)]/[0.04]",
+    header: "bg-[hsl(245_70%_55%)]/8 hover:bg-[hsl(245_70%_55%)]/12",
+    iconWrap: "bg-[hsl(245_70%_55%)]/15 text-[hsl(245_70%_55%)]",
+    title: "text-[hsl(245_70%_55%)]",
+    ring: "ring-[hsl(245_70%_55%)]/20",
+  },
+  neutral: {
+    card: "border-border bg-card",
+    header: "hover:bg-muted/30",
+    iconWrap: "bg-muted text-foreground",
+    title: "text-foreground",
+    ring: "ring-border",
+  },
+};
+
 // ─── Collapsible Section ───
 function Section({
   title,
@@ -198,27 +246,32 @@ function Section({
   children,
   defaultOpen = true,
   badge,
+  tone = "neutral",
 }: {
   title: string;
   icon: React.ReactNode;
   children: React.ReactNode;
   defaultOpen?: boolean;
   badge?: React.ReactNode;
+  tone?: SectionTone;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const t = TONE_STYLES[tone];
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <Card className="border-border bg-card overflow-hidden">
-        <CollapsibleTrigger className="flex w-full items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors">
+      <Card className={`overflow-hidden shadow-sm ${t.card}`}>
+        <CollapsibleTrigger className={`flex w-full items-center justify-between px-5 py-3.5 transition-colors ${t.header}`}>
           <div className="flex items-center gap-2.5">
-            {icon}
-            <h2 className="font-display text-sm font-bold text-foreground">{title}</h2>
+            <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${t.iconWrap}`}>
+              {icon}
+            </span>
+            <h2 className={`font-display text-sm font-bold ${t.title}`}>{title}</h2>
             {badge}
           </div>
-          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-4 w-4 ${t.title} transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="px-5 pb-5 pt-1">{children}</div>
+          <div className="px-5 pb-5 pt-3 bg-card">{children}</div>
         </CollapsibleContent>
       </Card>
     </Collapsible>
@@ -482,7 +535,23 @@ export default function LipidCalculator() {
                 Cardiovascular Risk Assessment & Management
               </p>
             </div>
-            <div className="flex gap-1.5 no-print shrink-0">
+            <div className="flex items-center gap-2 no-print shrink-0">
+              {preventResult?.valid && (
+                <div className={`hidden sm:flex flex-col items-end rounded-lg border px-2.5 py-1 leading-none ${
+                  preventResult.category === "High" ? "border-danger/30 bg-danger/5"
+                  : preventResult.category === "Intermediate" ? "border-warning/30 bg-warning/5"
+                  : preventResult.category === "Borderline" ? "border-primary/30 bg-primary/5"
+                  : "border-accent/30 bg-accent/5"
+                }`}>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground">Risk Index</span>
+                  <span className={`font-display text-sm font-bold ${
+                    preventResult.category === "High" ? "text-danger"
+                    : preventResult.category === "Intermediate" ? "text-warning"
+                    : preventResult.category === "Borderline" ? "text-primary"
+                    : "text-accent"
+                  }`}>{preventResult.riskPct}<span className="text-[10px]">%</span></span>
+                </div>
+              )}
               <Button variant="ghost" size="sm" onClick={() => navigate("/")} title="Back to Home">
                 <Home className="h-4 w-4" />
               </Button>
@@ -528,7 +597,7 @@ export default function LipidCalculator() {
             </Card>
 
             {/* ── Section 1: Demographics & Anthropometrics ── */}
-            <Section title="Demographics & Body Metrics" icon={<User className="h-4 w-4 text-primary" />}>
+            <Section title="Demographics & Body Metrics" tone="primary" icon={<User className="h-4 w-4" />}>
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-foreground">Age</label>
@@ -710,7 +779,7 @@ export default function LipidCalculator() {
             </Section>
 
             {/* ── Section 2: Lab Values ── */}
-            <Section title="Lab Values" icon={<TestTube className="h-4 w-4 text-primary" />}>
+            <Section title="Lab Values" tone="indigo" icon={<TestTube className="h-4 w-4" />}>
               <div className="grid grid-cols-3 gap-3 mb-3">
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-foreground">LDL-C (mg/dL)</label>
@@ -797,7 +866,8 @@ export default function LipidCalculator() {
             {/* ── Section 3: PREVENT Risk Score ── */}
             <Section
               title="AHA PREVENT — 10-Year ASCVD Risk"
-              icon={<TrendingUp className="h-4 w-4 text-primary" />}
+              tone="accent"
+              icon={<TrendingUp className="h-4 w-4" />}
               defaultOpen={true}
               badge={preventResult?.valid ? (
                 <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-bold ${
@@ -864,8 +934,9 @@ export default function LipidCalculator() {
             {/* ── Section 4: Risk Factors ── */}
             <Section
               title="Major ASCVD Risk Factors"
-              icon={<Heart className="h-4 w-4 text-danger" />}
-              badge={<span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs font-bold text-foreground">{rfCount}/{MAJOR_RF_KEYS.length}</span>}
+              tone="warning"
+              icon={<Heart className="h-4 w-4" />}
+              badge={<span className="ml-2 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-bold text-warning">{rfCount}/{MAJOR_RF_KEYS.length}</span>}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">CKD, age, low HDL, obesity auto-derived from inputs</p>
               <div className="space-y-2.5">
@@ -934,7 +1005,8 @@ export default function LipidCalculator() {
             {/* ── Section 5: ASCVD History & Modifiers ── */}
             <Section
               title="ASCVD History & Extreme-Risk Modifiers"
-              icon={<Stethoscope className="h-4 w-4 text-primary" />}
+              tone="danger"
+              icon={<Stethoscope className="h-4 w-4" />}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">
                 Tick all that apply. Auto-classifies C → B → A → VHR.
@@ -1124,7 +1196,7 @@ export default function LipidCalculator() {
             </Card>
 
             {/* ── Section 7: Decision Logic ── */}
-            <Section title="Decision Logic & Bucket Summary" icon={<Target className="h-4 w-4 text-primary" />} defaultOpen={false}>
+            <Section title="Decision Logic & Bucket Summary" tone="neutral" icon={<Target className="h-4 w-4" />} defaultOpen={false}>
               <ol className="list-decimal ml-5 space-y-1 text-sm text-foreground mb-4">
                 <li>Check Category C first: ongoing ASCVD sequelae despite LDL-C ≤30 and intensive therapy.</li>
                 <li>Then Category B: CAD plus very-high-risk features or recurrent events despite LDL-C &lt;50.</li>
@@ -1154,7 +1226,7 @@ export default function LipidCalculator() {
             </Section>
 
             {/* ── Section 8: EMR Note ── */}
-            <Section title="EMR Note" icon={<FileText className="h-4 w-4 text-primary" />}>
+            <Section title="EMR Note" tone="indigo" icon={<FileText className="h-4 w-4" />}>
               <textarea
                 readOnly
                 value={generateNote()}
