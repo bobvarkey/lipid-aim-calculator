@@ -191,6 +191,54 @@ function getCkdStage(egfrVal: number): string {
   return "Stage 5 (<15)";
 }
 
+// ─── Section tone palette (color-coded cards) ───
+type SectionTone = "primary" | "accent" | "danger" | "warning" | "neutral" | "indigo";
+
+const TONE_STYLES: Record<SectionTone, { card: string; header: string; iconWrap: string; title: string; ring: string }> = {
+  primary: {
+    card: "border-primary/25 bg-primary/[0.04]",
+    header: "bg-primary/8 hover:bg-primary/12",
+    iconWrap: "bg-primary/15 text-primary",
+    title: "text-primary",
+    ring: "ring-primary/20",
+  },
+  accent: {
+    card: "border-accent/25 bg-accent/[0.04]",
+    header: "bg-accent/8 hover:bg-accent/12",
+    iconWrap: "bg-accent/15 text-accent",
+    title: "text-accent",
+    ring: "ring-accent/20",
+  },
+  danger: {
+    card: "border-danger/25 bg-danger/[0.04]",
+    header: "bg-danger/8 hover:bg-danger/12",
+    iconWrap: "bg-danger/15 text-danger",
+    title: "text-danger",
+    ring: "ring-danger/20",
+  },
+  warning: {
+    card: "border-warning/30 bg-warning/[0.05]",
+    header: "bg-warning/10 hover:bg-warning/15",
+    iconWrap: "bg-warning/20 text-warning",
+    title: "text-warning",
+    ring: "ring-warning/20",
+  },
+  indigo: {
+    card: "border-[hsl(245_70%_55%)]/25 bg-[hsl(245_70%_55%)]/[0.04]",
+    header: "bg-[hsl(245_70%_55%)]/8 hover:bg-[hsl(245_70%_55%)]/12",
+    iconWrap: "bg-[hsl(245_70%_55%)]/15 text-[hsl(245_70%_55%)]",
+    title: "text-[hsl(245_70%_55%)]",
+    ring: "ring-[hsl(245_70%_55%)]/20",
+  },
+  neutral: {
+    card: "border-border bg-card",
+    header: "hover:bg-muted/30",
+    iconWrap: "bg-muted text-foreground",
+    title: "text-foreground",
+    ring: "ring-border",
+  },
+};
+
 // ─── Collapsible Section ───
 function Section({
   title,
@@ -198,27 +246,32 @@ function Section({
   children,
   defaultOpen = true,
   badge,
+  tone = "neutral",
 }: {
   title: string;
   icon: React.ReactNode;
   children: React.ReactNode;
   defaultOpen?: boolean;
   badge?: React.ReactNode;
+  tone?: SectionTone;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const t = TONE_STYLES[tone];
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <Card className="border-border bg-card overflow-hidden">
-        <CollapsibleTrigger className="flex w-full items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors">
+      <Card className={`overflow-hidden shadow-sm ${t.card}`}>
+        <CollapsibleTrigger className={`flex w-full items-center justify-between px-5 py-3.5 transition-colors ${t.header}`}>
           <div className="flex items-center gap-2.5">
-            {icon}
-            <h2 className="font-display text-sm font-bold text-foreground">{title}</h2>
+            <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${t.iconWrap}`}>
+              {icon}
+            </span>
+            <h2 className={`font-display text-sm font-bold ${t.title}`}>{title}</h2>
             {badge}
           </div>
-          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-4 w-4 ${t.title} transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="px-5 pb-5 pt-1">{children}</div>
+          <div className="px-5 pb-5 pt-3 bg-card">{children}</div>
         </CollapsibleContent>
       </Card>
     </Collapsible>
