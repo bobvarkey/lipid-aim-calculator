@@ -8,7 +8,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Activity, ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ShieldCheck, ChevronDown } from "lucide-react";
+import { Activity, ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ShieldCheck, ChevronDown, User, TestTube, FileText, TrendingUp } from "lucide-react";
+import { SectionCard } from "@/components/ui/section-card";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -284,8 +285,12 @@ export default function AscvdEmr() {
           </p>
         </div>
 
-        {/* Patient Header */}
-        <Card className="border-border bg-card p-5">
+        <SectionCard
+          title="Patient Profile"
+          tone="primary"
+          icon={<User className="h-4 w-4" />}
+          collapsible={false}
+        >
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {(["name", "mrn"] as const).map((k) => (
               <div key={k}>
@@ -302,11 +307,15 @@ export default function AscvdEmr() {
               <Input value={patient.sex} onChange={(e) => setPatient({ ...patient, sex: e.target.value })} />
             </div>
           </div>
-        </Card>
+        </SectionCard>
 
-        {/* Quick Toggles */}
-        <Card className="border-border bg-card p-5">
-          <h3 className="font-display text-sm font-bold text-foreground mb-3">Conditions</h3>
+        {/* Conditions */}
+        <SectionCard
+          title="Conditions"
+          tone="danger"
+          icon={<Heart className="h-4 w-4" />}
+          collapsible={false}
+        >
           <div className="flex gap-3 flex-wrap">
             {toggles.map((k) => (
               <label key={k} className="flex cursor-pointer items-center gap-2">
@@ -315,11 +324,15 @@ export default function AscvdEmr() {
               </label>
             ))}
           </div>
-        </Card>
+        </SectionCard>
 
         {/* Labs */}
-        <Card className="border-border bg-card p-5">
-          <h3 className="font-display text-sm font-bold text-foreground mb-3">Lab Values</h3>
+        <SectionCard
+          title="Lab Values"
+          tone="indigo"
+          icon={<TestTube className="h-4 w-4" />}
+          collapsible={false}
+        >
           <div className="grid grid-cols-3 gap-4">
             {labs.map((lab) => (
               <div key={lab}>
@@ -328,35 +341,50 @@ export default function AscvdEmr() {
               </div>
             ))}
           </div>
-        </Card>
+        </SectionCard>
 
         {/* Risk Card */}
-        <Card className={`border-border p-5 ${colorClass}`}>
-          <div className="text-3xl font-display font-bold">{risk.toFixed(1)}%</div>
-          <div className="text-sm font-semibold mt-1">{category} RISK</div>
-          <div className="mt-3 text-sm">
-            <span className="font-semibold">LDL Target:</span> {ldlTarget}
+        <SectionCard
+          title={`10-Year ASCVD Risk — ${category}`}
+          tone={category === "HIGH" ? "danger" : category === "LOW" ? "accent" : "warning"}
+          icon={<TrendingUp className="h-4 w-4" />}
+          collapsible={false}
+          badge={
+            <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+              category === "HIGH" ? "bg-danger/15 text-danger"
+              : category === "LOW" ? "bg-accent/15 text-accent"
+              : "bg-warning/15 text-warning"
+            }`}>
+              {risk.toFixed(1)}%
+            </span>
+          }
+        >
+          <div className={`rounded-lg px-4 py-3 ${
+            category === "HIGH" ? "bg-danger/8"
+            : category === "LOW" ? "bg-accent/8"
+            : "bg-warning/8"
+          }`}>
+            <div className="text-sm">
+              <span className="font-semibold text-foreground">LDL Target:</span> <span className="text-foreground">{ldlTarget}</span>
+            </div>
+            <div className="text-sm mt-1">
+              <span className="font-semibold text-foreground">Plan:</span> <span className="text-foreground">{treatment}</span>
+            </div>
           </div>
-          <div className="text-sm">
-            <span className="font-semibold">Plan:</span> {treatment}
-          </div>
-        </Card>
+        </SectionCard>
 
         {/* ─── ASCVD History & Extreme Risk Modifiers ─── */}
-        <Card className="border-border bg-card p-5">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-warning" />
-              <h3 className="font-display text-sm font-bold text-foreground">
-                ASCVD History & Extreme Risk Modifiers
-              </h3>
-            </div>
-            {qualifiedCount > 0 && (
-              <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[10px] font-bold text-warning">
-                {qualifiedCount}/{ASCVD_HISTORY_ITEMS.length}
-              </span>
-            )}
-          </div>
+        <SectionCard
+          title="ASCVD History & Extreme Risk Modifiers"
+          tone="warning"
+          icon={<AlertTriangle className="h-4 w-4" />}
+          collapsible={false}
+          badge={qualifiedCount > 0 ? (
+            <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[10px] font-bold text-warning">
+              {qualifiedCount}/{ASCVD_HISTORY_ITEMS.length}
+            </span>
+          ) : undefined}
+        >
           <p className="text-xs text-muted-foreground mb-3">
             Expand sub-criteria to auto-qualify each category. All selections are reflected in the EMR note.
           </p>
@@ -436,11 +464,15 @@ export default function AscvdEmr() {
               );
             })}
           </div>
-        </Card>
+        </SectionCard>
 
         {/* EMR Note */}
-        <Card className="border-border bg-card p-5">
-          <h3 className="font-display text-sm font-bold text-foreground mb-3">EMR Note</h3>
+        <SectionCard
+          title="EMR Note"
+          tone="indigo"
+          icon={<FileText className="h-4 w-4" />}
+          collapsible={false}
+        >
           <textarea
             value={generateNote}
             readOnly
@@ -456,7 +488,7 @@ export default function AscvdEmr() {
             <ClipboardCopy className="h-4 w-4" />
             Copy to EMR
           </Button>
-        </Card>
+        </SectionCard>
       </div>
     </div>
   );
