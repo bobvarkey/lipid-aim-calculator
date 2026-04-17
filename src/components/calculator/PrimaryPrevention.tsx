@@ -8,7 +8,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ShieldCheck, AlertTriangle, Heart, Activity, Copy, FileText, CheckCircle2, Globe, ChevronDown } from "lucide-react";
+import { ShieldCheck, AlertTriangle, Heart, Activity, Copy, FileText, CheckCircle2, Globe, ChevronDown, ListChecks } from "lucide-react";
+import { SectionCard } from "@/components/ui/section-card";
 import { toast } from "sonner";
 import {
   ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
@@ -418,15 +419,19 @@ export default function PrimaryPrevention() {
   return (
     <div className="space-y-4">
       {/* ─── Indian Ethnicity / Guideline Toggle ─── */}
-      <Card className="border-border bg-card p-4">
+      <SectionCard
+        title="Indian / South Asian Ethnicity"
+        tone="indigo"
+        icon={<Globe className="h-4 w-4" />}
+        collapsible={false}
+      >
         <label className="flex cursor-pointer items-center gap-3">
           <Checkbox
             checked={indianEthnicity}
             onCheckedChange={() => setIndianEthnicity(!indianEthnicity)}
           />
-          <Globe className="h-4 w-4 text-primary" />
           <div className="flex-1">
-            <span className="text-sm font-semibold text-foreground">Indian / South Asian Ethnicity</span>
+            <span className="text-sm font-semibold text-foreground">Apply LAI 2023 Guidelines</span>
             <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
               {indianEthnicity
                 ? "LAI 2023 guidelines applied (Lipid Association of India — Consensus IV)"
@@ -434,16 +439,15 @@ export default function PrimaryPrevention() {
             </p>
           </div>
         </label>
-      </Card>
+      </SectionCard>
 
       {/* LDL-C Targets by 10-Year Risk */}
-      <Card className="border-border bg-card p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <ShieldCheck className="h-4 w-4 text-primary" />
-          <h3 className="font-display text-sm font-bold text-foreground">
-            Primary Prevention LDL-C Targets by 10-Year ASCVD Risk
-          </h3>
-        </div>
+      <SectionCard
+        title="Primary Prevention LDL-C Targets by 10-Year ASCVD Risk"
+        tone="primary"
+        icon={<ShieldCheck className="h-4 w-4" />}
+        collapsible={false}
+      >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {RISK_TIERS.map((t) => (
             <div key={t.risk} className={`rounded-lg ${t.bg} px-4 py-3`}>
@@ -453,7 +457,7 @@ export default function PrimaryPrevention() {
             </div>
           ))}
         </div>
-      </Card>
+      </SectionCard>
 
       {/* 5-Step Workflow */}
       {STEPS.map((step, i) => (
@@ -478,20 +482,17 @@ export default function PrimaryPrevention() {
       ))}
 
       {/* ─── Diabetes Day-1 Treatment (Checklist) ─── */}
-      <Card className="border-border bg-card p-5">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2">
-            <Heart className="h-4 w-4 text-danger" />
-            <h3 className="font-display text-sm font-bold text-foreground">
-              Diabetes & Dyslipidemia — Day 1 Treatment
-            </h3>
-          </div>
-          {dmCount > 0 && (
-            <span className="rounded-full bg-danger/15 px-2 py-0.5 text-[10px] font-bold text-danger">
-              {dmCount}/{DM_CHECKLIST.length}
-            </span>
-          )}
-        </div>
+      <SectionCard
+        title="Diabetes & Dyslipidemia — Day 1 Treatment"
+        tone="danger"
+        icon={<Heart className="h-4 w-4" />}
+        collapsible={false}
+        badge={dmCount > 0 ? (
+          <span className="rounded-full bg-danger/15 px-2 py-0.5 text-[10px] font-bold text-danger">
+            {dmCount}/{DM_CHECKLIST.length}
+          </span>
+        ) : undefined}
+      >
         <p className="text-xs text-muted-foreground mb-3">
           Initiate dyslipidemia treatment <strong className="text-foreground">on day 1</strong> of diagnosis. Targets must be attained by <strong className="text-foreground">week 12</strong>.
         </p>
@@ -602,9 +603,7 @@ export default function PrimaryPrevention() {
             );
           })}
         </div>
-      </Card>
-
-      {/* ─── ASCVD & ACS Management (Checklist) ─── */}
+      </SectionCard>
       <Card className="border-border bg-card p-5">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
