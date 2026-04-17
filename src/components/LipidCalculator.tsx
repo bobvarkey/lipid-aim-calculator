@@ -763,7 +763,7 @@ export default function LipidCalculator() {
             </Section>
 
             {/* ── Section 2: Lab Values ── */}
-            <Section title="Lab Values" icon={<TestTube className="h-4 w-4 text-primary" />}>
+            <Section title="Lab Values" tone="indigo" icon={<TestTube className="h-4 w-4" />}>
               <div className="grid grid-cols-3 gap-3 mb-3">
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-foreground">LDL-C (mg/dL)</label>
@@ -850,7 +850,8 @@ export default function LipidCalculator() {
             {/* ── Section 3: PREVENT Risk Score ── */}
             <Section
               title="AHA PREVENT — 10-Year ASCVD Risk"
-              icon={<TrendingUp className="h-4 w-4 text-primary" />}
+              tone="accent"
+              icon={<TrendingUp className="h-4 w-4" />}
               defaultOpen={true}
               badge={preventResult?.valid ? (
                 <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-bold ${
@@ -917,8 +918,9 @@ export default function LipidCalculator() {
             {/* ── Section 4: Risk Factors ── */}
             <Section
               title="Major ASCVD Risk Factors"
-              icon={<Heart className="h-4 w-4 text-danger" />}
-              badge={<span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs font-bold text-foreground">{rfCount}/{MAJOR_RF_KEYS.length}</span>}
+              tone="warning"
+              icon={<Heart className="h-4 w-4" />}
+              badge={<span className="ml-2 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-bold text-warning">{rfCount}/{MAJOR_RF_KEYS.length}</span>}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">CKD, age, low HDL, obesity auto-derived from inputs</p>
               <div className="space-y-2.5">
@@ -987,7 +989,8 @@ export default function LipidCalculator() {
             {/* ── Section 5: ASCVD History & Modifiers ── */}
             <Section
               title="ASCVD History & Extreme-Risk Modifiers"
-              icon={<Stethoscope className="h-4 w-4 text-primary" />}
+              tone="danger"
+              icon={<Stethoscope className="h-4 w-4" />}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">
                 Tick all that apply. Auto-classifies C → B → A → VHR.
@@ -1177,7 +1180,7 @@ export default function LipidCalculator() {
             </Card>
 
             {/* ── Section 7: Decision Logic ── */}
-            <Section title="Decision Logic & Bucket Summary" icon={<Target className="h-4 w-4 text-primary" />} defaultOpen={false}>
+            <Section title="Decision Logic & Bucket Summary" tone="neutral" icon={<Target className="h-4 w-4" />} defaultOpen={false}>
               <ol className="list-decimal ml-5 space-y-1 text-sm text-foreground mb-4">
                 <li>Check Category C first: ongoing ASCVD sequelae despite LDL-C ≤30 and intensive therapy.</li>
                 <li>Then Category B: CAD plus very-high-risk features or recurrent events despite LDL-C &lt;50.</li>
@@ -1207,7 +1210,7 @@ export default function LipidCalculator() {
             </Section>
 
             {/* ── Section 8: EMR Note ── */}
-            <Section title="EMR Note" icon={<FileText className="h-4 w-4 text-primary" />}>
+            <Section title="EMR Note" tone="indigo" icon={<FileText className="h-4 w-4" />}>
               <textarea
                 readOnly
                 value={generateNote()}
