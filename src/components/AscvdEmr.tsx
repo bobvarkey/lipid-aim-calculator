@@ -464,11 +464,15 @@ export default function AscvdEmr() {
               );
             })}
           </div>
-        </Card>
+        </SectionCard>
 
         {/* EMR Note */}
-        <Card className="border-border bg-card p-5">
-          <h3 className="font-display text-sm font-bold text-foreground mb-3">EMR Note</h3>
+        <SectionCard
+          title="EMR Note"
+          tone="indigo"
+          icon={<FileText className="h-4 w-4" />}
+          collapsible={false}
+        >
           <textarea
             value={generateNote}
             readOnly
@@ -484,7 +488,7 @@ export default function AscvdEmr() {
             <ClipboardCopy className="h-4 w-4" />
             Copy to EMR
           </Button>
-        </Card>
+        </SectionCard>
       </div>
     </div>
   );
