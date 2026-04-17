@@ -385,60 +385,6 @@ export default function AscvdEmr() {
             </span>
           ) : undefined}
         >
-
-        {/* Quick Toggles */}
-        <Card className="border-border bg-card p-5">
-          <h3 className="font-display text-sm font-bold text-foreground mb-3">Conditions</h3>
-          <div className="flex gap-3 flex-wrap">
-            {toggles.map((k) => (
-              <label key={k} className="flex cursor-pointer items-center gap-2">
-                <Checkbox checked={data[k] as boolean} onCheckedChange={() => setData({ ...data, [k]: !data[k] })} />
-                <span className="text-sm font-medium text-foreground">{k.toUpperCase()}</span>
-              </label>
-            ))}
-          </div>
-        </Card>
-
-        {/* Labs */}
-        <Card className="border-border bg-card p-5">
-          <h3 className="font-display text-sm font-bold text-foreground mb-3">Lab Values</h3>
-          <div className="grid grid-cols-3 gap-4">
-            {labs.map((lab) => (
-              <div key={lab}>
-                <label className="mb-1 block text-xs font-semibold text-muted-foreground">{lab.toUpperCase()}</label>
-                <Input type="number" value={data[lab] as number} onChange={(e) => setData({ ...data, [lab]: +e.target.value })} />
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Risk Card */}
-        <Card className={`border-border p-5 ${colorClass}`}>
-          <div className="text-3xl font-display font-bold">{risk.toFixed(1)}%</div>
-          <div className="text-sm font-semibold mt-1">{category} RISK</div>
-          <div className="mt-3 text-sm">
-            <span className="font-semibold">LDL Target:</span> {ldlTarget}
-          </div>
-          <div className="text-sm">
-            <span className="font-semibold">Plan:</span> {treatment}
-          </div>
-        </Card>
-
-        {/* ─── ASCVD History & Extreme Risk Modifiers ─── */}
-        <Card className="border-border bg-card p-5">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-warning" />
-              <h3 className="font-display text-sm font-bold text-foreground">
-                ASCVD History & Extreme Risk Modifiers
-              </h3>
-            </div>
-            {qualifiedCount > 0 && (
-              <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[10px] font-bold text-warning">
-                {qualifiedCount}/{ASCVD_HISTORY_ITEMS.length}
-              </span>
-            )}
-          </div>
           <p className="text-xs text-muted-foreground mb-3">
             Expand sub-criteria to auto-qualify each category. All selections are reflected in the EMR note.
           </p>
