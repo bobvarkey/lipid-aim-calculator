@@ -604,18 +604,17 @@ export default function PrimaryPrevention() {
           })}
         </div>
       </SectionCard>
-      <Card className="border-border bg-card p-5">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-primary" />
-            <h3 className="font-display text-sm font-bold text-foreground">ASCVD & ACS Management</h3>
-          </div>
-          {acsCount > 0 && (
-            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">
-              {acsCount}/{ACS_CHECKLIST.length}
-            </span>
-          )}
-        </div>
+      <SectionCard
+        title="ASCVD & ACS Management"
+        tone="primary"
+        icon={<Activity className="h-4 w-4" />}
+        collapsible={false}
+        badge={acsCount > 0 ? (
+          <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">
+            {acsCount}/{ACS_CHECKLIST.length}
+          </span>
+        ) : undefined}
+      >
         <div className="space-y-2 mt-3">
           {ACS_CHECKLIST.map((item) => (
             <label
@@ -629,21 +628,20 @@ export default function PrimaryPrevention() {
             </label>
           ))}
         </div>
-      </Card>
+      </SectionCard>
 
       {/* ─── High-Risk Features (Checklist) ─── */}
-      <Card className="border-border bg-card p-5">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-warning" />
-            <h3 className="font-display text-sm font-bold text-foreground">High-Risk Features (LDL-C Target &lt;70 mg/dL)</h3>
-          </div>
-          {hrCount > 0 && (
-            <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[10px] font-bold text-warning">
-              {hrCount}/{HIGHRISK_CHECKLIST.length}
-            </span>
-          )}
-        </div>
+      <SectionCard
+        title="High-Risk Features (LDL-C Target <70 mg/dL)"
+        tone="warning"
+        icon={<AlertTriangle className="h-4 w-4" />}
+        collapsible={false}
+        badge={hrCount > 0 ? (
+          <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[10px] font-bold text-warning">
+            {hrCount}/{HIGHRISK_CHECKLIST.length}
+          </span>
+        ) : undefined}
+      >
         <div className="space-y-2 mt-3">
           {HIGHRISK_CHECKLIST.map((item) => {
             const isAuto = autoQualIds.has(item.id);
@@ -818,21 +816,19 @@ export default function PrimaryPrevention() {
             );
           })}
         </div>
-      </Card>
-
+      </SectionCard>
       {/* ─── Risk Modifiers (Checklist) ─── */}
-      <Card className="border-border bg-card p-5">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-primary" />
-            <h3 className="font-display text-sm font-bold text-foreground">Risk Modifiers (May Upgrade Low/Moderate → Higher Risk)</h3>
-          </div>
-          {rmCount > 0 && (
-            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">
-              {rmCount}/{MODIFIER_CHECKLIST.length}
-            </span>
-          )}
-        </div>
+      <SectionCard
+        title="Risk Modifiers (May Upgrade Low/Moderate → Higher Risk)"
+        tone="accent"
+        icon={<Activity className="h-4 w-4" />}
+        collapsible={false}
+        badge={rmCount > 0 ? (
+          <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold text-accent">
+            {rmCount}/{MODIFIER_CHECKLIST.length}
+          </span>
+        ) : undefined}
+      >
         <p className="text-xs text-muted-foreground mt-1 mb-3">
           No fixed number required — even 1 significant modifier can tip borderline risk toward statin initiation, while ≥2 more reliably upgrade intermediate risk.
         </p>
@@ -854,9 +850,7 @@ export default function PrimaryPrevention() {
             </label>
           ))}
         </div>
-      </Card>
-
-      {/* ─── Risk Upgrade Interpretation ─── */}
+      </SectionCard>
       <Card className={`border-border bg-card p-5 ${
         riskInfo.severity === "high" ? "ring-1 ring-danger/30" :
         riskInfo.severity === "moderate" ? "ring-1 ring-warning/30" :
@@ -899,22 +893,23 @@ export default function PrimaryPrevention() {
       </Card>
 
       {/* ─── Exportable Clinical Note ─── */}
-      <Card className="border-border bg-card p-5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-primary" />
-            <h3 className="font-display text-sm font-bold text-foreground">Exportable Clinical Note</h3>
-          </div>
+      <SectionCard
+        title="Exportable Clinical Note"
+        tone="indigo"
+        icon={<FileText className="h-4 w-4" />}
+        collapsible={false}
+        badge={
           <Button
             variant="outline"
             size="sm"
             onClick={handleCopy}
-            className="gap-1.5 text-xs"
+            className="gap-1.5 text-xs h-7"
           >
             {copied ? <CheckCircle2 className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
             {copied ? "Copied" : "Copy Note"}
           </Button>
-        </div>
+        }
+      >
         <Textarea
           value={displayNote}
           onChange={(e) => {
