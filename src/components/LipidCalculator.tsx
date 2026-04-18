@@ -1245,18 +1245,15 @@ export default function LipidCalculator() {
                               </p>
                             )}
                             {subConfig!.items.map((item) => (
-                              <label
+                              <RiskFactorChip
                                 key={item.id}
-                                className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                                  subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                                }`}
-                              >
-                                <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
-                                <div className="flex-1 min-w-0">
-                                  <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                                  {item.qualifier && <QualifierText text={item.qualifier} />}
-                                </div>
-                              </label>
+                                label={item.label}
+                                qualifier={item.qualifier}
+                                tone={SUB_TONE_BY_PARENT[key] ?? "amber"}
+                                size="sm"
+                                checked={!!subChecked[item.id]}
+                                onToggle={() => toggleSub(item.id)}
+                              />
                             ))}
                           </CollapsibleContent>
                         </Collapsible>
