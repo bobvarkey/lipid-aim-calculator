@@ -1107,18 +1107,25 @@ export default function LipidCalculator() {
               badge={<span className="ml-2 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-bold text-warning">{rfCount}/4</span>}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">Age and Low HDL-C are auto-derived from your inputs.</p>
-              <div className="space-y-3">
-                {MAJOR_RF_KEYS.map((key) => (
-                  <label key={key} className="flex cursor-pointer items-start gap-3">
-                    <Checkbox
-                      checked={rfChecked[key]}
-                      onCheckedChange={() => toggleRf(key)}
-                      disabled={key === "ageRisk" || key === "lowhdl"}
-                      className="mt-0.5"
+              <div className="space-y-2">
+                {MAJOR_RF_KEYS.map((key) => {
+                  const v = RF_VISUALS[key];
+                  const isAuto = key === "ageRisk" || key === "lowhdl";
+                  return (
+                    <RiskFactorChip
+                      key={key}
+                      label={MAJOR_RF_LABELS[key]}
+                      icon={v.icon}
+                      tone={v.tone}
+                      checked={!!rfChecked[key]}
+                      onToggle={() => toggleRf(key)}
+                      disabled={isAuto}
+                      rightSlot={isAuto ? (
+                        <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">auto</span>
+                      ) : undefined}
                     />
-                    <span className="text-sm leading-snug text-foreground">{MAJOR_RF_LABELS[key]}</span>
-                  </label>
-                ))}
+                  );
+                })}
               </div>
             </Section>
 
@@ -1132,22 +1139,21 @@ export default function LipidCalculator() {
               </span>}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">Indicates a higher categorical risk even at lower RF counts.</p>
-              <div className="space-y-2.5">
-                {HIGH_RISK_FEATURES_LAI.map((item) => (
-                  <div key={item.id}>
-                    <label className="flex cursor-pointer items-start gap-3">
-                      <Checkbox
-                        checked={laiFeatChecked[item.id]}
-                        onCheckedChange={() => toggleLaiFeat(item.id)}
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                        {item.qualifier && <QualifierText text={item.qualifier} />}
-                      </div>
-                    </label>
-                  </div>
-                ))}
+              <div className="space-y-2">
+                {HIGH_RISK_FEATURES_LAI.map((item) => {
+                  const v = FEATURE_VISUALS[item.id] ?? { tone: "rose" as LabTone, icon: <AlertTriangle className="h-4 w-4" /> };
+                  return (
+                    <RiskFactorChip
+                      key={item.id}
+                      label={item.label}
+                      qualifier={item.qualifier}
+                      icon={v.icon}
+                      tone={v.tone}
+                      checked={!!laiFeatChecked[item.id]}
+                      onToggle={() => toggleLaiFeat(item.id)}
+                    />
+                  );
+                })}
               </div>
             </Section>
 
@@ -1161,22 +1167,21 @@ export default function LipidCalculator() {
               </span>}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">Modifiers that can upgrade Low to Moderate or Moderate to High Risk.</p>
-              <div className="space-y-2.5">
-                {RISK_MODIFIERS_LAI.map((item) => (
-                  <div key={item.id}>
-                    <label className="flex cursor-pointer items-start gap-3">
-                      <Checkbox
-                        checked={laiModChecked[item.id]}
-                        onCheckedChange={() => toggleLaiMod(item.id)}
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                        {item.qualifier && <QualifierText text={item.qualifier} />}
-                      </div>
-                    </label>
-                  </div>
-                ))}
+              <div className="space-y-2">
+                {RISK_MODIFIERS_LAI.map((item) => {
+                  const v = MODIFIER_VISUALS_LAI[item.id] ?? { tone: "sky" as LabTone, icon: <ShieldCheck className="h-4 w-4" /> };
+                  return (
+                    <RiskFactorChip
+                      key={item.id}
+                      label={item.label}
+                      qualifier={item.qualifier}
+                      icon={v.icon}
+                      tone={v.tone}
+                      checked={!!laiModChecked[item.id]}
+                      onToggle={() => toggleLaiMod(item.id)}
+                    />
+                  );
+                })}
               </div>
             </Section>
 
