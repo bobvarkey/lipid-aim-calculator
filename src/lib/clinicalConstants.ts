@@ -66,6 +66,30 @@ export const TOD_MACROVASCULAR: SubItem[] = [
 
 export const TOD_ALL: SubItem[] = [...TOD_MICROVASCULAR, ...TOD_MACROVASCULAR];
 
+// ─── LAI 2023 Risk Modifiers ───
+export const RISK_MODIFIERS_LAI: SubItem[] = [
+  { id: "mod_lpa", label: "Lipoprotein(a) 20–49 mg/dL", qualifier: "Minor Lp(a) elevation" },
+  { id: "mod_ifg", label: "IFG / Prediabetes (FBG 100–125 mg/dL)", qualifier: "Impaired fasting glucose" },
+  { id: "mod_waist", label: "Increased waist circumference", qualifier: ">90 cm in men, >80 cm in women" },
+  { id: "mod_hscrp", label: "hsCRP >2 mg/L", qualifier: "Inflammatory marker" },
+  { id: "mod_tg", label: "Triglycerides >150 mg/dL (fasting) or >175 mg/dL (non-fasting)", qualifier: "Hypertriglyceridemia" },
+  { id: "mod_autoimmune", label: "RA, Psoriasis, Spondyloarthropathies", qualifier: "Chronic inflammatory conditions" },
+  { id: "mod_pregnancy", label: "Premature menopause, Pre-eclampsia, GDM, PCOS", qualifier: "Women-specific risk modifiers" },
+  { id: "mod_prs", label: "High polygenic risk score", qualifier: "Genetic predisposition" },
+  { id: "mod_pollution", label: "Air pollution", qualifier: "Environmental risk factor" },
+  { id: "mod_hiv", label: "HIV infection", qualifier: "Viral inflammatory risk" },
+];
+
+// ─── LAI 2023 High-Risk Features ───
+export const HIGH_RISK_FEATURES_LAI: SubItem[] = [
+  { id: "feat_apob", label: "Apolipoprotein B >130 mg/dL", qualifier: "Highly atherogenic particle burden" },
+  { id: "feat_extreme", label: "Extreme of a single risk factor", qualifier: "Smoking >1 pack/day or BP >180/110 mmHg" },
+  { id: "feat_lpa", label: "Lipoprotein(a) ≥50 mg/dL", qualifier: "Major Lp(a) elevation" },
+  { id: "feat_mets", label: "Metabolic syndrome", qualifier: "Clusters of cardiovascular risk factors" },
+  { id: "feat_nafld", label: "NAFLD with fibrosis (Stage 2/3)", qualifier: "Non-alcoholic fatty liver disease" },
+  { id: "feat_cacs", label: "CACS 1–99 and <75th percentile", qualifier: "Mild subclinical atherosclerosis burden" },
+];
+
 // ─── Helper ───
 export function countCheckedItems(items: { id: string }[], checked: Record<string, boolean>) {
   return items.filter((i) => checked[i.id]).length;

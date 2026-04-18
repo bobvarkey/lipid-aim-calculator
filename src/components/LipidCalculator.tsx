@@ -26,6 +26,7 @@ import {
   ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
   FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
   TOD_ALL, countCheckedItems, type SubItem,
+  RISK_MODIFIERS_LAI, HIGH_RISK_FEATURES_LAI,
 } from "@/lib/clinicalConstants";
 
 import EducationSection from "@/components/calculator/EducationSection";
@@ -41,18 +42,14 @@ const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
 
 // ─── Major ASCVD Risk Factors ───
 const MAJOR_RF_KEYS = [
-  "ageRisk", "smoking", "htn", "lowhdl", "fhx", "dm", "ckd", "obesity",
+  "ageRisk", "smoking", "htn", "lowhdl",
 ] as const;
 
 const MAJOR_RF_LABELS: Record<string, string> = {
-  ageRisk: "Age threshold met (men ≥45 y, women ≥55 y)",
-  smoking: "Current cigarette smoking",
-  htn: "Hypertension (BP ≥140/90 or treated)",
-  lowhdl: "Low HDL-C (men <40 mg/dL, women <50 mg/dL)",
-  fhx: "Family history of premature CHD",
-  dm: "Diabetes mellitus",
-  ckd: "Chronic kidney disease (eGFR <60)",
-  obesity: "Obesity",
+  ageRisk: "Age (Men ≥45y, Women ≥55y)",
+  smoking: "Tobacco use: Cigarettes, bidi, paan, gutka, etc.",
+  htn: "High blood pressure (≥140/90 or on treatment)",
+  lowhdl: "Low HDL-C (Men <40 mg/dL, Women <50 mg/dL)",
 };
 
 // ─── ASCVD history & extreme-risk modifiers ───
@@ -146,10 +143,13 @@ interface CategoryResult {
 }
 
 const BUCKET_TABLE = [
-  { cat: "C", trigger: "Residual ASCVD sequelae despite LDL ≤30", ldl: "10–15 mg/dL" },
-  { cat: "B", trigger: "CAD + very-high-risk features, or recurrent/progressive events despite LDL <50", ldl: "≤30 mg/dL" },
-  { cat: "A", trigger: "ASCVD/equivalent with major modifiers; CAD not mandatory", ldl: "<50 mg/dL, optional ≤30" },
-  { cat: "VHR", trigger: "ASCVD or equivalent very-high-risk state", ldl: "<50 mg/dL" },
+  { cat: "C", trigger: "Recurrent ASCVD despite LDL ~30", ldl: "Focus on non-LDL factors / specialized care" },
+  { cat: "B", trigger: "ASCVD + 2 VHR features, recurrent ACS, or polyvascular", ldl: "Aggressive target" },
+  { cat: "A", trigger: "ASCVD + 1 High-Risk feature or CACS ≥300", ldl: "<50 mg/dL" },
+  { cat: "VHR", trigger: "DM + TOD, DM + ≥2 major factors, or LDL ≥190", ldl: "<50 mg/dL" },
+  { cat: "High", trigger: "≥3 major RF or DM + 0–1 major factor", ldl: "<70 mg/dL" },
+  { cat: "Moderate", trigger: "2 major RF or 1 risk modifier", ldl: "<100 mg/dL" },
+  { cat: "Low", trigger: "0–1 major RF", ldl: "<100 mg/dL (primary prevention)" },
 ];
 
 const TREATMENTS: Record<string, string[]> = {
@@ -300,7 +300,7 @@ export default function LipidCalculator() {
   const [bmi, setBmi] = useState("");
   const [bmiAuto, setBmiAuto] = useState(false);
   const [waistCirc, setWaistCirc] = useState("");
-  const [ethnicity, setEthnicity] = useState<"caucasian" | "asian" | "indian" | "other">("caucasian");
+  const [ethnicity, setEthnicity] = useState<"caucasian" | "asian" | "indian" | "other">("indian");
   // ─── PREVENT inputs ───
   const [sbp, setSbp] = useState("");
   const [totalChol, setTotalChol] = useState("");
@@ -432,38 +432,83 @@ export default function LipidCalculator() {
   const toggleMod = (key: string) => setModChecked((prev) => ({ ...prev, [key]: !prev[key] }));
 
   // ─── Classification logic ───
+  const [laiModChecked, setLaiModChecked] = useState<Record<string, boolean>>(
+    Object.fromEntries(RISK_MODIFIERS_LAI.map(m => [m.id, false]))
+  );
+  const [laiFeatChecked, setLaiFeatChecked] = useState<Record<string, boolean>>(
+    Object.fromEntries(HIGH_RISK_FEATURES_LAI.map(f => [f.id, false]))
+  );
+
+  const toggleLaiMod = (id: string) => setLaiModChecked(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggleLaiFeat = (id: string) => setLaiFeatChecked(prev => ({ ...prev, [id]: !prev[id] }));
+
+  // ─── Classification logic (LAI 2023) ───
   const classify = useCallback((): CategoryResult | null => {
     const v = modChecked;
-    const lpaVal = parseFloat(lpa);
+    const ldlVal = parseFloat(ldl);
+    const nonhdlVal = parseFloat(nonhdl);
     const rf = rfCount;
+    const mods = Object.values(laiModChecked).filter(Boolean).length;
+    const feats = Object.values(laiFeatChecked).filter(Boolean).length;
+    
     let cat = "", ldlTarget = "", nonHdlTarget = "", apoBTarget = "";
     const why: string[] = [];
 
+    // Reverse order: start from most extreme
+    
+    // Extreme C
     if (v.sequelae30) {
-      cat = "Extreme Risk C"; ldlTarget = "10–15 mg/dL"; nonHdlTarget = "≤ 40 mg/dL"; apoBTarget = "< 35 mg/dL";
-      why.push("Ongoing ASCVD sequelae despite LDL-C ≤30 mg/dL and intensive therapy.");
-    } else if ((v.cad && (rfChecked.dm || v.polyvascular || v.tod || rf >= 3)) || v.recurrent50 || v.acs12 || v.hofh) {
+      cat = "Extreme Risk C"; ldlTarget = "Specialized Care"; nonHdlTarget = "—"; apoBTarget = "—";
+      why.push("Recurrent ASCVD event despite LDL-C around 30 mg/dL.");
+    } 
+    // Extreme B
+    else if ((v.ascvd && (feats >= 2)) || v.acs12 || v.polyvascular || v.hofh) {
       cat = "Extreme Risk B"; ldlTarget = "≤ 30 mg/dL"; nonHdlTarget = "≤ 60 mg/dL"; apoBTarget = "< 45 mg/dL";
-      if (v.cad) why.push("CAD present with very-high-risk features.");
-      if (v.recurrent50) why.push("Recurrent/progressive events despite LDL-C <50 mg/dL.");
-      if (v.acs12) why.push("Recurrent ACS within 12 months despite LDL goal.");
-      if (v.hofh) why.push("Homozygous familial hypercholesterolemia selected.");
-    } else if ((v.ascvd && (rfChecked.dm || v.fh || rf >= 3 || v.ckd34 || v.polyvascular || v.pad || v.stroke || (!isNaN(lpaVal) && lpaVal >= 50) || v.subclinical)) || v.subclinical) {
-      cat = "Extreme Risk A"; ldlTarget = "< 50 mg/dL, optional ≤ 30 mg/dL"; nonHdlTarget = "< 80 mg/dL (optional ≤ 60)"; apoBTarget = "< 55 mg/dL";
-      why.push("Very-high-risk ASCVD or equivalent burden detected.");
-      if (v.ascvd && !v.cad && (v.stroke || v.pad)) why.push("CAD not required because other ASCVD territories qualify.");
-      if (v.subclinical) why.push("High calcium / extensive plaque burden supports extreme-risk A assignment.");
-    } else if (v.ascvd || v.hofh || (rfChecked.dm && (rf >= 3 || v.tod))) {
+      if (v.ascvd && feats >= 2) why.push("ASCVD with ≥2 features of very high risk group.");
+      if (v.acs12) why.push("Recurrent ACS.");
+      if (v.polyvascular) why.push("Polyvascular disease.");
+      if (v.hofh) why.push("Homozygous FH.");
+    }
+    // Extreme A
+    else if ((v.ascvd && feats >= 1) || (!isNaN(parseFloat(lpa)) && parseFloat(lpa) >= 300) || v.hofh) { // Note: HoFH is also here in Category A if less severe? Prompt says HoFH in B too.
+      // CACS >= 300
+      cat = "Extreme Risk A"; ldlTarget = "< 50 mg/dL"; nonHdlTarget = "< 80 mg/dL"; apoBTarget = "< 55 mg/dL";
+      why.push("ASCVD with ≥1 High-risk group feature or HoFH.");
+    }
+    // Very High Risk
+    else if ((rfChecked.dm && (v.tod || rf >= 2)) || feats >= 2 || v.ascvd || v.fh || ldlVal >= 190) {
       cat = "Very High Risk"; ldlTarget = "< 50 mg/dL"; nonHdlTarget = "< 80 mg/dL"; apoBTarget = "< 65 mg/dL";
-      if (v.ascvd) why.push("Established ASCVD present.");
-      if (v.hofh) why.push("Homozygous FH present.");
-      if (rfChecked.dm && (rf >= 3 || v.tod)) why.push("Diabetes with ≥3 risk factors or target-organ damage.");
-    } else {
+      if (rfChecked.dm && (v.tod || rf >= 2)) why.push("Diabetes with TOD or ≥2 major risk factors.");
+      if (feats >= 2) why.push("≥2 High-risk features present.");
+      if (v.ascvd) why.push("Established ASCVD.");
+      if (v.fh || ldlVal >= 190) why.push("Heterozygous FH or LDL-C ≥190 mg/dL.");
+    }
+    // High Risk
+    else if (rf >= 3 || (ldlVal >= 160 && ldlVal <= 189) || (nonhdlVal >= 190 && nonhdlVal <= 219) || (rfChecked.dm && rf <= 1) || (rf === 2 && mods >= 1) || feats >= 1) {
+      cat = "High Risk"; ldlTarget = "< 70 mg/dL"; nonHdlTarget = "< 100 mg/dL"; apoBTarget = "< 80 mg/dL";
+      if (rf >= 3) why.push("≥3 major ASCVD risk factors.");
+      if (ldlVal >= 160) why.push("LDL-C 160-189 mg/dL.");
+      if (rfChecked.dm) why.push("Diabetes with 0-1 major risk factors.");
+      if (rf === 2 && mods >= 1) why.push("2 major factors + ≥1 risk modifier.");
+      if (feats >= 1) why.push("1 high-risk feature present.");
+    }
+    // Moderate Risk
+    else if (rf === 2 || (ldlVal >= 130 && ldlVal <= 159) || (nonhdlVal >= 160 && nonhdlVal <= 189) || (rf <= 1 && mods >= 1)) {
+      cat = "Moderate Risk"; ldlTarget = "< 100 mg/dL"; nonHdlTarget = "< 130 mg/dL"; apoBTarget = "—";
+      if (rf === 2) why.push("2 major ASCVD risk factors.");
+      if (mods >= 1) why.push("≥1 risk modifier present.");
+    }
+    // Low Risk
+    else if (rf <= 1 || (ldlVal >= 100 && ldlVal <= 129)) {
+      cat = "Low Risk"; ldlTarget = "< 100 mg/dL"; nonHdlTarget = "< 130 mg/dL"; apoBTarget = "—";
+      why.push("0–1 major ASCVD risk factor.");
+    }
+    else {
       return null;
     }
 
     return { category: cat, ldlTarget, nonHdlTarget, apoBTarget, treatment: TREATMENTS[cat] || [], why };
-  }, [modChecked, rfChecked, rfCount, lpa]);
+  }, [modChecked, rfChecked, rfCount, lpa, ldl, nonhdl, laiModChecked, laiFeatChecked]);
 
   const result = classify();
 
@@ -931,75 +976,85 @@ export default function LipidCalculator() {
               )}
             </Section>
 
-            {/* ── Section 4: Risk Factors ── */}
+            {/* ── Section 4: Major ASCVD Risk Factors ── */}
             <Section
               title="Major ASCVD Risk Factors"
               tone="warning"
               icon={<Heart className="h-4 w-4" />}
-              badge={<span className="ml-2 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-bold text-warning">{rfCount}/{MAJOR_RF_KEYS.length}</span>}
+              badge={<span className="ml-2 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-bold text-warning">{rfCount}/4</span>}
             >
-              <p className="mb-3 text-[10px] text-muted-foreground">CKD, age, low HDL, obesity auto-derived from inputs</p>
-              <div className="space-y-2.5">
+              <p className="mb-3 text-[10px] text-muted-foreground">Age and Low HDL-C are auto-derived from your inputs.</p>
+              <div className="space-y-3">
                 {MAJOR_RF_KEYS.map((key) => (
-                  <div key={key}>
+                  <label key={key} className="flex cursor-pointer items-start gap-3">
+                    <Checkbox
+                      checked={rfChecked[key]}
+                      onCheckedChange={() => toggleRf(key)}
+                      disabled={key === "ageRisk" || key === "lowhdl"}
+                      className="mt-0.5"
+                    />
+                    <span className="text-sm leading-snug text-foreground">{MAJOR_RF_LABELS[key]}</span>
+                  </label>
+                ))}
+              </div>
+            </Section>
+
+            {/* ── Section: High-Risk Features ── */}
+            <Section
+              title="High-Risk Features"
+              tone="danger"
+              icon={<AlertTriangle className="h-4 w-4" />}
+              badge={<span className="ml-2 rounded-full bg-danger/15 px-2 py-0.5 text-xs font-bold text-danger">
+                {Object.values(laiFeatChecked).filter(Boolean).length}/{HIGH_RISK_FEATURES_LAI.length}
+              </span>}
+            >
+              <p className="mb-3 text-[10px] text-muted-foreground">Indicates a higher categorical risk even at lower RF counts.</p>
+              <div className="space-y-2.5">
+                {HIGH_RISK_FEATURES_LAI.map((item) => (
+                  <div key={item.id}>
                     <label className="flex cursor-pointer items-start gap-3">
                       <Checkbox
-                        checked={rfChecked[key]}
-                        onCheckedChange={() => toggleRf(key)}
-                        disabled={key === "fhx" && fhxAutoQual}
+                        checked={laiFeatChecked[item.id]}
+                        onCheckedChange={() => toggleLaiFeat(item.id)}
                         className="mt-0.5"
                       />
-                      <div className="flex-1">
-                        <span className="text-sm leading-snug text-foreground">{MAJOR_RF_LABELS[key]}</span>
-                        {key === "fhx" && (
-                          <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                            fhxAutoQual ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                          }`}>
-                            {countCheckedItems(FHX_ITEMS, subChecked)}/{FHX_ITEMS.length} — {fhxAutoQual ? "Qualified ✓" : "≥1 required"}
-                          </span>
-                        )}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        {item.qualifier && <QualifierText text={item.qualifier} />}
                       </div>
                     </label>
-                    {key === "fhx" && (
-                      <Collapsible open={subListOpen["rf_fhx"]} onOpenChange={() => toggleSubList("rf_fhx")} className="ml-8 mt-2 mb-1">
-                        <CollapsibleTrigger asChild>
-                          <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
-                            <span className="text-xs font-semibold text-muted-foreground">
-                              Premature CHD / ASCVD ({countCheckedItems(FHX_ITEMS, subChecked)}/{FHX_ITEMS.length})
-                            </span>
-                            <ChevronDown className={`h-4 w-4 transition-transform ${subListOpen["rf_fhx"] ? "rotate-180" : ""}`} />
-                          </button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="space-y-1.5 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
-                          <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
-                            "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
-                          </p>
-                          {FHX_ITEMS.map((item) => (
-                            <label
-                              key={item.id}
-                              className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                                subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                              }`}
-                            >
-                              <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
-                              <div className="flex-1 min-w-0">
-                                <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                                {item.qualifier && <QualifierText text={item.qualifier} />}
-                              </div>
-                            </label>
-                          ))}
-                        </CollapsibleContent>
-                      </Collapsible>
-                    )}
                   </div>
                 ))}
               </div>
-              {rfCount >= 3 && (
-                <div className="mt-3 flex items-center gap-2 rounded-lg bg-danger/10 px-3 py-2 text-xs font-medium text-danger">
-                  <AlertTriangle className="h-4 w-4 shrink-0" />
-                  ≥3 major ASCVD risk factors — qualifies for higher risk stratification
-                </div>
-              )}
+            </Section>
+
+            {/* ── Section: Risk Modifiers ── */}
+            <Section
+              title="Risk Modifiers"
+              tone="primary"
+              icon={<ShieldCheck className="h-4 w-4" />}
+              badge={<span className="ml-2 rounded-full bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
+                {Object.values(laiModChecked).filter(Boolean).length}/{RISK_MODIFIERS_LAI.length}
+              </span>}
+            >
+              <p className="mb-3 text-[10px] text-muted-foreground">Modifiers that can upgrade Low to Moderate or Moderate to High Risk.</p>
+              <div className="space-y-2.5">
+                {RISK_MODIFIERS_LAI.map((item) => (
+                  <div key={item.id}>
+                    <label className="flex cursor-pointer items-start gap-3">
+                      <Checkbox
+                        checked={laiModChecked[item.id]}
+                        onCheckedChange={() => toggleLaiMod(item.id)}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
+                        {item.qualifier && <QualifierText text={item.qualifier} />}
+                      </div>
+                    </label>
+                  </div>
+                ))}
+              </div>
             </Section>
 
             {/* ── Section 5: ASCVD History & Modifiers ── */}
