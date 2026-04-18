@@ -20,7 +20,14 @@ import {
   Heart, AlertTriangle, ShieldCheck, RotateCcw, Activity,
   Printer, Target, Copy, ClipboardCheck, TrendingUp, User,
   TestTube, ChevronDown, Stethoscope, FileText, Home,
+  Droplet, Beaker, FlaskConical, Gauge, Ruler, Scale, Waves,
+  Wind, Zap, CircleDot,
 } from "lucide-react";
+import {
+  LabInput,
+  UNITS_CHOL, UNITS_APOB, UNITS_LPA, UNITS_HBA1C, UNITS_HSCRP,
+  UNITS_CREAT, UNITS_CM, UNITS_KG, UNITS_MMHG, UNITS_EGFR,
+} from "@/components/ui/lab-input";
 import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
 import {
   ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
