@@ -783,10 +783,14 @@ export default function LipidCalculator() {
 
               {/* Waist Circumference */}
               <div className="mt-3 grid grid-cols-2 gap-3 items-end">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Waist Circumference (cm)</label>
-                  <Input type="number" placeholder="e.g. 88" value={waistCirc} onChange={(e) => setWaistCirc(e.target.value)} />
-                  {(() => {
+                <LabInput
+                  label="Waist Circumference"
+                  tone="orange"
+                  icon={<CircleDot className="h-3 w-3" />}
+                  value={waistCirc}
+                  onChange={setWaistCirc}
+                  units={UNITS_CM}
+                  belowInput={(() => {
                     const wc = parseFloat(waistCirc);
                     if (isNaN(wc) || wc <= 0) return null;
                     const maleHigh = wc >= 90;
@@ -799,7 +803,7 @@ export default function LipidCalculator() {
                       </p>
                     );
                   })()}
-                </div>
+                />
               </div>
 
               {/* Waist Circumference Reference — Collapsible */}
@@ -844,74 +848,121 @@ export default function LipidCalculator() {
             {/* ── Section 2: Lab Values ── */}
             <Section title="Lab Values" tone="indigo" icon={<TestTube className="h-4 w-4" />}>
               <div className="grid grid-cols-3 gap-3 mb-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">LDL-C (mg/dL)</label>
-                  <Input type="number" placeholder="85" value={ldl} onChange={(e) => setLdl(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Non-HDL-C</label>
-                  <Input type="number" placeholder="110" value={nonhdl} onChange={(e) => setNonhdl(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">ApoB (mg/dL)</label>
-                  <Input type="number" placeholder="70" value={apob} onChange={(e) => setApob(e.target.value)} />
-                </div>
+                <LabInput
+                  label="LDL-C"
+                  tone="rose"
+                  icon={<Droplet className="h-3 w-3" />}
+                  value={ldl}
+                  onChange={setLdl}
+                  units={UNITS_CHOL}
+                />
+                <LabInput
+                  label="Non-HDL-C"
+                  tone="amber"
+                  icon={<Droplet className="h-3 w-3" />}
+                  value={nonhdl}
+                  onChange={setNonhdl}
+                  units={UNITS_CHOL}
+                />
+                <LabInput
+                  label="ApoB"
+                  tone="violet"
+                  icon={<FlaskConical className="h-3 w-3" />}
+                  value={apob}
+                  onChange={setApob}
+                  units={UNITS_APOB}
+                />
               </div>
               <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Lp(a) (mg/dL)</label>
-                  <Input type="number" placeholder="45" value={lpa} onChange={(e) => setLpa(e.target.value)} />
-                  {!isNaN(lpaNum) && lpaNum >= 50 && (
-                    <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-danger">
-                      <AlertTriangle className="h-3 w-3" /> ≥50 → Extreme Risk A
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">HbA1c (%)</label>
-                  <Input type="number" placeholder="7.2" value={hba1c} onChange={(e) => setHba1c(e.target.value)} />
-                </div>
+                <LabInput
+                  label="Lp(a)"
+                  tone="fuchsia"
+                  icon={<Beaker className="h-3 w-3" />}
+                  value={lpa}
+                  onChange={setLpa}
+                  units={UNITS_LPA}
+                  belowInput={
+                    !isNaN(lpaNum) && lpaNum >= 50 ? (
+                      <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-danger">
+                        <AlertTriangle className="h-3 w-3" /> ≥50 → Extreme Risk A
+                      </div>
+                    ) : null
+                  }
+                />
+                <LabInput
+                  label="HbA1c"
+                  tone="orange"
+                  icon={<Activity className="h-3 w-3" />}
+                  value={hba1c}
+                  onChange={setHba1c}
+                  units={UNITS_HBA1C}
+                />
               </div>
               <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
-                  <Input type="number" placeholder="42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">hsCRP (mg/L)</label>
-                  <Input type="number" placeholder="3.5" value={hscrp} onChange={(e) => setHscrp(e.target.value)} />
-                </div>
+                <LabInput
+                  label="HDL-C"
+                  tone="emerald"
+                  icon={<Droplet className="h-3 w-3" />}
+                  value={hdl}
+                  onChange={setHdl}
+                  units={UNITS_CHOL}
+                />
+                <LabInput
+                  label="hs-CRP"
+                  tone="lime"
+                  icon={<Wind className="h-3 w-3" />}
+                  value={hscrp}
+                  onChange={setHscrp}
+                  units={UNITS_HSCRP}
+                />
               </div>
               <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Creatinine (mg/dL)</label>
-                  <Input type="number" placeholder="1.2" value={creatinine} onChange={(e) => setCreatinine(e.target.value)} />
-                  <p className="mt-0.5 text-[10px] text-muted-foreground">Auto-calculates eGFR</p>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">
-                    eGFR {egfrAuto && <span className="text-[10px] font-normal text-primary">auto</span>}
-                  </label>
-                  <Input type="number" placeholder="45" value={egfr} onChange={(e) => { setEgfr(e.target.value); setEgfrAuto(false); setCreatinine(""); }} className={egfrAuto ? "bg-muted" : ""} />
-                  {ckdStage && (
-                    <p className={`mt-0.5 text-[10px] font-medium ${egfrVal < 60 ? "text-danger" : "text-muted-foreground"}`}>
-                      CKD {ckdStage}
-                    </p>
-                  )}
-                </div>
+                <LabInput
+                  label="Creatinine"
+                  tone="teal"
+                  icon={<TestTube className="h-3 w-3" />}
+                  value={creatinine}
+                  onChange={setCreatinine}
+                  units={UNITS_CREAT}
+                  hint="Auto-calculates eGFR"
+                />
+                <LabInput
+                  label="eGFR"
+                  tone="cyan"
+                  icon={<Waves className="h-3 w-3" />}
+                  value={egfr}
+                  onChange={(v) => { setEgfr(v); setEgfrAuto(false); setCreatinine(""); }}
+                  units={UNITS_EGFR}
+                  auto={egfrAuto}
+                  belowInput={
+                    ckdStage ? (
+                      <p className={`mt-0.5 text-[10px] font-medium ${egfrVal < 60 ? "text-danger" : "text-muted-foreground"}`}>
+                        CKD {ckdStage}
+                      </p>
+                    ) : null
+                  }
+                />
               </div>
               {/* PREVENT-specific */}
               <div className="border-t border-border pt-3 mt-1">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">PREVENT Calculator Inputs</p>
                 <div className="grid grid-cols-2 gap-3 mb-2">
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-foreground">SBP (mmHg)</label>
-                    <Input type="number" placeholder="130" value={sbp} onChange={(e) => setSbp(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-foreground">Total Chol (mg/dL)</label>
-                    <Input type="number" placeholder="200" value={totalChol} onChange={(e) => setTotalChol(e.target.value)} />
-                  </div>
+                  <LabInput
+                    label="Systolic BP"
+                    tone="rose"
+                    icon={<Zap className="h-3 w-3" />}
+                    value={sbp}
+                    onChange={setSbp}
+                    units={UNITS_MMHG}
+                  />
+                  <LabInput
+                    label="Total Cholesterol"
+                    tone="violet"
+                    icon={<Droplet className="h-3 w-3" />}
+                    value={totalChol}
+                    onChange={setTotalChol}
+                    units={UNITS_CHOL}
+                  />
                 </div>
                 <div className="flex flex-wrap gap-4">
                   <label className="flex cursor-pointer items-center gap-2">
