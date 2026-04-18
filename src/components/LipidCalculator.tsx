@@ -1278,20 +1278,17 @@ export default function LipidCalculator() {
                               <div key={title}>
                                 <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">{title}</p>
                                 <div className="space-y-1.5">
-                                  {items.map((tod) => (
-                                    <label
-                                      key={tod.id}
-                                      className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                                        subChecked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                                      }`}
-                                    >
-                                      <Checkbox checked={!!subChecked[tod.id]} onCheckedChange={() => toggleSub(tod.id)} className="mt-0.5" />
-                                      <div className="flex-1 min-w-0">
-                                        <span className="text-sm leading-snug text-foreground">{tod.label}</span>
-                                        {tod.qualifier && <QualifierText text={tod.qualifier} />}
-                                      </div>
-                                    </label>
-                                  ))}
+                                   {items.map((tod) => (
+                                     <RiskFactorChip
+                                       key={tod.id}
+                                       label={tod.label}
+                                       qualifier={tod.qualifier}
+                                       tone={title === "Microvascular" ? "amber" : "rose"}
+                                       size="sm"
+                                       checked={!!subChecked[tod.id]}
+                                       onToggle={() => toggleSub(tod.id)}
+                                     />
+                                   ))}
                                 </div>
                               </div>
                             ))}
