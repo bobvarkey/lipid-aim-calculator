@@ -21,13 +21,18 @@ import {
   Printer, Target, Copy, ClipboardCheck, TrendingUp, User,
   TestTube, ChevronDown, Stethoscope, FileText, Home,
   Droplet, Beaker, FlaskConical, Gauge, Ruler, Scale, Waves,
-  Wind, Zap, CircleDot,
+  Wind, Zap, CircleDot, Cigarette, CalendarClock, HeartPulse,
+  Dna, Sparkles, Microscope, Brain, Footprints, Bone, FlameKindling,
+  Flame, Hourglass, GitBranch, Network, Layers, Cloud, Bug,
+  Donut, Soup, Eye, Pill, Repeat, AlertOctagon, Syringe,
 } from "lucide-react";
 import {
   LabInput,
   UNITS_CHOL, UNITS_APOB, UNITS_LPA, UNITS_HBA1C, UNITS_HSCRP,
   UNITS_CREAT, UNITS_CM, UNITS_KG, UNITS_MMHG, UNITS_EGFR,
+  type LabTone,
 } from "@/components/ui/lab-input";
+import { RiskFactorChip } from "@/components/ui/risk-factor-chip";
 import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
 import {
   ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
@@ -35,6 +40,55 @@ import {
   TOD_ALL, countCheckedItems, type SubItem,
   RISK_MODIFIERS_LAI, HIGH_RISK_FEATURES_LAI,
 } from "@/lib/clinicalConstants";
+
+// ─── Visual mapping: per-item tone + icon for risk-factor chips ───
+const RF_VISUALS: Record<string, { tone: LabTone; icon: React.ReactNode }> = {
+  ageRisk:  { tone: "amber",   icon: <CalendarClock className="h-4 w-4" /> },
+  smoking:  { tone: "orange",  icon: <Cigarette className="h-4 w-4" /> },
+  htn:      { tone: "rose",    icon: <HeartPulse className="h-4 w-4" /> },
+  lowhdl:   { tone: "violet",  icon: <Droplet className="h-4 w-4" /> },
+};
+
+const FEATURE_VISUALS: Record<string, { tone: LabTone; icon: React.ReactNode }> = {
+  feat_apob:    { tone: "fuchsia", icon: <Beaker className="h-4 w-4" /> },
+  feat_extreme: { tone: "rose",    icon: <Flame className="h-4 w-4" /> },
+  feat_lpa:     { tone: "violet",  icon: <Dna className="h-4 w-4" /> },
+  feat_mets:    { tone: "amber",   icon: <Layers className="h-4 w-4" /> },
+  feat_nafld:   { tone: "lime",    icon: <Soup className="h-4 w-4" /> },
+  feat_cacs:    { tone: "indigo",  icon: <CircleDot className="h-4 w-4" /> },
+};
+
+const MODIFIER_VISUALS_LAI: Record<string, { tone: LabTone; icon: React.ReactNode }> = {
+  mod_lpa:        { tone: "violet",  icon: <Dna className="h-4 w-4" /> },
+  mod_ifg:        { tone: "amber",   icon: <Donut className="h-4 w-4" /> },
+  mod_waist:      { tone: "orange",  icon: <Ruler className="h-4 w-4" /> },
+  mod_hscrp:      { tone: "rose",    icon: <FlameKindling className="h-4 w-4" /> },
+  mod_tg:         { tone: "fuchsia", icon: <Droplet className="h-4 w-4" /> },
+  mod_autoimmune: { tone: "teal",    icon: <Bone className="h-4 w-4" /> },
+  mod_pregnancy:  { tone: "rose",    icon: <Sparkles className="h-4 w-4" /> },
+  mod_prs:        { tone: "indigo",  icon: <GitBranch className="h-4 w-4" /> },
+  mod_pollution:  { tone: "slate",   icon: <Cloud className="h-4 w-4" /> },
+  mod_hiv:        { tone: "cyan",    icon: <Bug className="h-4 w-4" /> },
+};
+
+const ASCVD_MOD_VISUALS: Record<string, { tone: LabTone; icon: React.ReactNode }> = {
+  ascvd:        { tone: "rose",    icon: <HeartPulse className="h-4 w-4" /> },
+  polyvascular: { tone: "fuchsia", icon: <Network className="h-4 w-4" /> },
+  tod:          { tone: "amber",   icon: <Eye className="h-4 w-4" /> },
+  fh:           { tone: "violet",  icon: <Dna className="h-4 w-4" /> },
+  hofh:         { tone: "fuchsia", icon: <Dna className="h-4 w-4" /> },
+  subclinical:  { tone: "indigo",  icon: <CircleDot className="h-4 w-4" /> },
+  ckd34:        { tone: "teal",    icon: <Activity className="h-4 w-4" /> },
+  recurrent50:  { tone: "rose",    icon: <Repeat className="h-4 w-4" /> },
+  acs12:        { tone: "orange",  icon: <AlertOctagon className="h-4 w-4" /> },
+  sequelae30:   { tone: "rose",    icon: <Syringe className="h-4 w-4" /> },
+};
+
+// Tone for nested sub-items, derived from parent modifier
+const SUB_TONE_BY_PARENT: Record<string, LabTone> = {
+  ascvd: "rose", polyvascular: "fuchsia", tod: "amber", fh: "violet",
+  subclinical: "indigo", ckd34: "teal",
+};
 
 import EducationSection from "@/components/calculator/EducationSection";
 import { calculatePrevent, type PreventResult } from "@/lib/prevent";
@@ -1053,18 +1107,25 @@ export default function LipidCalculator() {
               badge={<span className="ml-2 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-bold text-warning">{rfCount}/4</span>}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">Age and Low HDL-C are auto-derived from your inputs.</p>
-              <div className="space-y-3">
-                {MAJOR_RF_KEYS.map((key) => (
-                  <label key={key} className="flex cursor-pointer items-start gap-3">
-                    <Checkbox
-                      checked={rfChecked[key]}
-                      onCheckedChange={() => toggleRf(key)}
-                      disabled={key === "ageRisk" || key === "lowhdl"}
-                      className="mt-0.5"
+              <div className="space-y-2">
+                {MAJOR_RF_KEYS.map((key) => {
+                  const v = RF_VISUALS[key];
+                  const isAuto = key === "ageRisk" || key === "lowhdl";
+                  return (
+                    <RiskFactorChip
+                      key={key}
+                      label={MAJOR_RF_LABELS[key]}
+                      icon={v.icon}
+                      tone={v.tone}
+                      checked={!!rfChecked[key]}
+                      onToggle={() => toggleRf(key)}
+                      disabled={isAuto}
+                      rightSlot={isAuto ? (
+                        <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">auto</span>
+                      ) : undefined}
                     />
-                    <span className="text-sm leading-snug text-foreground">{MAJOR_RF_LABELS[key]}</span>
-                  </label>
-                ))}
+                  );
+                })}
               </div>
             </Section>
 
@@ -1078,22 +1139,21 @@ export default function LipidCalculator() {
               </span>}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">Indicates a higher categorical risk even at lower RF counts.</p>
-              <div className="space-y-2.5">
-                {HIGH_RISK_FEATURES_LAI.map((item) => (
-                  <div key={item.id}>
-                    <label className="flex cursor-pointer items-start gap-3">
-                      <Checkbox
-                        checked={laiFeatChecked[item.id]}
-                        onCheckedChange={() => toggleLaiFeat(item.id)}
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                        {item.qualifier && <QualifierText text={item.qualifier} />}
-                      </div>
-                    </label>
-                  </div>
-                ))}
+              <div className="space-y-2">
+                {HIGH_RISK_FEATURES_LAI.map((item) => {
+                  const v = FEATURE_VISUALS[item.id] ?? { tone: "rose" as LabTone, icon: <AlertTriangle className="h-4 w-4" /> };
+                  return (
+                    <RiskFactorChip
+                      key={item.id}
+                      label={item.label}
+                      qualifier={item.qualifier}
+                      icon={v.icon}
+                      tone={v.tone}
+                      checked={!!laiFeatChecked[item.id]}
+                      onToggle={() => toggleLaiFeat(item.id)}
+                    />
+                  );
+                })}
               </div>
             </Section>
 
@@ -1107,22 +1167,21 @@ export default function LipidCalculator() {
               </span>}
             >
               <p className="mb-3 text-[10px] text-muted-foreground">Modifiers that can upgrade Low to Moderate or Moderate to High Risk.</p>
-              <div className="space-y-2.5">
-                {RISK_MODIFIERS_LAI.map((item) => (
-                  <div key={item.id}>
-                    <label className="flex cursor-pointer items-start gap-3">
-                      <Checkbox
-                        checked={laiModChecked[item.id]}
-                        onCheckedChange={() => toggleLaiMod(item.id)}
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                        {item.qualifier && <QualifierText text={item.qualifier} />}
-                      </div>
-                    </label>
-                  </div>
-                ))}
+              <div className="space-y-2">
+                {RISK_MODIFIERS_LAI.map((item) => {
+                  const v = MODIFIER_VISUALS_LAI[item.id] ?? { tone: "sky" as LabTone, icon: <ShieldCheck className="h-4 w-4" /> };
+                  return (
+                    <RiskFactorChip
+                      key={item.id}
+                      label={item.label}
+                      qualifier={item.qualifier}
+                      icon={v.icon}
+                      tone={v.tone}
+                      checked={!!laiModChecked[item.id]}
+                      onToggle={() => toggleLaiMod(item.id)}
+                    />
+                  );
+                })}
               </div>
             </Section>
 
@@ -1142,33 +1201,31 @@ export default function LipidCalculator() {
                   const isAutoQualified = modAutoQual[key];
                   const subConfig = MOD_SUB_MAP[key];
 
+                  const v = ASCVD_MOD_VISUALS[key] ?? { tone: "rose" as LabTone, icon: <Stethoscope className="h-4 w-4" /> };
+                  const subCountBadge = (hasSubMap || hasTod) ? (() => {
+                    const items = hasTod ? TOD_ALL : subConfig!.items;
+                    const count = countCheckedItems(items, subChecked);
+                    const qualified = isAutoQualified;
+                    return (
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                        qualified ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                      }`}>
+                        {count}/{items.length} — {qualified ? "Qualified ✓" : "≥1 required"}
+                      </span>
+                    );
+                  })() : undefined;
+
                   return (
                     <div key={key}>
-                      <label className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2 transition-colors ${
-                        modChecked[key] ? "bg-primary/8 ring-1 ring-primary/20" : "hover:bg-muted/50"
-                      }`}>
-                        <Checkbox
-                          checked={modChecked[key]}
-                          onCheckedChange={() => toggleMod(key)}
-                          disabled={!!isAutoQualified}
-                          className="mt-0.5"
-                        />
-                        <div className="flex-1">
-                          <span className="text-sm leading-snug text-foreground">{MODIFIER_LABELS[key]}</span>
-                          {(hasSubMap || hasTod) && (() => {
-                            const items = hasTod ? TOD_ALL : subConfig!.items;
-                            const count = countCheckedItems(items, subChecked);
-                            const qualified = isAutoQualified;
-                            return (
-                              <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                                qualified ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                              }`}>
-                                {count}/{items.length} — {qualified ? "Qualified ✓" : "≥1 required"}
-                              </span>
-                            );
-                          })()}
-                        </div>
-                      </label>
+                      <RiskFactorChip
+                        label={MODIFIER_LABELS[key]}
+                        icon={v.icon}
+                        tone={v.tone}
+                        checked={!!modChecked[key]}
+                        onToggle={() => toggleMod(key)}
+                        disabled={!!isAutoQualified}
+                        rightSlot={subCountBadge}
+                      />
 
                       {/* Sub-checklists */}
                       {hasSubMap && (
@@ -1188,18 +1245,15 @@ export default function LipidCalculator() {
                               </p>
                             )}
                             {subConfig!.items.map((item) => (
-                              <label
+                              <RiskFactorChip
                                 key={item.id}
-                                className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                                  subChecked[item.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                                }`}
-                              >
-                                <Checkbox checked={!!subChecked[item.id]} onCheckedChange={() => toggleSub(item.id)} className="mt-0.5" />
-                                <div className="flex-1 min-w-0">
-                                  <span className="text-sm leading-snug text-foreground">{item.label}</span>
-                                  {item.qualifier && <QualifierText text={item.qualifier} />}
-                                </div>
-                              </label>
+                                label={item.label}
+                                qualifier={item.qualifier}
+                                tone={SUB_TONE_BY_PARENT[key] ?? "amber"}
+                                size="sm"
+                                checked={!!subChecked[item.id]}
+                                onToggle={() => toggleSub(item.id)}
+                              />
                             ))}
                           </CollapsibleContent>
                         </Collapsible>
@@ -1224,20 +1278,17 @@ export default function LipidCalculator() {
                               <div key={title}>
                                 <p className="text-[11px] font-bold text-warning/80 uppercase tracking-wide mb-1.5">{title}</p>
                                 <div className="space-y-1.5">
-                                  {items.map((tod) => (
-                                    <label
-                                      key={tod.id}
-                                      className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 transition-colors text-sm ${
-                                        subChecked[tod.id] ? "bg-warning/10 ring-1 ring-warning/15" : "hover:bg-muted/50"
-                                      }`}
-                                    >
-                                      <Checkbox checked={!!subChecked[tod.id]} onCheckedChange={() => toggleSub(tod.id)} className="mt-0.5" />
-                                      <div className="flex-1 min-w-0">
-                                        <span className="text-sm leading-snug text-foreground">{tod.label}</span>
-                                        {tod.qualifier && <QualifierText text={tod.qualifier} />}
-                                      </div>
-                                    </label>
-                                  ))}
+                                   {items.map((tod) => (
+                                     <RiskFactorChip
+                                       key={tod.id}
+                                       label={tod.label}
+                                       qualifier={tod.qualifier}
+                                       tone={title === "Microvascular" ? "amber" : "rose"}
+                                       size="sm"
+                                       checked={!!subChecked[tod.id]}
+                                       onToggle={() => toggleSub(tod.id)}
+                                     />
+                                   ))}
                                 </div>
                               </div>
                             ))}
