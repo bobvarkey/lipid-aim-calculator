@@ -53,6 +53,39 @@ const MAJOR_RF_LABELS: Record<string, string> = {
 };
 
 // ─── ASCVD history & extreme-risk modifiers ───
+// ─── Predictor Badge Styles ───
+const PREDICTOR_STYLING: Record<string, { bg: string; text: string; border: string }> = {
+  feat_apob: { bg: "bg-indigo-500/10", text: "text-indigo-600 dark:text-indigo-400", border: "border-indigo-500/30" },
+  feat_extreme: { bg: "bg-rose-500/10", text: "text-rose-600 dark:text-rose-400", border: "border-rose-500/30" },
+  feat_lpa: { bg: "bg-cyan-500/10", text: "text-cyan-600 dark:text-cyan-400", border: "border-cyan-500/30" },
+  feat_mets: { bg: "bg-amber-500/10", text: "text-amber-600 dark:text-amber-400", border: "border-amber-500/30" },
+  feat_nafld: { bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", border: "border-emerald-500/30" },
+  feat_cacs: { bg: "bg-orange-500/10", text: "text-orange-600 dark:text-orange-400", border: "border-orange-500/30" },
+};
+
+function PredictorBadge({ id, label }: { id: string; label: string }) {
+  const style = PREDICTOR_STYLING[id] || { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" };
+  // Extract a meaningful letter (usually the first char of the main subject)
+  const letterMap: Record<string, string> = {
+    feat_apob: "B",
+    feat_extreme: "E",
+    feat_lpa: "L",
+    feat_mets: "M",
+    feat_nafld: "N",
+    feat_cacs: "C"
+  };
+  const letter = letterMap[id] || "?";
+  
+  return (
+    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border ${style.bg} ${style.text} ${style.border} text-[11px] font-black uppercase tracking-widest shadow-sm transition-all hover:scale-105`}>
+      <span className="flex items-center justify-center w-5 h-5 rounded-lg bg-white dark:bg-black/40 text-[10px] shadow-sm">
+        {letter}
+      </span>
+      {label}
+    </div>
+  );
+}
+
 const MODIFIER_KEYS = [
   "ascvd", "polyvascular",
   "tod", "fh", "hofh", "subclinical", "ckd34",
@@ -80,28 +113,45 @@ const MOD_SUB_MAP: Record<string, { items: SubItem[]; title: string }> = {
   fh: { items: FHX_ITEMS, title: "Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):" },
 };
 
-// Asian BMI classification helper
+// ─── Unit Conversion Utilities ───
+const CONVERSIONS = {
+  kgToLb: (v: number) => v * 2.20462,
+  lbToKg: (v: number) => v / 2.20462,
+  cmToIn: (v: number) => v * 0.393701,
+  inToCm: (v: number) => v / 0.393701,
+  mgdlToMmol: (v: number) => v * 0.02586,
+  mmolToMgdl: (v: number) => v / 0.02586,
+};
+
+function formatDisplay(val: string, unit: string, useMetric: boolean): string {
+  if (!val) return "NA";
+  const num = parseFloat(val);
+  if (isNaN(num)) return "NA";
+  return `${num.toFixed(1)} ${unit}`;
+}
+
+/** Asian BMI classification helper */
 function getAsianBmiClass(bmiVal: number): { label: string; color: string } {
-  if (bmiVal < 18.5) return { label: "Underweight", color: "text-primary" };
-  if (bmiVal < 23) return { label: "Normal", color: "text-success" };
-  if (bmiVal < 25) return { label: "Overweight (At Risk)", color: "text-warning" };
-  if (bmiVal < 27.5) return { label: "Obese I", color: "text-danger" };
-  return { label: "Obese II", color: "text-danger" };
+  if (bmiVal < 18.5) return { label: "Underweight", color: "text-blue-500" };
+  if (bmiVal < 23) return { label: "Normal", color: "text-emerald-500" };
+  if (bmiVal < 25) return { label: "Overweight (At Risk)", color: "text-amber-500" };
+  if (bmiVal < 27.5) return { label: "Obese I", color: "text-rose-500" };
+  return { label: "Obese II", color: "text-rose-600" };
 }
 
 function getWhoBmiClass(bmiVal: number): { label: string; color: string } {
-  if (bmiVal < 18.5) return { label: "Underweight", color: "text-primary" };
-  if (bmiVal < 25) return { label: "Normal", color: "text-success" };
-  if (bmiVal < 30) return { label: "Overweight", color: "text-warning" };
-  return { label: "Obese", color: "text-danger" };
+  if (bmiVal < 18.5) return { label: "Underweight", color: "text-blue-500" };
+  if (bmiVal < 25) return { label: "Normal", color: "text-emerald-500" };
+  if (bmiVal < 30) return { label: "Overweight", color: "text-amber-500" };
+  return { label: "Obese", color: "text-rose-600" };
 }
 
 function getIndianBmiClass(bmiVal: number): { label: string; color: string } {
-  if (bmiVal < 18.5) return { label: "Underweight", color: "text-primary" };
-  if (bmiVal < 23) return { label: "Normal", color: "text-success" };
-  if (bmiVal < 25) return { label: "Overweight (At Risk)", color: "text-warning" };
-  if (bmiVal < 27) return { label: "Obese I", color: "text-danger" };
-  return { label: "Obese II", color: "text-danger" };
+  if (bmiVal < 18.5) return { label: "Underweight", color: "text-blue-500" };
+  if (bmiVal < 23) return { label: "Normal", color: "text-emerald-500" };
+  if (bmiVal < 25) return { label: "Overweight (At Risk)", color: "text-amber-500" };
+  if (bmiVal < 27) return { label: "Obese I", color: "text-rose-500" };
+  return { label: "Obese II", color: "text-rose-600" };
 }
 
 function getBmiClass(bmiVal: number, ethnicity: string): { label: string; color: string } {
@@ -281,8 +331,9 @@ function Section({
 export default function LipidCalculator() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("calculator");
+  const [useMetric, setUseMetric] = useState(true);
 
-  // ─── Lab inputs ───
+  // ─── Lab inputs (Base units: cm, kg, mg/dL) ───
   const [age, setAge] = useState("");
   const [sex, setSex] = useState<"male" | "female">("male");
   const [ldl, setLdl] = useState("");
@@ -301,7 +352,6 @@ export default function LipidCalculator() {
   const [bmiAuto, setBmiAuto] = useState(false);
   const [waistCirc, setWaistCirc] = useState("");
   const [ethnicity, setEthnicity] = useState<"caucasian" | "asian" | "indian" | "other">("indian");
-  // ─── PREVENT inputs ───
   const [sbp, setSbp] = useState("");
   const [totalChol, setTotalChol] = useState("");
   const [bpMed, setBpMed] = useState(false);
@@ -372,13 +422,20 @@ export default function LipidCalculator() {
 
   // ─── Auto-calculate BMI ───
   useEffect(() => {
-    const h = parseFloat(height);
-    const w = parseFloat(weight);
+    let h = parseFloat(height);
+    let w = parseFloat(weight);
     if (isNaN(h) || h <= 0 || isNaN(w) || w <= 0) { setBmiAuto(false); return; }
+    
+    // Normalize to cm and kg if in Imperial
+    if (!useMetric) {
+      h = h * 2.54; // in to cm
+      w = w * 0.453592; // lb to kg
+    }
+    
     const hm = h / 100;
     setBmi((w / (hm * hm)).toFixed(1));
     setBmiAuto(true);
-  }, [height, weight]);
+  }, [height, weight, useMetric]);
 
   // ─── Auto-derive obesity ───
   useEffect(() => {
@@ -391,16 +448,22 @@ export default function LipidCalculator() {
 
   // ─── Auto-calculate eGFR (CKD-EPI 2021) ───
   useEffect(() => {
-    const cr = parseFloat(creatinine);
+    let cr = parseFloat(creatinine);
     const a = parseFloat(age);
     if (isNaN(cr) || cr <= 0 || isNaN(a) || a <= 0) { setEgfrAuto(false); return; }
+    
+    // Normalize to mg/dL if in Imperial (umol/L)
+    if (!useMetric) {
+      cr = cr / 88.42; 
+    }
+    
     const kappa = sex === "female" ? 0.7 : 0.9;
     const alpha = sex === "female" ? -0.241 : -0.302;
     const sexMul = sex === "female" ? 1.012 : 1.0;
     const calculated = 142 * Math.pow(Math.min(cr / kappa, 1), alpha) * Math.pow(Math.max(cr / kappa, 1), -1.200) * Math.pow(0.9938, a) * sexMul;
     setEgfr(Math.round(calculated).toString());
     setEgfrAuto(true);
-  }, [creatinine, age, sex]);
+  }, [creatinine, age, sex, useMetric]);
 
   const egfrVal = parseFloat(egfr);
   const ckdStage = !isNaN(egfrVal) ? getCkdStage(egfrVal) : null;
@@ -451,41 +514,38 @@ export default function LipidCalculator() {
     const mods = Object.values(laiModChecked).filter(Boolean).length;
     const feats = Object.values(laiFeatChecked).filter(Boolean).length;
     
-    let cat = "", ldlTarget = "", nonHdlTarget = "", apoBTarget = "";
+    let cat = "", ldlT = 0, nonHdlT = 0, apoBT = 0;
     const why: string[] = [];
 
-    // Reverse order: start from most extreme
-    
-    // Extreme C
+    // Category C
     if (v.sequelae30) {
-      cat = "Extreme Risk C"; ldlTarget = "Specialized Care"; nonHdlTarget = "—"; apoBTarget = "—";
+      cat = "Extreme Risk C"; ldlT = 30; nonHdlT = 60; apoBT = 45;
       why.push("Recurrent ASCVD event despite LDL-C around 30 mg/dL.");
     } 
-    // Extreme B
+    // Category B
     else if ((v.ascvd && (feats >= 2)) || v.acs12 || v.polyvascular || v.hofh) {
-      cat = "Extreme Risk B"; ldlTarget = "≤ 30 mg/dL"; nonHdlTarget = "≤ 60 mg/dL"; apoBTarget = "< 45 mg/dL";
+      cat = "Extreme Risk B"; ldlT = 30; nonHdlT = 60; apoBT = 45;
       if (v.ascvd && feats >= 2) why.push("ASCVD with ≥2 features of very high risk group.");
       if (v.acs12) why.push("Recurrent ACS.");
       if (v.polyvascular) why.push("Polyvascular disease.");
       if (v.hofh) why.push("Homozygous FH.");
     }
-    // Extreme A
-    else if ((v.ascvd && feats >= 1) || (!isNaN(parseFloat(lpa)) && parseFloat(lpa) >= 300) || v.hofh) { // Note: HoFH is also here in Category A if less severe? Prompt says HoFH in B too.
-      // CACS >= 300
-      cat = "Extreme Risk A"; ldlTarget = "< 50 mg/dL"; nonHdlTarget = "< 80 mg/dL"; apoBTarget = "< 55 mg/dL";
-      why.push("ASCVD with ≥1 High-risk group feature or HoFH.");
+    // Category A
+    else if ((v.ascvd && feats >= 1) || (!isNaN(parseFloat(lpa)) && parseFloat(lpa) >= 300)) {
+      cat = "Extreme Risk A"; ldlT = 50; nonHdlT = 80; apoBT = 55;
+      why.push("ASCVD with ≥1 High-risk group feature.");
     }
     // Very High Risk
-    else if ((rfChecked.dm && (v.tod || rf >= 2)) || feats >= 2 || v.ascvd || v.fh || ldlVal >= 190) {
-      cat = "Very High Risk"; ldlTarget = "< 50 mg/dL"; nonHdlTarget = "< 80 mg/dL"; apoBTarget = "< 65 mg/dL";
+    else if (v.ascvd || v.fh || (rfChecked.dm && (v.tod || rf >= 2)) || feats >= 2 || ldlVal >= 190) {
+      cat = "Very High Risk"; ldlT = 50; nonHdlT = 80; apoBT = 65;
       if (rfChecked.dm && (v.tod || rf >= 2)) why.push("Diabetes with TOD or ≥2 major risk factors.");
       if (feats >= 2) why.push("≥2 High-risk features present.");
       if (v.ascvd) why.push("Established ASCVD.");
       if (v.fh || ldlVal >= 190) why.push("Heterozygous FH or LDL-C ≥190 mg/dL.");
     }
     // High Risk
-    else if (rf >= 3 || (ldlVal >= 160 && ldlVal <= 189) || (nonhdlVal >= 190 && nonhdlVal <= 219) || (rfChecked.dm && rf <= 1) || (rf === 2 && mods >= 1) || feats >= 1) {
-      cat = "High Risk"; ldlTarget = "< 70 mg/dL"; nonHdlTarget = "< 100 mg/dL"; apoBTarget = "< 80 mg/dL";
+    else if (rf >= 3 || (ldlVal >= 160 && ldlVal <= 189) || (rfChecked.dm && rf <= 1) || (rf === 2 && mods >= 1) || feats >= 1) {
+      cat = "High Risk"; ldlT = 70; nonHdlT = 100; apoBT = 80;
       if (rf >= 3) why.push("≥3 major ASCVD risk factors.");
       if (ldlVal >= 160) why.push("LDL-C 160-189 mg/dL.");
       if (rfChecked.dm) why.push("Diabetes with 0-1 major risk factors.");
@@ -493,21 +553,28 @@ export default function LipidCalculator() {
       if (feats >= 1) why.push("1 high-risk feature present.");
     }
     // Moderate Risk
-    else if (rf === 2 || (ldlVal >= 130 && ldlVal <= 159) || (nonhdlVal >= 160 && nonhdlVal <= 189) || (rf <= 1 && mods >= 1)) {
-      cat = "Moderate Risk"; ldlTarget = "< 100 mg/dL"; nonHdlTarget = "< 130 mg/dL"; apoBTarget = "—";
+    else if (rf === 2 || (ldlVal >= 130 && ldlVal <= 159) || (rf <= 1 && mods >= 1)) {
+      cat = "Moderate Risk"; ldlT = 100; nonHdlT = 130; apoBT = 0;
       if (rf === 2) why.push("2 major ASCVD risk factors.");
       if (mods >= 1) why.push("≥1 risk modifier present.");
     }
     // Low Risk
     else if (rf <= 1 || (ldlVal >= 100 && ldlVal <= 129)) {
-      cat = "Low Risk"; ldlTarget = "< 100 mg/dL"; nonHdlTarget = "< 130 mg/dL"; apoBTarget = "—";
+      cat = "Low Risk"; ldlT = 100; nonHdlT = 130; apoBT = 0;
       why.push("0–1 major ASCVD risk factor.");
     }
     else {
       return null;
     }
 
-    return { category: cat, ldlTarget, nonHdlTarget, apoBTarget, treatment: TREATMENTS[cat] || [], why };
+    return { 
+      category: cat, 
+      ldlTarget: ldlT, 
+      nonHdlTarget: nonHdlT, 
+      apoBTarget: apoBT, 
+      treatment: TREATMENTS[cat] || [], 
+      why 
+    };
   }, [modChecked, rfChecked, rfCount, lpa, ldl, nonhdl, laiModChecked, laiFeatChecked]);
 
   const result = classify();
@@ -548,10 +615,47 @@ export default function LipidCalculator() {
     setSbp(""); setTotalChol(""); setBpMed(false); setOnStatin(false);
     setRfChecked(Object.fromEntries(MAJOR_RF_KEYS.map((k) => [k, false])));
     setModChecked(Object.fromEntries(MODIFIER_KEYS.map((k) => [k, false])));
+    setLaiFeatChecked(Object.fromEntries(HIGH_RISK_FEATURES_LAI.map((f) => [f.id, false])));
     setSubChecked({});
   };
 
-  // ─── Goal checks ───
+  const toggleUnits = () => {
+    const isNowMetric = !useMetric;
+    setUseMetric(isNowMetric);
+
+    const conv = (val: string, factor: number) => {
+      if (!val) return "";
+      const n = parseFloat(val);
+      if (isNaN(n)) return "";
+      return (n * factor).toFixed(1);
+    };
+
+    // Metric (SI) vs Imperial (US)
+    if (isNowMetric) {
+      // Switching from Imperial (mg/dL) to Metric (mmol/L)
+      setLdl(prev => conv(prev, CONVERSIONS.mgdlToMmol(1)));
+      setNonhdl(prev => conv(prev, CONVERSIONS.mgdlToMmol(1)));
+      setHdl(prev => conv(prev, CONVERSIONS.mgdlToMmol(1)));
+      setTotalChol(prev => conv(prev, CONVERSIONS.mgdlToMmol(1)));
+      setHeight(prev => conv(prev, CONVERSIONS.inToCm(1)));
+      setWeight(prev => conv(prev, CONVERSIONS.lbToKg(1)));
+      setApob(prev => conv(prev, 1 / 100)); // mg/dL to g/L
+      setLpa(prev => conv(prev, 2.4)); // mg/dL to nmol/L (rough avg)
+      setCreatinine(prev => conv(prev, 88.42)); // mg/dL to μmol/L
+    } else {
+      // Switching from Metric (mmol/L) to Imperial (mg/dL)
+      setLdl(prev => conv(prev, CONVERSIONS.mmolToMgdl(1)));
+      setNonhdl(prev => conv(prev, CONVERSIONS.mmolToMgdl(1)));
+      setHdl(prev => conv(prev, CONVERSIONS.mmolToMgdl(1)));
+      setTotalChol(prev => conv(prev, CONVERSIONS.mmolToMgdl(1)));
+      setHeight(prev => conv(prev, CONVERSIONS.cmToIn(1)));
+      setWeight(prev => conv(prev, CONVERSIONS.kgToLb(1)));
+      setApob(prev => conv(prev, 100)); // g/L to mg/dL
+      setLpa(prev => conv(prev, 0.4166)); // nmol/L to mg/dL
+      setCreatinine(prev => conv(prev, 0.0113)); // μmol/L to mg/dL
+    }
+  };
+
   const ldlNum = parseFloat(ldl);
   const nonHdlNum = parseFloat(nonhdl);
   const apoBNum = parseFloat(apob);
@@ -568,33 +672,49 @@ export default function LipidCalculator() {
       {/* ─── Sticky Header + Tabs ─── */}
       <div className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto max-w-2xl px-4">
-          <div className="flex items-center gap-3 py-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-              <Heart className="h-4.5 w-4.5 text-primary-foreground" />
+          <div className="flex items-center justify-between py-2">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-md shadow-indigo-500/20">
+                <Heart className="h-4 w-4 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1 className="font-display text-base font-bold tracking-tight text-foreground truncate">
+                  Lipid Risk Predictor
+                </h1>
+                <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">
+                  Premium Clinical Decision Support
+                </p>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <h1 className="font-display text-base font-bold tracking-tight text-foreground truncate">
-                Lipid Risk Predictor
-              </h1>
-              <p className="text-[10px] text-muted-foreground truncate">
-                Cardiovascular Risk Assessment & Management
-              </p>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">Units:</span>
+              <button 
+                onClick={toggleUnits}
+                className={`relative flex h-6 w-12 items-center rounded-full p-1 transition-colors duration-200 focus:outline-none ${useMetric ? "bg-emerald-500" : "bg-orange-500"}`}
+              >
+                <div className={`h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${useMetric ? "translate-x-6" : "translate-x-0"}`} />
+              </button>
+              <span className="text-[10px] font-black w-12 text-center text-foreground">
+                {useMetric ? "METRIC" : "IMPERIAL"}
+              </span>
             </div>
+          </div>
             <div className="flex items-center gap-2 no-print shrink-0">
               {preventResult?.valid && (
                 <div className={`hidden sm:flex flex-col items-end rounded-lg border px-2.5 py-1 leading-none ${
-                  preventResult.category === "High" ? "border-danger/30 bg-danger/5"
-                  : preventResult.category === "Intermediate" ? "border-warning/30 bg-warning/5"
-                  : preventResult.category === "Borderline" ? "border-primary/30 bg-primary/5"
-                  : "border-accent/30 bg-accent/5"
-                }`}>
+                    preventResult.category === "High" ? "border-danger/30 bg-danger/5"
+                    : preventResult.category === "Intermediate" ? "border-warning/30 bg-warning/5"
+                    : preventResult.category === "Borderline" ? "border-primary/30 bg-primary/5"
+                    : "border-accent/30 bg-accent/5"
+                  }`}>
                   <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground">Risk Index</span>
                   <span className={`font-display text-sm font-bold ${
-                    preventResult.category === "High" ? "text-danger"
-                    : preventResult.category === "Intermediate" ? "text-warning"
-                    : preventResult.category === "Borderline" ? "text-primary"
-                    : "text-accent"
-                  }`}>{preventResult.riskPct}<span className="text-[10px]">%</span></span>
+                      preventResult.category === "High" ? "text-danger"
+                      : preventResult.category === "Intermediate" ? "text-warning"
+                      : preventResult.category === "Borderline" ? "text-primary"
+                      : "text-accent"
+                    }`}>{preventResult.riskPct}<span className="text-[10px]">%</span></span>
                 </div>
               )}
               <Button variant="ghost" size="sm" onClick={() => navigate("/")} title="Back to Home">
@@ -604,7 +724,6 @@ export default function LipidCalculator() {
                 <RotateCcw className="h-4 w-4" />
               </Button>
             </div>
-          </div>
           <div className="flex gap-0.5 pb-2 overflow-x-auto no-print">
             {TABS.map((tab) => (
               <button
@@ -627,284 +746,295 @@ export default function LipidCalculator() {
       {/* ─── Content ─── */}
       <div className="mx-auto max-w-2xl px-4 py-5">
         {activeTab === "calculator" && (
-          <div className="space-y-3">
-            {/* Quick Link */}
-            <Card className="border-border bg-card p-3.5 no-print">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-display text-xs font-bold text-foreground">ASCVD Risk Assessment & EMR</h3>
-                  <p className="text-[10px] text-muted-foreground">ACC/AHA Primary Prevention</p>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => navigate("/ascvd")} className="gap-1.5 text-xs h-7">
-                  Open <Activity className="h-3 w-3" />
-                </Button>
-              </div>
-            </Card>
-
-            {/* ── Section 1: Demographics & Anthropometrics ── */}
-            <Section title="Demographics & Body Metrics" tone="primary" icon={<User className="h-4 w-4" />}>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Age</label>
-                  <Input type="number" placeholder="e.g. 55" value={age} onChange={(e) => setAge(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Sex</label>
-                  <select value={sex} onChange={(e) => setSex(e.target.value as "male" | "female")} className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground">
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
-                </div>
-              </div>
-              <div className="mb-3">
-                <label className="mb-1 block text-xs font-semibold text-foreground">Ethnicity</label>
-                <Select value={ethnicity} onValueChange={(v) => setEthnicity(v as "caucasian" | "asian" | "indian" | "other")}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select ethnicity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="caucasian">Caucasian</SelectItem>
-                    <SelectItem value="asian">Asian</SelectItem>
-                    <SelectItem value="indian">Indian</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Height (cm)</label>
-                  <Input type="number" placeholder="170" value={height} onChange={(e) => setHeight(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Weight (kg)</label>
-                  <Input type="number" placeholder="75" value={weight} onChange={(e) => setWeight(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">
-                    BMI {bmiAuto && <span className="text-[10px] font-normal text-primary">auto</span>}
+          <div className="space-y-4">
+            <Section title="Demographics & Metrics" tone="primary" icon={<User className="h-4 w-4" />}>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-indigo-500 flex items-center gap-2">
+                    <User className="h-3 w-3" /> Age (Years)
                   </label>
-                  <Input type="number" placeholder="26" value={bmi} onChange={(e) => { setBmi(e.target.value); setBmiAuto(false); setHeight(""); setWeight(""); }} className={bmiAuto ? "bg-muted" : ""} />
-                  {(() => {
-                    const bmiVal = parseFloat(bmi);
-                    if (isNaN(bmiVal) || bmiVal <= 0) return null;
-                    const bmiClass = getBmiClass(bmiVal, ethnicity);
-                    const threshold = getObesityThreshold(ethnicity);
-                    return (
-                      <div className="mt-1.5 space-y-1">
-                        <p className={`text-[10px] font-medium ${bmiClass.color}`}>
-                          {ethnicity === "caucasian" ? "WHO" : ethnicity.charAt(0).toUpperCase() + ethnicity.slice(1)}: {bmiClass.label} (BMI {bmiVal.toFixed(1)})
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          Obesity threshold: ≥{threshold} kg/m²
-                        </p>
-                      </div>
-                    );
-                  })()}
+                  <Input 
+                    type="number" 
+                    min="0"
+                    placeholder="Enter Age" 
+                    value={age} 
+                    onChange={(e) => setAge(e.target.value)}
+                    className="h-10 border-indigo-500/20 bg-indigo-500/5 focus-visible:ring-indigo-500" 
+                  />
                 </div>
-              </div>
-              {/* BMI Classification Reference — Collapsible */}
-              {!isNaN(parseFloat(bmi)) && (
-                <Collapsible>
-                  <CollapsibleTrigger className="w-full mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground/70 transition-colors cursor-pointer">
-                    <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 [&[data-state=open]]:rotate-0 -rotate-90 shrink-0" />
-                    BMI Classification Criteria (WHO &amp; Asian Guidelines)
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="mt-2 rounded-lg border border-border bg-muted/30 p-3 space-y-3">
-                      {/* WHO Standard */}
-                      <div>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1">WHO Standard Criteria</p>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
-                          {[
-                            { range: "<18.5", label: "Underweight", color: "text-primary" },
-                            { range: "18.5–24.9", label: "Normal", color: "text-success" },
-                            { range: "25–29.9", label: "Overweight", color: "text-warning" },
-                            { range: "≥30", label: "Obese", color: "text-danger" },
-                          ].map((t) => (
-                            <div key={t.label} className={`rounded px-2 py-1.5 bg-muted/50 ${t.color}`}>
-                              <span className="font-bold">{t.label}</span><br />
-                              <span className="text-muted-foreground">{t.range} kg/m²</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      {/* Asian Criteria */}
-                      <div>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1">Asian-Specific Cut-offs (WHO Asia-Pacific)</p>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
-                          {[
-                            { range: "18.5–22.9", label: "Normal", color: "text-success" },
-                            { range: "23–24.9", label: "Overweight", color: "text-warning" },
-                            { range: "25–27.4", label: "Obese I", color: "text-danger" },
-                            { range: "≥27.5", label: "Obese II", color: "text-danger" },
-                          ].map((t) => (
-                            <div key={t.label} className={`rounded px-2 py-1.5 bg-muted/50 ${t.color}`}>
-                              <span className="font-bold">{t.label}</span><br />
-                              <span className="text-muted-foreground">{t.range} kg/m²</span>
-                            </div>
-                          ))}
-                        </div>
-                        <p className="text-[10px] text-muted-foreground mt-1.5 leading-snug">
-                          Asian populations face higher metabolic risks at lower BMI. WHO action points: ≥23 (public health), ≥27.5 (high risk).
-                        </p>
-                      </div>
-                      {/* Country Examples */}
-                      <div>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1">Country-Specific Variations</p>
-                        <div className="space-y-1 text-[10px] text-muted-foreground leading-snug">
-                          <p>🇮🇳 <strong className="text-foreground">India</strong>: Overweight 23–24.9, Obesity ≥25 kg/m²</p>
-                          <p>🇯🇵 <strong className="text-foreground">Japan</strong>: Obesity ≥25 kg/m²</p>
-                          <p>🇰🇷 <strong className="text-foreground">Korea</strong>: Overweight/Pre-obese ≥23, Obesity ≥25 kg/m²</p>
-                          <p>🇨🇳 <strong className="text-foreground">China</strong>: Overweight ≥24, Obesity ≥28 kg/m²</p>
-                        </div>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              )}
-
-              {/* Waist Circumference */}
-              <div className="mt-3 grid grid-cols-2 gap-3 items-end">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Waist Circumference (cm)</label>
-                  <Input type="number" placeholder="e.g. 88" value={waistCirc} onChange={(e) => setWaistCirc(e.target.value)} />
-                  {(() => {
-                    const wc = parseFloat(waistCirc);
-                    if (isNaN(wc) || wc <= 0) return null;
-                    const maleHigh = wc >= 90;
-                    const femaleHigh = wc >= 80;
-                    const isHigh = sex === "male" ? maleHigh : femaleHigh;
-                    const threshold = sex === "male" ? "≥90 cm" : "≥80 cm";
-                    return (
-                      <p className={`mt-1 text-[10px] font-medium ${isHigh ? "text-danger" : "text-success"}`}>
-                        {isHigh ? `⚠ Above Asian cutoff (${threshold})` : `Below Asian cutoff (${threshold})`}
-                      </p>
-                    );
-                  })()}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-purple-500 flex items-center gap-2">
+                    <Activity className="h-3 w-3" /> Sex
+                  </label>
+                  <Select value={sex} onValueChange={(v: any) => setSex(v)}>
+                    <SelectTrigger className="h-10 border-purple-500/20 bg-purple-500/5 focus:ring-purple-500">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
-              {/* Waist Circumference Reference — Collapsible */}
-              <Collapsible>
-                <CollapsibleTrigger className="w-full mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground/70 transition-colors cursor-pointer">
-                  <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 [&[data-state=open]]:rotate-0 -rotate-90 shrink-0" />
-                  Waist Circumference — Asian Cutoffs &amp; Clinical Role
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="mt-2 rounded-lg border border-border bg-muted/30 p-3 space-y-2.5 text-[10px] text-muted-foreground leading-snug">
-                    <p>WC assesses central/abdominal obesity, complementing BMI due to higher visceral fat and metabolic risks at lower BMIs in Asians. Predicts CV and diabetes risks better than BMI alone.</p>
-                    <div>
-                      <p className="font-bold text-foreground uppercase tracking-wide mb-1">Measurement</p>
-                      <p>Midpoint between lower rib margin and iliac crest, midway in axilla, relaxed abdomen. Non-stretch tape at minimal tension. Avoid post-meal.</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-foreground uppercase tracking-wide mb-1">Asian Cutoffs</p>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-[10px] border-collapse">
-                          <thead>
-                            <tr className="border-b border-border">
-                              <th className="text-left py-1 pr-2 font-bold text-foreground">Population</th>
-                              <th className="text-center py-1 px-2 font-bold text-foreground">Men (cm)</th>
-                              <th className="text-center py-1 pl-2 font-bold text-foreground">Women (cm)</th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-muted-foreground">
-                            <tr className="border-b border-border/50"><td className="py-1 pr-2">🇮🇳 India — Action Level 1</td><td className="text-center py-1 px-2">≥78</td><td className="text-center py-1 pl-2">≥72</td></tr>
-                            <tr className="border-b border-border/50"><td className="py-1 pr-2">🇮🇳 India — Action Level 2</td><td className="text-center py-1 px-2">≥90</td><td className="text-center py-1 pl-2">≥80</td></tr>
-                            <tr className="border-b border-border/50"><td className="py-1 pr-2">IDF South Asians</td><td className="text-center py-1 px-2">≥90</td><td className="text-center py-1 pl-2">≥80</td></tr>
-                            <tr><td className="py-1 pr-2">🇨🇳 Chinese</td><td className="text-center py-1 px-2">≥90</td><td className="text-center py-1 pl-2">≥80</td></tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <p>WC identifies abdominal obesity even at "normal" BMI (18.5–22.9) in Asians. Combine with BMI: overweight/obesity if BMI ≥23 or WC above cutoffs.</p>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center gap-2">
+                    <TrendingUp className="h-3 w-3" /> Height ({useMetric ? "cm" : "in"})
+                  </label>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    placeholder={useMetric ? "cm" : "in"} 
+                    value={height} 
+                    onChange={(e) => setHeight(e.target.value)}
+                    className="h-10 border-emerald-500/20 bg-emerald-500/5 focus-visible:ring-emerald-500" 
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-teal-500 flex items-center gap-2">
+                    <TrendingUp className="h-3 w-3" /> Weight ({useMetric ? "kg" : "lb"})
+                  </label>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    placeholder={useMetric ? "kg" : "lb"} 
+                    value={weight} 
+                    onChange={(e) => setWeight(e.target.value)}
+                    className="h-10 border-teal-500/20 bg-teal-500/5 focus-visible:ring-teal-500" 
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="flex items-center justify-between rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-4 transition-all hover:bg-indigo-500/20">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500">Calculated BMI</span>
+                    <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{bmi || "NA"}</span>
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
+                  {bmi && (
+                    <div className="text-right">
+                      <span className={`text-[11px] font-black uppercase ${getBmiClass(parseFloat(bmi), ethnicity).color}`}>
+                        {getBmiClass(parseFloat(bmi), ethnicity).label}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-500 flex items-center gap-2">
+                    <Globe className="h-3 w-3" /> Ethnicity
+                  </label>
+                  <Select value={ethnicity} onValueChange={(v) => setEthnicity(v as any)}>
+                    <SelectTrigger className="h-10 border-blue-500/20 bg-blue-500/5 focus:ring-blue-500">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="indian">Indian</SelectItem>
+                      <SelectItem value="asian">Asian</SelectItem>
+                      <SelectItem value="caucasian">Caucasian</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+               <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-emerald-600 flex items-center gap-2">
+                  <Activity className="h-3 w-3" /> Waist Circ (cm)
+                </label>
+                <div className="flex gap-3">
+                  <Input 
+                    type="number" 
+                    min="0"
+                    placeholder="cm" 
+                    value={waistCirc} 
+                    onChange={(e) => setWaistCirc(e.target.value)}
+                    className="h-10 border-emerald-600/20 bg-emerald-600/5 focus-visible:ring-emerald-600 flex-1" 
+                  />
+                  {waistCirc && (
+                    <div className="flex items-center gap-2 rounded-lg border border-emerald-600/10 bg-emerald-600/5 px-4 text-[10px] font-bold">
+                      {(sex === "male" ? parseFloat(waistCirc) >= 90 : parseFloat(waistCirc) >= 80) ? (
+                        <span className="text-rose-500 uppercase">Above Cutoff</span>
+                      ) : (
+                        <span className="text-emerald-600 uppercase">Normal</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </Section>
 
-            {/* ── Section 2: Lab Values ── */}
-            <Section title="Lab Values" tone="indigo" icon={<TestTube className="h-4 w-4" />}>
-              <div className="grid grid-cols-3 gap-3 mb-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">LDL-C (mg/dL)</label>
-                  <Input type="number" placeholder="85" value={ldl} onChange={(e) => setLdl(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Non-HDL-C</label>
-                  <Input type="number" placeholder="110" value={nonhdl} onChange={(e) => setNonhdl(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">ApoB (mg/dL)</label>
-                  <Input type="number" placeholder="70" value={apob} onChange={(e) => setApob(e.target.value)} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Lp(a) (mg/dL)</label>
-                  <Input type="number" placeholder="45" value={lpa} onChange={(e) => setLpa(e.target.value)} />
-                  {!isNaN(lpaNum) && lpaNum >= 50 && (
-                    <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-danger">
-                      <AlertTriangle className="h-3 w-3" /> ≥50 → Extreme Risk A
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">HbA1c (%)</label>
-                  <Input type="number" placeholder="7.2" value={hba1c} onChange={(e) => setHba1c(e.target.value)} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">HDL-C (mg/dL)</label>
-                  <Input type="number" placeholder="42" value={hdl} onChange={(e) => setHdl(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">hsCRP (mg/L)</label>
-                  <Input type="number" placeholder="3.5" value={hscrp} onChange={(e) => setHscrp(e.target.value)} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Creatinine (mg/dL)</label>
-                  <Input type="number" placeholder="1.2" value={creatinine} onChange={(e) => setCreatinine(e.target.value)} />
-                  <p className="mt-0.5 text-[10px] text-muted-foreground">Auto-calculates eGFR</p>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">
-                    eGFR {egfrAuto && <span className="text-[10px] font-normal text-primary">auto</span>}
+            {/* ── Section 2: Laboratory Values ── */}
+            <Section title="Laboratory Values" tone="indigo" icon={<TestTube className="h-4 w-4" />}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-rose-500 flex items-center gap-2">
+                    <TestTube className="h-3 w-3" /> LDL-C ({useMetric ? "mmol/L" : "mg/dL"})
                   </label>
-                  <Input type="number" placeholder="45" value={egfr} onChange={(e) => { setEgfr(e.target.value); setEgfrAuto(false); setCreatinine(""); }} className={egfrAuto ? "bg-muted" : ""} />
-                  {ckdStage && (
-                    <p className={`mt-0.5 text-[10px] font-medium ${egfrVal < 60 ? "text-danger" : "text-muted-foreground"}`}>
-                      CKD {ckdStage}
-                    </p>
-                  )}
+                  <Input 
+                    type="number" 
+                    min="0"
+                    value={ldl} 
+                    onChange={(e) => setLdl(e.target.value)}
+                    className="h-10 border-rose-500/20 bg-rose-500/5 focus-visible:ring-rose-500" 
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-orange-500 flex items-center gap-2">
+                    <TestTube className="h-3 w-3" /> Non-HDL ({useMetric ? "mmol/L" : "mg/dL"})
+                  </label>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    value={nonhdl} 
+                    onChange={(e) => setNonhdl(e.target.value)}
+                    className="h-10 border-orange-500/20 bg-orange-500/5 focus-visible:ring-orange-500" 
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
+                    <TestTube className="h-3 w-3" /> ApoB ({useMetric ? "g/L" : "mg/dL"})
+                  </label>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    value={apob} 
+                    onChange={(e) => setApob(e.target.value)}
+                    className="h-10 border-amber-500/20 bg-amber-500/5 focus-visible:ring-amber-500" 
+                  />
                 </div>
               </div>
-              {/* PREVENT-specific */}
-              <div className="border-t border-border pt-3 mt-1">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">PREVENT Calculator Inputs</p>
-                <div className="grid grid-cols-2 gap-3 mb-2">
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-foreground">SBP (mmHg)</label>
-                    <Input type="number" placeholder="130" value={sbp} onChange={(e) => setSbp(e.target.value)} />
+               
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-cyan-500 flex items-center gap-2">
+                    <TestTube className="h-3 w-3" /> Lp(a) ({useMetric ? "nmol/L" : "mg/dL"})
+                  </label>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    value={lpa} 
+                    onChange={(e) => setLpa(e.target.value)}
+                    className="h-10 border-cyan-500/20 bg-cyan-500/5 focus-visible:ring-cyan-500" 
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center gap-2">
+                    <TestTube className="h-3 w-3" /> HbA1c (%)
+                  </label>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    value={hba1c} 
+                    onChange={(e) => setHba1c(e.target.value)}
+                    className="h-10 border-emerald-500/20 bg-emerald-500/5 focus-visible:ring-emerald-500" 
+                  />
+                </div>
+              </div>
+
+               <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-500 flex items-center gap-2">
+                    <TestTube className="h-3 w-3" /> HDL-C ({useMetric ? "mmol/L" : "mg/dL"})
+                  </label>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    value={hdl} 
+                    onChange={(e) => setHdl(e.target.value)}
+                    className="h-10 border-blue-500/20 bg-blue-500/5 focus-visible:ring-blue-500" 
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-violet-500 flex items-center gap-2">
+                    <TestTube className="h-3 w-3" /> Creatinine ({useMetric ? "μmol/L" : "mg/dL"})
+                  </label>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    value={creatinine} 
+                    onChange={(e) => setCreatinine(e.target.value)}
+                    className="h-10 border-violet-500/20 bg-violet-500/5 focus-visible:ring-violet-500" 
+                  />
+                </div>
+              </div>
+
+              {/* Cardiovascular Risk Parameters */}
+              <div className="border-t border-border pt-4 mt-6">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Cardiovascular Risk Parameters (PREVENT)</p>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-600 flex items-center gap-2">
+                      <Activity className="h-3 w-3" /> SBP (mmHg)
+                    </label>
+                    <Input 
+                      type="number" 
+                      min="0"
+                      placeholder="e.g. 130" 
+                      value={sbp} 
+                      onChange={(e) => setSbp(e.target.value)}
+                      className="h-10 border-slate-500/20 bg-slate-500/5 focus-visible:ring-slate-500" 
+                    />
                   </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-foreground">Total Chol (mg/dL)</label>
-                    <Input type="number" placeholder="200" value={totalChol} onChange={(e) => setTotalChol(e.target.value)} />
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-600 flex items-center gap-2">
+                      <TestTube className="h-3 w-3" /> Total Chol ({useMetric ? "mmol/L" : "mg/dL"})
+                    </label>
+                    <Input 
+                      type="number" 
+                      min="0"
+                      placeholder="e.g. 200" 
+                      value={totalChol} 
+                      onChange={(e) => setTotalChol(e.target.value)}
+                      className="h-10 border-slate-500/20 bg-slate-500/5 focus-visible:ring-slate-500" 
+                    />
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-4">
-                  <label className="flex cursor-pointer items-center gap-2">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-500/10 bg-slate-500/5 px-3 py-2 transition-colors hover:bg-slate-500/10">
                     <Checkbox checked={bpMed} onCheckedChange={() => setBpMed(!bpMed)} />
-                    <span className="text-xs text-foreground">On BP medication</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600">On BP Meds</span>
                   </label>
-                  <label className="flex cursor-pointer items-center gap-2">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-500/10 bg-slate-500/5 px-3 py-2 transition-colors hover:bg-slate-500/10">
                     <Checkbox checked={onStatin} onCheckedChange={() => setOnStatin(!onStatin)} />
-                    <span className="text-xs text-foreground">On statin</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600">On Statin</span>
                   </label>
                 </div>
+              </div>
+            </Section>
+
+            {/* ── Section: High-Risk Features ── */}
+            <Section title="High-Risk Features Checklist" tone="secondary" icon={<Activity className="h-4 w-4" />}>
+              <div className="grid grid-cols-1 gap-2">
+                {HIGH_RISK_FEATURES_LAI.map(feature => (
+                  <label 
+                    key={feature.id}
+                    className={`flex items-start gap-3 rounded-xl border p-3 transition-all cursor-pointer hover:bg-muted/50 ${
+                      laiFeatChecked[feature.id] 
+                        ? "border-indigo-500/30 bg-indigo-500/5 shadow-sm" 
+                        : "border-border/50 bg-background"
+                    }`}
+                  >
+                    <div className="mt-1">
+                      <Checkbox 
+                        checked={laiFeatChecked[feature.id]} 
+                        onCheckedChange={() => toggleLaiFeat(feature.id)}
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className={`text-xs font-bold leading-none ${laiFeatChecked[feature.id] ? "text-indigo-600" : "text-foreground"}`}>
+                        {feature.label}
+                      </span>
+                      {feature.qualifier && (
+                        <span className="text-[10px] text-muted-foreground mt-1">
+                          {feature.qualifier}
+                        </span>
+                      )}
+                    </div>
+                  </label>
+                ))}
               </div>
             </Section>
 
@@ -1186,8 +1316,7 @@ export default function LipidCalculator() {
               </div>
             </Section>
 
-            {/* ── Section 6: Classification Result ── */}
-            <Card className={`border-border bg-card overflow-hidden`}>
+            <Card className="border-border bg-card overflow-hidden">
               <div className={`px-5 py-4 ${result ? (catColor === "warning" ? "bg-warning/10" : "bg-danger/10") : "bg-muted/30"}`}>
                 <div className="flex items-center justify-between">
                   <div className={`flex items-center gap-2 font-display font-bold ${result ? (catColor === "warning" ? "text-warning" : "text-danger") : "text-muted-foreground"}`}>
@@ -1201,51 +1330,90 @@ export default function LipidCalculator() {
                   )}
                 </div>
               </div>
+
+               {/* Predicted High-Risk Load Detectors */}
+              {Object.values(laiFeatChecked).some(Boolean) && (
+                <div className="px-5 py-3 border-b border-border/50 bg-indigo-50/50 dark:bg-indigo-950/10">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-2">High-Risk Predictors Found</p>
+                  <div className="flex flex-wrap gap-2">
+                    {HIGH_RISK_FEATURES_LAI.filter(f => laiFeatChecked[f.id]).map(f => (
+                      <PredictorBadge key={f.id} id={f.id} label={f.label} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="p-5 space-y-4">
                 {result ? (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {[
-                        { label: "LDL-C Target", value: result.ldlTarget },
-                        { label: "Non-HDL-C Target", value: result.nonHdlTarget },
-                        { label: "ApoB Target", value: result.apoBTarget },
-                      ].map((t) => (
-                        <div key={t.label}>
-                          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.label}</p>
-                          <p className="mt-1 font-display text-lg font-bold text-foreground">{t.value}</p>
-                        </div>
-                      ))}
+                      {([
+                        { label: "LDL-C Target", val: result.ldlTarget, type: "ldl" },
+                        { label: "Non-HDL Target", val: result.nonHdlTarget, type: "nonhdl" },
+                        { label: "ApoB Target", val: result.apoBTarget, type: "apob" },
+                      ] as const).map((t) => {
+                        let displayVal = "—";
+                        if (t.val > 0) {
+                          if (t.type === "apob") {
+                            displayVal = useMetric ? `< ${ (t.val / 100).toFixed(2) } g/L` : `< ${t.val} mg/dL`;
+                          } else {
+                            displayVal = useMetric ? `< ${ (t.val / 38.67).toFixed(1) } mmol/L` : `< ${t.val} mg/dL`;
+                          }
+                        }
+                        return (
+                          <div key={t.label}>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.label}</p>
+                            <p className="mt-1 font-display text-lg font-bold text-foreground">{displayVal}</p>
+                          </div>
+                        );
+                      })}
                     </div>
-                    {(ldlAtGoal !== null || nonHdlAtGoal !== null || apoBAtGoal !== null) && (
-                      <div className="space-y-2">
-                        {ldlAtGoal !== null && <GoalIndicator label={`LDL-C (${ldl} mg/dL)`} atGoal={ldlAtGoal} />}
-                        {nonHdlAtGoal !== null && <GoalIndicator label={`Non-HDL-C (${nonhdl} mg/dL)`} atGoal={nonHdlAtGoal} />}
-                        {apoBAtGoal !== null && <GoalIndicator label={`ApoB (${apob} mg/dL)`} atGoal={apoBAtGoal} />}
-                      </div>
-                    )}
+
+                    <div className="space-y-2">
+                      {ldl && result.ldlTarget > 0 && (
+                        <GoalIndicator 
+                          label={`LDL-C (${ldl} ${useMetric ? "mmol/L" : "mg/dL"})`} 
+                          atGoal={useMetric ? parseFloat(ldl) <= result.ldlTarget/38.67 : parseFloat(ldl) <= result.ldlTarget} 
+                        />
+                      )}
+                      {nonhdl && result.nonHdlTarget > 0 && (
+                        <GoalIndicator 
+                          label={`Non-HDL (${nonhdl} ${useMetric ? "mmol/L" : "mg/dL"})`} 
+                          atGoal={useMetric ? parseFloat(nonhdl) <= result.nonHdlTarget/38.67 : parseFloat(nonhdl) <= result.nonHdlTarget} 
+                        />
+                      )}
+                      {apob && result.apoBTarget > 0 && (
+                        <GoalIndicator 
+                          label={`ApoB (${apob} ${useMetric ? "g/L" : "mg/dL"})`} 
+                          atGoal={useMetric ? parseFloat(apob) <= result.apoBTarget/100 : parseFloat(apob) <= result.apoBTarget} 
+                        />
+                      )}
+                    </div>
+
                     {result.why.length > 0 && (
-                      <div className="rounded-lg bg-muted/50 px-4 py-3 space-y-1">
+                      <div className="rounded-lg bg-muted/50 px-4 py-3 space-y-1 border border-border/50">
                         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rationale</p>
                         {result.why.map((w, i) => <p key={i} className="text-sm text-foreground">{w}</p>)}
                       </div>
                     )}
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Treatment Algorithm</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Clinical Management</p>
                       <ul className="space-y-2">
                         {result.treatment.map((step, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-foreground">
-                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{i + 1}</span>
+                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-black text-primary border border-primary/20">{i + 1}</span>
                             {step}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    {result.category === "Extreme Risk A" && (
-                      <p className="text-xs text-muted-foreground italic">*The LDL-C goal of ≤30 mg/dL must be pursued after detailed risk–benefit discussion.</p>
-                    )}
                   </>
                 ) : (
-                  <p className="text-sm text-muted-foreground text-center py-2">Enter data or tick criteria to classify the patient.</p>
+                  <div className="flex flex-col items-center justify-center py-8 text-center bg-muted/20 rounded-xl border border-dashed border-border">
+                    <ShieldCheck className="h-10 w-10 text-muted-foreground/30 mb-3" />
+                    <p className="text-sm font-bold text-muted-foreground">Clinical Entry Incomplete</p>
+                    <p className="text-xs text-muted-foreground/60">Enter laboratory values and risk factors to classify.</p>
+                  </div>
                 )}
               </div>
             </Card>
