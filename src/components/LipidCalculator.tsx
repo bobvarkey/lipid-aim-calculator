@@ -678,20 +678,31 @@ export default function LipidCalculator() {
                 </Select>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Height (cm)</label>
-                  <Input type="number" placeholder="170" value={height} onChange={(e) => setHeight(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">Weight (kg)</label>
-                  <Input type="number" placeholder="75" value={weight} onChange={(e) => setWeight(e.target.value)} />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-foreground">
-                    BMI {bmiAuto && <span className="text-[10px] font-normal text-primary">auto</span>}
-                  </label>
-                  <Input type="number" placeholder="26" value={bmi} onChange={(e) => { setBmi(e.target.value); setBmiAuto(false); setHeight(""); setWeight(""); }} className={bmiAuto ? "bg-muted" : ""} />
-                  {(() => {
+                <LabInput
+                  label="Height"
+                  tone="sky"
+                  icon={<Ruler className="h-3 w-3" />}
+                  value={height}
+                  onChange={setHeight}
+                  units={UNITS_CM}
+                />
+                <LabInput
+                  label="Weight"
+                  tone="teal"
+                  icon={<Scale className="h-3 w-3" />}
+                  value={weight}
+                  onChange={setWeight}
+                  units={UNITS_KG}
+                />
+                <LabInput
+                  label="BMI"
+                  tone="emerald"
+                  icon={<Gauge className="h-3 w-3" />}
+                  value={bmi}
+                  onChange={(v) => { setBmi(v); setBmiAuto(false); setHeight(""); setWeight(""); }}
+                  units={[{ label: "kg/m²", fromMetric: (n) => n, toMetric: (n) => n, precision: 1, placeholder: "26" }]}
+                  auto={bmiAuto}
+                  belowInput={(() => {
                     const bmiVal = parseFloat(bmi);
                     if (isNaN(bmiVal) || bmiVal <= 0) return null;
                     const bmiClass = getBmiClass(bmiVal, ethnicity);
@@ -707,7 +718,7 @@ export default function LipidCalculator() {
                       </div>
                     );
                   })()}
-                </div>
+                />
               </div>
               {/* BMI Classification Reference — Collapsible */}
               {!isNaN(parseFloat(bmi)) && (
