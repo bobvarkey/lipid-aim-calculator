@@ -1201,33 +1201,31 @@ export default function LipidCalculator() {
                   const isAutoQualified = modAutoQual[key];
                   const subConfig = MOD_SUB_MAP[key];
 
+                  const v = ASCVD_MOD_VISUALS[key] ?? { tone: "rose" as LabTone, icon: <Stethoscope className="h-4 w-4" /> };
+                  const subCountBadge = (hasSubMap || hasTod) ? (() => {
+                    const items = hasTod ? TOD_ALL : subConfig!.items;
+                    const count = countCheckedItems(items, subChecked);
+                    const qualified = isAutoQualified;
+                    return (
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                        qualified ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                      }`}>
+                        {count}/{items.length} — {qualified ? "Qualified ✓" : "≥1 required"}
+                      </span>
+                    );
+                  })() : undefined;
+
                   return (
                     <div key={key}>
-                      <label className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2 transition-colors ${
-                        modChecked[key] ? "bg-primary/8 ring-1 ring-primary/20" : "hover:bg-muted/50"
-                      }`}>
-                        <Checkbox
-                          checked={modChecked[key]}
-                          onCheckedChange={() => toggleMod(key)}
-                          disabled={!!isAutoQualified}
-                          className="mt-0.5"
-                        />
-                        <div className="flex-1">
-                          <span className="text-sm leading-snug text-foreground">{MODIFIER_LABELS[key]}</span>
-                          {(hasSubMap || hasTod) && (() => {
-                            const items = hasTod ? TOD_ALL : subConfig!.items;
-                            const count = countCheckedItems(items, subChecked);
-                            const qualified = isAutoQualified;
-                            return (
-                              <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                                qualified ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                              }`}>
-                                {count}/{items.length} — {qualified ? "Qualified ✓" : "≥1 required"}
-                              </span>
-                            );
-                          })()}
-                        </div>
-                      </label>
+                      <RiskFactorChip
+                        label={MODIFIER_LABELS[key]}
+                        icon={v.icon}
+                        tone={v.tone}
+                        checked={!!modChecked[key]}
+                        onToggle={() => toggleMod(key)}
+                        disabled={!!isAutoQualified}
+                        rightSlot={subCountBadge}
+                      />
 
                       {/* Sub-checklists */}
                       {hasSubMap && (
