@@ -13,7 +13,11 @@ export type SectionTone =
   | "danger"
   | "warning"
   | "neutral"
-  | "indigo";
+  | "indigo"
+  | "emerald"
+  | "amber"
+  | "purple"
+  | "cyan";
 
 const TONE_STYLES: Record<
   SectionTone,
@@ -54,6 +58,30 @@ const TONE_STYLES: Record<
     header: "hover:bg-muted/30",
     iconWrap: "bg-muted text-foreground",
     title: "text-foreground",
+  },
+  emerald: {
+    card: "border-emerald-500/25 bg-emerald-500/[0.04]",
+    header: "bg-emerald-500/8 hover:bg-emerald-500/12",
+    iconWrap: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+    title: "text-emerald-600 dark:text-emerald-400",
+  },
+  amber: {
+    card: "border-amber-500/25 bg-amber-500/[0.04]",
+    header: "bg-amber-500/8 hover:bg-amber-500/12",
+    iconWrap: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+    title: "text-amber-600 dark:text-amber-400",
+  },
+  purple: {
+    card: "border-purple-500/25 bg-purple-500/[0.04]",
+    header: "bg-purple-500/8 hover:bg-purple-500/12",
+    iconWrap: "bg-purple-500/15 text-purple-600 dark:text-purple-400",
+    title: "text-purple-600 dark:text-purple-400",
+  },
+  cyan: {
+    card: "border-cyan-500/25 bg-cyan-500/[0.04]",
+    header: "bg-cyan-500/8 hover:bg-cyan-500/12",
+    iconWrap: "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400",
+    title: "text-cyan-600 dark:text-cyan-400",
   },
 };
 

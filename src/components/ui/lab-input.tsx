@@ -79,6 +79,8 @@ export interface LabInputProps {
   step?: string;
   /** Slot rendered below the input (status badges, warnings). */
   belowInput?: React.ReactNode;
+  /** When set, overrides the internal unit selection (0 = metric, 1 = imperial). */
+  forcedUnitIdx?: number;
 }
 
 export function LabInput({
@@ -95,10 +97,12 @@ export function LabInput({
   disabled,
   step = "any",
   belowInput,
+  forcedUnitIdx,
 }: LabInputProps) {
   const t = TONE[tone];
   const [unitIdx, setUnitIdx] = useState(0);
-  const unit = units[unitIdx] ?? units[0];
+  const activeIdx = forcedUnitIdx !== undefined ? Math.min(forcedUnitIdx, units.length - 1) : unitIdx;
+  const unit = units[activeIdx] ?? units[0];
   const metricUnit = units[0];
 
   // Convert the canonical metric value to the currently displayed unit string.
@@ -106,12 +110,12 @@ export function LabInput({
     if (value === "" || value === null || value === undefined) return "";
     const n = parseFloat(value);
     if (isNaN(n)) return "";
-    if (unitIdx === 0) return value; // store-as-typed for metric
+    if (activeIdx === 0) return value; // store-as-typed for metric
     const converted = unit.fromMetric(n);
     if (!isFinite(converted)) return "";
     const p = unit.precision ?? 1;
     return Number(converted.toFixed(p)).toString();
-  }, [value, unit, unitIdx]);
+  }, [value, unit, activeIdx]);
 
   const [localText, setLocalText] = useState(displayValue);
   useEffect(() => setLocalText(displayValue), [displayValue]);
@@ -124,7 +128,7 @@ export function LabInput({
     }
     const n = parseFloat(raw);
     if (isNaN(n)) return;
-    const metric = unitIdx === 0 ? n : unit.toMetric(n);
+    const metric = activeIdx === 0 ? n : unit.toMetric(n);
     // Round canonical to a sensible precision (3 sig figs for small, 1 dp otherwise).
     const rounded =
       Math.abs(metric) >= 10 ? metric.toFixed(1) : metric.toFixed(2);
@@ -164,7 +168,7 @@ export function LabInput({
                 onClick={() => setUnitIdx(i)}
                 className={cn(
                   "px-1.5 py-0.5 text-[9px] font-semibold rounded transition-colors leading-tight",
-                  i === unitIdx ? t.chipOn : t.chipOff,
+                  i === activeIdx ? t.chipOn : t.chipOff,
                 )}
                 aria-pressed={i === unitIdx}
               >

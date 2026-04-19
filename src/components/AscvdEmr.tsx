@@ -140,11 +140,11 @@ interface PatientData {
 export default function AscvdEmr() {
   const navigate = useNavigate();
   const [patient, setPatient] = useState({
-    name: "John Doe", age: 52, sex: "Male", mrn: "123456",
+    name: "", age: "" as unknown as number, sex: "", mrn: "",
   });
   const [data, setData] = useState<PatientData>({
-    ascvd: false, diabetes: true, smoker: false, htn: true,
-    ldl: 140, hdl: 38, hba1c: 7.5,
+    ascvd: false, diabetes: false, smoker: false, htn: false,
+    ldl: "" as unknown as number, hdl: "" as unknown as number, hba1c: "" as unknown as number,
   });
   const [qChecked, setQChecked] = useState<Record<string, boolean>>({});
   const [fhxOpen, setFhxOpen] = useState(false);
@@ -169,11 +169,14 @@ export default function AscvdEmr() {
   const qualifiedCount = ASCVD_HISTORY_ITEMS.filter((i) => autoQual[i.id]).length;
 
   // ─── Risk calc ───
+  const hasEnoughData = !!patient.age && !!data.ldl && !!data.hdl;
+
   const calculateRisk = () => {
+    if (!hasEnoughData) return null;
     let risk = 0;
-    risk += (patient.age - 30) * 0.6;
-    risk += (data.ldl - 100) * 0.12;
-    risk -= (data.hdl - 40) * 0.25;
+    risk += (Number(patient.age) - 30) * 0.6;
+    risk += (Number(data.ldl) - 100) * 0.12;
+    risk -= (Number(data.hdl) - 40) * 0.25;
     if (data.smoker) risk += 10;
     if (data.diabetes) risk += 12;
     if (data.htn) risk += 6;
@@ -181,7 +184,7 @@ export default function AscvdEmr() {
   };
 
   const risk = calculateRisk();
-  const category = data.ascvd || risk >= 20 ? "HIGH" : risk >= 7.5 ? "INTERMEDIATE" : risk >= 5 ? "BORDERLINE" : "LOW";
+  const category = !risk ? "—" : data.ascvd || risk >= 20 ? "HIGH" : risk >= 7.5 ? "INTERMEDIATE" : risk >= 5 ? "BORDERLINE" : "LOW";
   const colorClass = category === "HIGH" ? "bg-danger/10 text-danger" : category === "LOW" ? "bg-success/10 text-success" : "bg-warning/10 text-warning";
   const ldlTarget = category === "HIGH" ? "<50 mg/dL" : category === "LOW" ? "<100 mg/dL" : "<70 mg/dL";
   const treatment = category === "HIGH" ? "High-intensity statin ± ezetimibe ± PCSK9" : category === "LOW" ? "Lifestyle only" : "Moderate-intensity statin";
@@ -223,7 +226,7 @@ export default function AscvdEmr() {
     lines.push(`  HbA1c: ${data.hba1c}%`);
     lines.push("");
 
-    lines.push(`▸ 10-YEAR ASCVD RISK: ${risk.toFixed(1)}%`);
+    lines.push(`▸ 10-YEAR ASCVD RISK: ${risk != null ? risk.toFixed(1) + "%" : "—"}`);
     lines.push(`  Category: ${category}`);
     lines.push(`  LDL Target: ${ldlTarget}`);
     lines.push(`  Plan: ${treatment}`);
@@ -287,7 +290,7 @@ export default function AscvdEmr() {
 
         <SectionCard
           title="Patient Profile"
-          tone="primary"
+          tone="cyan"
           icon={<User className="h-4 w-4" />}
           collapsible={false}
         >
@@ -312,7 +315,7 @@ export default function AscvdEmr() {
         {/* Conditions */}
         <SectionCard
           title="Conditions"
-          tone="danger"
+          tone="purple"
           icon={<Heart className="h-4 w-4" />}
           collapsible={false}
         >
@@ -329,7 +332,7 @@ export default function AscvdEmr() {
         {/* Labs */}
         <SectionCard
           title="Lab Values"
-          tone="indigo"
+          tone="warning"
           icon={<TestTube className="h-4 w-4" />}
           collapsible={false}
         >
@@ -346,22 +349,24 @@ export default function AscvdEmr() {
         {/* Risk Card */}
         <SectionCard
           title={`10-Year ASCVD Risk — ${category}`}
-          tone={category === "HIGH" ? "danger" : category === "LOW" ? "accent" : "warning"}
+          tone={category === "HIGH" ? "danger" : category === "LOW" ? "accent" : category === "—" ? "neutral" : "warning"}
           icon={<TrendingUp className="h-4 w-4" />}
           collapsible={false}
           badge={
             <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
               category === "HIGH" ? "bg-danger/15 text-danger"
               : category === "LOW" ? "bg-accent/15 text-accent"
+              : category === "—" ? "bg-muted text-muted-foreground"
               : "bg-warning/15 text-warning"
             }`}>
-              {risk.toFixed(1)}%
+              {risk != null ? `${risk.toFixed(1)}%` : "—"}
             </span>
           }
         >
           <div className={`rounded-lg px-4 py-3 ${
             category === "HIGH" ? "bg-danger/8"
             : category === "LOW" ? "bg-accent/8"
+            : category === "—" ? "bg-muted/30"
             : "bg-warning/8"
           }`}>
             <div className="text-sm">
@@ -376,7 +381,7 @@ export default function AscvdEmr() {
         {/* ─── ASCVD History & Extreme Risk Modifiers ─── */}
         <SectionCard
           title="ASCVD History & Extreme Risk Modifiers"
-          tone="warning"
+          tone="indigo"
           icon={<AlertTriangle className="h-4 w-4" />}
           collapsible={false}
           badge={qualifiedCount > 0 ? (
@@ -469,7 +474,7 @@ export default function AscvdEmr() {
         {/* EMR Note */}
         <SectionCard
           title="EMR Note"
-          tone="indigo"
+          tone="emerald"
           icon={<FileText className="h-4 w-4" />}
           collapsible={false}
         >

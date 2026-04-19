@@ -34,6 +34,11 @@ import {
 } from "@/components/ui/lab-input";
 import { RiskFactorChip } from "@/components/ui/risk-factor-chip";
 import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
+import heroDoctorImg from "@/assets/hero-doctor.jpg";
+import cvRiskImg from "@/assets/cv-risk-measures.png";
+import lipidsImg from "@/assets/Lipids Gemini_Generated_Image_4o82814o82814o82.png";
+import lipoproteinImg from "@/assets/lipoprotein-particles.png";
+import cprFrameworkImg from "@/assets/cpr-framework.png";
 import {
   ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
   FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
@@ -342,6 +347,8 @@ function Section({
 export default function LipidCalculator() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("calculator");
+  // 0 = metric (default), 1 = imperial
+  const [unitSystem, setUnitSystem] = useState<0 | 1>(0);
 
   // ─── Lab inputs ───
   const [age, setAge] = useState("");
@@ -630,14 +637,14 @@ export default function LipidCalculator() {
       <div className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto max-w-2xl px-4">
           <div className="flex items-center gap-3 py-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-              <Heart className="h-4.5 w-4.5 text-primary-foreground" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 shadow-md">
+              <Heart className="h-5 w-5 text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <h1 className="font-display text-base font-bold tracking-tight text-foreground truncate">
+              <h1 className="font-display text-xl font-extrabold tracking-tight bg-gradient-to-r from-rose-500 via-pink-500 to-purple-600 bg-clip-text text-transparent truncate">
                 Lipid Risk Predictor
               </h1>
-              <p className="text-[10px] text-muted-foreground truncate">
+              <p className="text-xs font-medium text-indigo-500 dark:text-indigo-400 truncate">
                 Cardiovascular Risk Assessment & Management
               </p>
             </div>
@@ -658,6 +665,23 @@ export default function LipidCalculator() {
                   }`}>{preventResult.riskPct}<span className="text-[10px]">%</span></span>
                 </div>
               )}
+              {/* Metric / Imperial toggle */}
+              <div className="flex items-center rounded-md border border-border bg-background/60 p-0.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setUnitSystem(0)}
+                  className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${unitSystem === 0 ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Metric
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUnitSystem(1)}
+                  className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${unitSystem === 1 ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Imperial
+                </button>
+              </div>
               <Button variant="ghost" size="sm" onClick={() => navigate("/")} title="Back to Home">
                 <Home className="h-4 w-4" />
               </Button>
@@ -684,6 +708,13 @@ export default function LipidCalculator() {
           </div>
         </div>
       </div>
+
+      {/* ─── Hero Image ─── */}
+      {activeTab === "calculator" && (
+        <div className="w-full overflow-hidden" style={{ maxHeight: "220px" }}>
+          <img src={heroDoctorImg} alt="Cardiovascular care" className="w-full object-cover object-top" style={{ maxHeight: "220px" }} />
+        </div>
+      )}
 
       {/* ─── Content ─── */}
       <div className="mx-auto max-w-2xl px-4 py-5">
@@ -739,6 +770,7 @@ export default function LipidCalculator() {
                   value={height}
                   onChange={setHeight}
                   units={UNITS_CM}
+                  forcedUnitIdx={unitSystem}
                 />
                 <LabInput
                   label="Weight"
@@ -747,6 +779,7 @@ export default function LipidCalculator() {
                   value={weight}
                   onChange={setWeight}
                   units={UNITS_KG}
+                  forcedUnitIdx={unitSystem}
                 />
                 <LabInput
                   label="BMI"
@@ -844,6 +877,7 @@ export default function LipidCalculator() {
                   value={waistCirc}
                   onChange={setWaistCirc}
                   units={UNITS_CM}
+                  forcedUnitIdx={unitSystem}
                   belowInput={(() => {
                     const wc = parseFloat(waistCirc);
                     if (isNaN(wc) || wc <= 0) return null;
@@ -898,6 +932,11 @@ export default function LipidCalculator() {
                 </CollapsibleContent>
               </Collapsible>
             </Section>
+
+            {/* ── Divider image ── */}
+            <div className="rounded-xl overflow-hidden opacity-80 my-1" style={{ maxHeight: "110px" }}>
+              <img src={lipidsImg} alt="Lipid particles" className="w-full object-cover object-center" style={{ maxHeight: "110px" }} />
+            </div>
 
             {/* ── Section 2: Lab Values ── */}
             <Section title="Lab Values" tone="indigo" icon={<TestTube className="h-4 w-4" />}>
@@ -1031,6 +1070,11 @@ export default function LipidCalculator() {
               </div>
             </Section>
 
+            {/* ── Divider image ── */}
+            <div className="rounded-xl overflow-hidden opacity-80 my-1" style={{ maxHeight: "110px" }}>
+              <img src={cvRiskImg} alt="CV risk measures" className="w-full object-cover object-top" style={{ maxHeight: "110px" }} />
+            </div>
+
             {/* ── Section 3: PREVENT Risk Score ── */}
             <Section
               title="AHA PREVENT — 10-Year ASCVD Risk"
@@ -1099,6 +1143,11 @@ export default function LipidCalculator() {
               )}
             </Section>
 
+            {/* ── Divider ── */}
+            <div className="rounded-xl overflow-hidden opacity-75 my-1">
+              <img src={lipoproteinImg} alt="Lipoprotein particles" className="w-full object-cover object-center" style={{ maxHeight: "100px" }} />
+            </div>
+
             {/* ── Section 4: Major ASCVD Risk Factors ── */}
             <Section
               title="Major ASCVD Risk Factors"
@@ -1129,6 +1178,11 @@ export default function LipidCalculator() {
               </div>
             </Section>
 
+            {/* ── Divider ── */}
+            <div className="rounded-xl overflow-hidden opacity-75 my-1">
+              <img src={cprFrameworkImg} alt="CPR framework" className="w-full object-cover object-top" style={{ maxHeight: "100px" }} />
+            </div>
+
             {/* ── Section: High-Risk Features ── */}
             <Section
               title="High-Risk Features"
@@ -1157,6 +1211,11 @@ export default function LipidCalculator() {
               </div>
             </Section>
 
+            {/* ── Divider ── */}
+            <div className="rounded-xl overflow-hidden opacity-75 my-1">
+              <img src={cvRiskImg} alt="CV risk measures" className="w-full object-cover object-top" style={{ maxHeight: "100px" }} />
+            </div>
+
             {/* ── Section: Risk Modifiers ── */}
             <Section
               title="Risk Modifiers"
@@ -1184,6 +1243,11 @@ export default function LipidCalculator() {
                 })}
               </div>
             </Section>
+
+            {/* ── Divider ── */}
+            <div className="rounded-xl overflow-hidden opacity-75 my-1">
+              <img src={lipidsImg} alt="Lipid particles" className="w-full object-cover object-center" style={{ maxHeight: "100px" }} />
+            </div>
 
             {/* ── Section 5: ASCVD History & Modifiers ── */}
             <Section
@@ -1306,6 +1370,11 @@ export default function LipidCalculator() {
               </div>
             </Section>
 
+            {/* ── Divider ── */}
+            <div className="rounded-xl overflow-hidden opacity-75 my-1">
+              <img src={lipoproteinImg} alt="Lipoprotein particles" className="w-full object-cover object-center" style={{ maxHeight: "100px" }} />
+            </div>
+
             {/* ── Section 6: Classification Result ── */}
             <Card className={`border-border bg-card overflow-hidden`}>
               <div className={`px-5 py-4 ${result ? (catColor === "warning" ? "bg-warning/10" : "bg-danger/10") : "bg-muted/30"}`}>
@@ -1370,6 +1439,11 @@ export default function LipidCalculator() {
               </div>
             </Card>
 
+            {/* ── Divider ── */}
+            <div className="rounded-xl overflow-hidden opacity-75 my-1">
+              <img src={cprFrameworkImg} alt="CPR framework" className="w-full object-cover object-top" style={{ maxHeight: "100px" }} />
+            </div>
+
             {/* ── Section 7: Decision Logic ── */}
             <Section title="Decision Logic & Bucket Summary" tone="neutral" icon={<Target className="h-4 w-4" />} defaultOpen={false}>
               <ol className="list-decimal ml-5 space-y-1 text-sm text-foreground mb-4">
@@ -1399,6 +1473,11 @@ export default function LipidCalculator() {
                 </table>
               </div>
             </Section>
+
+            {/* ── Divider ── */}
+            <div className="rounded-xl overflow-hidden opacity-75 my-1">
+              <img src={cvRiskImg} alt="CV risk measures" className="w-full object-cover object-top" style={{ maxHeight: "100px" }} />
+            </div>
 
             {/* ── Section 8: EMR Note ── */}
             <Section title="EMR Note" tone="indigo" icon={<FileText className="h-4 w-4" />}>

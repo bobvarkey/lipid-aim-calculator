@@ -1,49 +1,36 @@
 import { Card } from "@/components/ui/card";
 import { Heart, TrendingUp, AlertTriangle, Dna, Activity } from "lucide-react";
-import cvRiskMeasures from "@/assets/cv-risk-measures.png";
-import lipoproteinParticles from "@/assets/lipoprotein-particles.png";
-import cprFramework from "@/assets/cpr-framework.png";
 import MermaidChart from "@/components/MermaidChart";
 
 export default function EducationSection() {
   return (
     <div className="space-y-6">
-      {/* Images */}
-      <Card className="border-border bg-card overflow-hidden">
-        <img src={cvRiskMeasures} alt="Core measures to assess cardiovascular risk" className="w-full" />
-      </Card>
-      <Card className="border-border bg-card overflow-hidden">
-        <img src={lipoproteinParticles} alt="Lipoprotein particles - VLDL, LDL, IDL and HDL" className="w-full" />
-      </Card>
-      <Card className="border-border bg-card overflow-hidden">
-        <img src={cprFramework} alt="CPR Framework for Risk Evaluation - 2026 ACC/AHA" className="w-full" />
-      </Card>
 
       {/* 2026 AHA/ACC At-a-Glance */}
-      <Card className="border-border bg-card p-5">
+      <Card className="border-indigo-500/30 bg-indigo-500/5 p-5">
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-            <Heart className="h-4 w-4 text-primary" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20">
+            <Heart className="h-4 w-4 text-indigo-500" />
           </div>
-          <h3 className="font-display text-base font-bold text-foreground">2026 AHA/ACC Dyslipidemia Guidelines At-a-Glance</h3>
+          <h3 className="font-display text-base font-bold text-indigo-600 dark:text-indigo-400">2026 AHA/ACC Dyslipidemia Guidelines At-a-Glance</h3>
         </div>
-        <p className="text-sm text-foreground leading-relaxed mb-4">
-          The American Heart Association and American College of Cardiology released the first cholesterol guideline update in eight years, with <strong>52 distinct new recommendations</strong>.
+        <p className="text-sm text-foreground leading-relaxed mb-4 p-3 rounded-lg border border-indigo-500/20 bg-indigo-500/10">
+          The American Heart Association and American College of Cardiology released the first cholesterol guideline update in eight years, with <strong className="text-indigo-600 dark:text-indigo-400">52 distinct new recommendations</strong>.
         </p>
 
-        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 mb-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Key Recommendation</p>
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 mb-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-2">Key Recommendation</p>
           <p className="text-sm text-foreground leading-relaxed">
-            <strong>Lp(a) Screening:</strong> Measure Lp(a) at least once in every adult's life to identify very high inherited levels (&gt;180 mg/dL), which can reclassify moderate-risk patients to higher risk.
+            <strong className="text-emerald-600 dark:text-emerald-400">Lp(a) Screening:</strong> Measure Lp(a) at least once in every adult's life to identify very high inherited levels (&gt;180 mg/dL), which can reclassify moderate-risk patients to higher risk.
           </p>
         </div>
 
-        <div className="space-y-2.5 text-sm text-foreground leading-relaxed mb-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Biggest Changes</p>
-          <p>• <strong>Lp(a) testing</strong> is now recommended for all adults.</p>
-          <p>• Treatment is now recommended for <strong>younger adults</strong>, based on 30-year risk projections.</p>
-          <p>• <strong>ApoB testing, hsCRP, and CAC</strong> are recommended more frequently.</p>
-          <p>• <strong>Specific LDL targets are back</strong>, after being removed in the 2013 guidelines.</p>
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 space-y-2.5 text-sm text-foreground leading-relaxed mb-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-2">Biggest Changes</p>
+          <p>• <strong className="text-amber-600 dark:text-amber-400">Lp(a) testing</strong> is now recommended for all adults.</p>
+          <p>• Treatment is now recommended for <strong className="text-amber-600 dark:text-amber-400">younger adults</strong>, based on 30-year risk projections.</p>
+          <p>• <strong className="text-amber-600 dark:text-amber-400">ApoB testing, hsCRP, and CAC</strong> are recommended more frequently.</p>
+          <p>• <strong className="text-amber-600 dark:text-amber-400">Specific LDL targets are back</strong>, after being removed in the 2013 guidelines.</p>
         </div>
 
         {/* Risk Categories & LDL-C Targets */}
@@ -266,8 +253,8 @@ export default function EducationSection() {
               <li>Optional goal: &lt;55 mg/dL</li>
             </ol>
           </div>
-          <div className="rounded-lg border border-border bg-muted/50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Severe Hypercholesterolemia (LDL-C ≥190 mg/dL)</p>
+          <div className="rounded-lg border border-purple-500/30 bg-purple-500/5 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-purple-500 mb-2">Severe Hypercholesterolemia (LDL-C ≥190 mg/dL)</p>
             <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
               <li><strong>Cascade screening</strong> + complete genetic testing</li>
               <li>Add <strong>ezetimibe</strong></li>
@@ -277,8 +264,8 @@ export default function EducationSection() {
         </div>
 
         {/* TG ≥500 */}
-        <div className="rounded-lg border border-border bg-muted/50 p-4 mb-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Adults with Triglycerides ≥500 mg/dL</p>
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 mb-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-500 mb-2">Adults with Triglycerides ≥500 mg/dL</p>
           <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
             <li>Identify/manage <strong>secondary causes</strong></li>
             <li><strong>Lifestyle:</strong> Optimize diet/exercise</li>
@@ -292,8 +279,8 @@ export default function EducationSection() {
         </div>
 
         {/* Statin-Intolerant */}
-        <div className="rounded-lg border border-border bg-muted/50 p-4 mb-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Statin-Intolerant Adults</p>
+        <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-4 mb-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-cyan-500 mb-2">Statin-Intolerant Adults</p>
           <div className="space-y-1.5 text-sm text-foreground leading-relaxed">
             <p>• Evaluate muscle symptoms</p>
             <p>• <strong>ASCVD absent:</strong> LDL &lt;100 mg/dL → ezetimibe</p>
@@ -309,22 +296,43 @@ export default function EducationSection() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">COR</th>
-                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">LOE</th>
+                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">COR (Class of Recommendation)</th>
+                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">LOE (Level of Evidence)</th>
                   <th className="text-left py-2 font-semibold text-muted-foreground">Recommendation</th>
                 </tr>
               </thead>
               <tbody className="text-foreground">
                 <tr className="border-b border-border/50">
-                  <td className="py-2 pr-3 font-semibold">1</td><td className="py-2 pr-3">B-NR</td>
+                  <td className="py-2 pr-3">
+                    <p className="font-semibold">1</p>
+                    <p className="text-xs text-muted-foreground">Class 1: Recommended/indicated. Evidence is strong that it works.</p>
+                  </td>
+                  <td className="py-2 pr-3">
+                    <p className="font-semibold">B-NR</p>
+                    <p className="text-xs text-muted-foreground">Based on Non-Randomized studies or registries (observational data).</p>
+                  </td>
                   <td className="py-2 text-xs leading-relaxed">Lipid profile every 5y for ASCVD risk, more frequent with risk factors</td>
                 </tr>
                 <tr className="border-b border-border/50">
-                  <td className="py-2 pr-3 font-semibold">1</td><td className="py-2 pr-3">B-NR</td>
+                  <td className="py-2 pr-3">
+                    <p className="font-semibold">1</p>
+                    <p className="text-xs text-muted-foreground">Class 1: Recommended/indicated. Evidence is strong that it works.</p>
+                  </td>
+                  <td className="py-2 pr-3">
+                    <p className="font-semibold">B-NR</p>
+                    <p className="text-xs text-muted-foreground">Based on Non-Randomized studies or registries (observational data).</p>
+                  </td>
                   <td className="py-2 text-xs leading-relaxed">Children 9–11y to screen for FH/other lipid disorders</td>
                 </tr>
                 <tr>
-                  <td className="py-2 pr-3 font-semibold">2a</td><td className="py-2 pr-3">B-NR</td>
+                  <td className="py-2 pr-3">
+                    <p className="font-semibold">2a</p>
+                    <p className="text-xs text-muted-foreground">Class 2a: Reasonable to do. Moderate evidence that it is useful.</p>
+                  </td>
+                  <td className="py-2 pr-3">
+                    <p className="font-semibold">B-NR</p>
+                    <p className="text-xs text-muted-foreground">Based on Non-Randomized studies or registries (observational data).</p>
+                  </td>
                   <td className="py-2 text-xs leading-relaxed">Cascade screening with lipid profile for FH relatives</td>
                 </tr>
               </tbody>
