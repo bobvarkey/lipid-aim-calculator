@@ -1414,12 +1414,7 @@ export default function LipidCalculator() {
                 </p>
               </div>
             </Section>
-
-            {/* ── Divider ── */}
-            <div className="rounded-xl overflow-hidden opacity-75 my-1">
-              <img src={lipoproteinImg} alt="Lipoprotein particles" className="w-full object-cover object-center" style={{ maxHeight: "100px" }} />
-            </div>
-
+            </>)}
             {/* ── Section 6: Classification Result ── */}
             <Card className={`border-border bg-card overflow-hidden`}>
               <div className={`px-5 py-4 ${result ? (catColor === "warning" ? "bg-warning/10" : "bg-danger/10") : "bg-muted/30"}`}>
