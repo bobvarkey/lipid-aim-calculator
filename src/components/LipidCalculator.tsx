@@ -721,6 +721,41 @@ export default function LipidCalculator() {
       <div className="mx-auto max-w-2xl px-4 py-5">
         {activeTab === "calculator" && (
           <div className="space-y-3">
+            {/* ── Primary / Secondary Prevention switch ── */}
+            <div className="no-print rounded-xl border border-border bg-card p-1 shadow-sm">
+              <div className="grid grid-cols-2 gap-1">
+                <button
+                  type="button"
+                  onClick={() => setPrevType("primary")}
+                  className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
+                    prevType === "primary"
+                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  Primary Prevention
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrevType("secondary")}
+                  className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
+                    prevType === "secondary"
+                      ? "bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-md"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  <HeartPulse className="h-4 w-4" />
+                  Secondary Prevention
+                </button>
+              </div>
+              <p className="px-2 pt-1.5 pb-1 text-center text-[10px] text-muted-foreground">
+                {prevType === "primary"
+                  ? "No established ASCVD — uses PREVENT 10-yr risk + risk-factor counting"
+                  : "Established ASCVD — auto-classifies VHR / Extreme A·B·C buckets"}
+              </p>
+            </div>
+
             {/* Quick Link */}
             <Card className="border-border bg-card p-3.5 no-print">
               <div className="flex items-center justify-between">
