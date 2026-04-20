@@ -347,6 +347,7 @@ function Section({
 export default function LipidCalculator() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("calculator");
+  const [prevType, setPrevType] = useState<"primary" | "secondary">("primary");
   // 0 = metric (default), 1 = imperial
   const [unitSystem, setUnitSystem] = useState<0 | 1>(0);
 
@@ -720,6 +721,41 @@ export default function LipidCalculator() {
       <div className="mx-auto max-w-2xl px-4 py-5">
         {activeTab === "calculator" && (
           <div className="space-y-3">
+            {/* ── Primary / Secondary Prevention switch ── */}
+            <div className="no-print rounded-xl border border-border bg-card p-1 shadow-sm">
+              <div className="grid grid-cols-2 gap-1">
+                <button
+                  type="button"
+                  onClick={() => setPrevType("primary")}
+                  className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
+                    prevType === "primary"
+                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  Primary Prevention
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrevType("secondary")}
+                  className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
+                    prevType === "secondary"
+                      ? "bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-md"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  <HeartPulse className="h-4 w-4" />
+                  Secondary Prevention
+                </button>
+              </div>
+              <p className="px-2 pt-1.5 pb-1 text-center text-[10px] text-muted-foreground">
+                {prevType === "primary"
+                  ? "No established ASCVD — uses PREVENT 10-yr risk + risk-factor counting"
+                  : "Established ASCVD — auto-classifies VHR / Extreme A·B·C buckets"}
+              </p>
+            </div>
+
             {/* Quick Link */}
             <Card className="border-border bg-card p-3.5 no-print">
               <div className="flex items-center justify-between">
@@ -1075,6 +1111,8 @@ export default function LipidCalculator() {
               <img src={cvRiskImg} alt="CV risk measures" className="w-full object-cover object-top" style={{ maxHeight: "110px" }} />
             </div>
 
+            {/* ── Section 3: PREVENT Risk Score (Primary only) ── */}
+            {prevType === "primary" && (<>
             {/* ── Section 3: PREVENT Risk Score ── */}
             <Section
               title="AHA PREVENT — 10-Year ASCVD Risk"
@@ -1142,11 +1180,15 @@ export default function LipidCalculator() {
                 </p>
               )}
             </Section>
+            </>)}
 
             {/* ── Divider ── */}
             <div className="rounded-xl overflow-hidden opacity-75 my-1">
               <img src={lipoproteinImg} alt="Lipoprotein particles" className="w-full object-cover object-center" style={{ maxHeight: "100px" }} />
             </div>
+
+            {/* ── Major RFs + Risk Modifiers (Primary only) ── */}
+            {prevType === "primary" && (<>
 
             {/* ── Section 4: Major ASCVD Risk Factors ── */}
             <Section
@@ -1243,7 +1285,10 @@ export default function LipidCalculator() {
                 })}
               </div>
             </Section>
+            </>)}
 
+            {/* ── ASCVD History (Secondary only) ── */}
+            {prevType === "secondary" && (<>
             {/* ── Divider ── */}
             <div className="rounded-xl overflow-hidden opacity-75 my-1">
               <img src={lipidsImg} alt="Lipid particles" className="w-full object-cover object-center" style={{ maxHeight: "100px" }} />
@@ -1369,12 +1414,7 @@ export default function LipidCalculator() {
                 </p>
               </div>
             </Section>
-
-            {/* ── Divider ── */}
-            <div className="rounded-xl overflow-hidden opacity-75 my-1">
-              <img src={lipoproteinImg} alt="Lipoprotein particles" className="w-full object-cover object-center" style={{ maxHeight: "100px" }} />
-            </div>
-
+            </>)}
             {/* ── Section 6: Classification Result ── */}
             <Card className={`border-border bg-card overflow-hidden`}>
               <div className={`px-5 py-4 ${result ? (catColor === "warning" ? "bg-warning/10" : "bg-danger/10") : "bg-muted/30"}`}>
