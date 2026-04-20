@@ -716,15 +716,19 @@ export default function LipidCalculator() {
         {activeTab === "calculator" && (
           <div className="space-y-3">
             {/* ── Primary / Secondary Prevention switch ── */}
-            <div className="no-print rounded-xl border border-border bg-card p-1 shadow-sm">
+            <div className={`no-print rounded-xl border-2 p-1 shadow-sm transition-colors ${
+              prevType === "primary"
+                ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-950/30"
+                : "border-rose-400 bg-rose-50 dark:bg-rose-950/30"
+            }`}>
               <div className="grid grid-cols-2 gap-1">
                 <button
                   type="button"
                   onClick={() => setPrevType("primary")}
                   className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
                     prevType === "primary"
-                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md"
-                      : "text-muted-foreground hover:bg-muted"
+                      ? "bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md"
+                      : "text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
                   }`}
                 >
                   <ShieldCheck className="h-4 w-4" />
@@ -735,15 +739,19 @@ export default function LipidCalculator() {
                   onClick={() => setPrevType("secondary")}
                   className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
                     prevType === "secondary"
-                      ? "bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-md"
-                      : "text-muted-foreground hover:bg-muted"
+                      ? "bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-md"
+                      : "text-rose-700 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30"
                   }`}
                 >
                   <HeartPulse className="h-4 w-4" />
                   Secondary Prevention
                 </button>
               </div>
-              <p className="px-2 pt-1.5 pb-1 text-center text-[10px] text-muted-foreground">
+              <p className={`px-2 pt-2 pb-1.5 text-center text-sm font-semibold leading-snug ${
+                prevType === "primary"
+                  ? "text-emerald-800 dark:text-emerald-300"
+                  : "text-rose-800 dark:text-rose-300"
+              }`}>
                 {prevType === "primary"
                   ? "No established ASCVD — uses PREVENT 10-yr risk + risk-factor counting"
                   : "Established ASCVD — auto-classifies VHR / Extreme A·B·C buckets"}
