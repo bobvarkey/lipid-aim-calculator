@@ -207,32 +207,23 @@ export default function AscvdEmr() {
   // ─── EMR Note ───
   const generateNote = useMemo(() => {
     const lines: string[] = [];
-    lines.push("═══ ASCVD RISK ASSESSMENT ═══");
+    lines.push("ASCVD RISK ASSESSMENT");
     lines.push(`Patient: ${patient.name} (${patient.mrn})`);
     lines.push(`Age: ${patient.age}, Sex: ${patient.sex}`);
     lines.push(`Date: ${new Date().toLocaleDateString()}`);
-    lines.push("");
-
     lines.push("▸ CONDITIONS:");
     if (data.ascvd) lines.push("  ✓ Established ASCVD");
     if (data.diabetes) lines.push("  ✓ Diabetes mellitus");
     if (data.smoker) lines.push("  ✓ Active smoker");
     if (data.htn) lines.push("  ✓ Hypertension");
-    lines.push("");
-
     lines.push("▸ LABS:");
     lines.push(`  LDL-C: ${data.ldl} mg/dL`);
     lines.push(`  HDL-C: ${data.hdl} mg/dL`);
     lines.push(`  HbA1c: ${data.hba1c}%`);
-    lines.push("");
-
     lines.push(`▸ 10-YEAR ASCVD RISK: ${risk != null ? risk.toFixed(1) + "%" : "—"}`);
     lines.push(`  Category: ${category}`);
     lines.push(`  LDL Target: ${ldlTarget}`);
     lines.push(`  Plan: ${treatment}`);
-    lines.push("");
-
-    // Qualifier section
     const qualChecked = ASCVD_HISTORY_ITEMS.filter((i) => autoQual[i.id]);
     if (qualChecked.length > 0) {
       lines.push(`▸ ASCVD HISTORY & EXTREME RISK MODIFIERS (${qualChecked.length}/${ASCVD_HISTORY_ITEMS.length}):`);
@@ -259,9 +250,7 @@ export default function AscvdEmr() {
           }
         }
       }
-      lines.push("");
     }
-
     lines.push("▸ FOLLOW-UP:");
     lines.push("  Repeat lipids in 6–12 months.");
 

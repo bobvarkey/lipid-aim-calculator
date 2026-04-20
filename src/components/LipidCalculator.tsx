@@ -591,17 +591,11 @@ export default function LipidCalculator() {
   // ─── EMR Note ───
   const generateNote = useCallback(() => {
     const lines: string[] = [];
-    lines.push("═══════════════════════════════════════════════════");
-    lines.push("       LIPID RISK PREDICTOR");
-    lines.push("═══════════════════════════════════════════════════");
-    lines.push("");
+    lines.push("LIPID RISK PREDICTOR");
     lines.push("CATEGORY: " + (result?.category || "Lower than VHR / not classifiable"));
-    lines.push("");
     lines.push("LDL-C Target: " + (result?.ldlTarget || "Use standard LAI primary-prevention pathway"));
     lines.push("Non-HDL-C Target: " + (result?.nonHdlTarget || "—"));
     lines.push("ApoB Target: " + (result?.apoBTarget || "—"));
-    lines.push("");
-    lines.push("═══════════════════════════════════════════════════");
     lines.push("Ref: 2026 ACC/AHA Guideline on Management of Dyslipidemia · LAI 2023 Consensus IV");
     return lines.join("\n");
   }, [result]);
