@@ -347,6 +347,7 @@ function Section({
 export default function LipidCalculator() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("calculator");
+  const [prevType, setPrevType] = useState<"primary" | "secondary">("primary");
   // 0 = metric (default), 1 = imperial
   const [unitSystem, setUnitSystem] = useState<0 | 1>(0);
 
