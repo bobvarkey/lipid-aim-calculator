@@ -1111,6 +1111,8 @@ export default function LipidCalculator() {
               <img src={cvRiskImg} alt="CV risk measures" className="w-full object-cover object-top" style={{ maxHeight: "110px" }} />
             </div>
 
+            {/* ── Section 3: PREVENT Risk Score (Primary only) ── */}
+            {prevType === "primary" && (<>
             {/* ── Section 3: PREVENT Risk Score ── */}
             <Section
               title="AHA PREVENT — 10-Year ASCVD Risk"
@@ -1178,11 +1180,15 @@ export default function LipidCalculator() {
                 </p>
               )}
             </Section>
+            </>)}
 
             {/* ── Divider ── */}
             <div className="rounded-xl overflow-hidden opacity-75 my-1">
               <img src={lipoproteinImg} alt="Lipoprotein particles" className="w-full object-cover object-center" style={{ maxHeight: "100px" }} />
             </div>
+
+            {/* ── Major RFs + Risk Modifiers (Primary only) ── */}
+            {prevType === "primary" && (<>
 
             {/* ── Section 4: Major ASCVD Risk Factors ── */}
             <Section
