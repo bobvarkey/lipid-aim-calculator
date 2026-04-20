@@ -1285,7 +1285,10 @@ export default function LipidCalculator() {
                 })}
               </div>
             </Section>
+            </>)}
 
+            {/* ── ASCVD History (Secondary only) ── */}
+            {prevType === "secondary" && (<>
             {/* ── Divider ── */}
             <div className="rounded-xl overflow-hidden opacity-75 my-1">
               <img src={lipidsImg} alt="Lipid particles" className="w-full object-cover object-center" style={{ maxHeight: "100px" }} />
