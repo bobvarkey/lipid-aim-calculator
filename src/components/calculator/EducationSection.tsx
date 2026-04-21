@@ -86,7 +86,7 @@ export default function EducationSection() {
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 mb-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-2">Key Recommendation</p>
           <p className="text-sm text-foreground leading-relaxed">
-            <strong className="text-emerald-600 dark:text-emerald-400">Lp(a) Screening:</strong> Measure Lp(a) at least once in every adult's life to identify very high inherited levels (&gt;180 mg/dL), which can reclassify moderate-risk patients to higher risk.
+            <strong className="text-emerald-600 dark:text-emerald-400">Lp(a) Screening:</strong> Measure Lp(a) at least once in every adult's life to identify very high inherited levels (&gt;180 mg/dL / &gt;430 nmol/L), which can reclassify moderate-risk patients to higher risk.
           </p>
         </div>
 
@@ -114,22 +114,22 @@ export default function EducationSection() {
                 <tr className="border-b border-border/50">
                   <td className="py-2.5 pr-3 font-semibold text-danger">Very High</td>
                   <td className="py-2.5 pr-3 text-xs leading-relaxed">ASCVD, diabetes with organ damage/&gt;20y duration, eGFR&lt;30, FH with ASCVD, SCORE&gt;10%</td>
-                  <td className="py-2.5 font-semibold whitespace-nowrap">&lt;55 mg/dL<br /><span className="font-normal text-xs text-muted-foreground">(&lt;40 recurrent ASCVD)</span></td>
+                  <td className="py-2.5 font-semibold whitespace-nowrap">&lt;55 mg/dL (&lt;1.4 mmol/L)<br /><span className="font-normal text-xs text-muted-foreground">(&lt;40 mg/dL / &lt;1.0 mmol/L recurrent ASCVD)</span></td>
                 </tr>
                 <tr className="border-b border-border/50">
                   <td className="py-2.5 pr-3 font-semibold text-warning">High</td>
                   <td className="py-2.5 pr-3 text-xs leading-relaxed">LDL-C&gt;190, TC&gt;310, BP&gt;180/110, FH, diabetes&gt;10y, eGFR 30–59, SCORE 5–10%</td>
-                  <td className="py-2.5 font-semibold">&lt;70 mg/dL</td>
+                  <td className="py-2.5 font-semibold">&lt;70 mg/dL (&lt;1.8 mmol/L)</td>
                 </tr>
                 <tr className="border-b border-border/50">
                   <td className="py-2.5 pr-3 font-semibold text-primary">Moderate</td>
                   <td className="py-2.5 pr-3 text-xs leading-relaxed">Younger diabetes, diabetes&lt;10y without other risks, SCORE 1–5%</td>
-                  <td className="py-2.5 font-semibold">&lt;100 mg/dL</td>
+                  <td className="py-2.5 font-semibold">&lt;100 mg/dL (&lt;2.6 mmol/L)</td>
                 </tr>
                 <tr>
                   <td className="py-2.5 pr-3 font-semibold text-success">Low</td>
                   <td className="py-2.5 pr-3 text-xs leading-relaxed">SCORE &lt;1%</td>
-                  <td className="py-2.5 font-semibold">&lt;116 mg/dL</td>
+                  <td className="py-2.5 font-semibold">&lt;116 mg/dL (&lt;3.0 mmol/L)</td>
                 </tr>
               </tbody>
             </table>
@@ -154,17 +154,17 @@ export default function EducationSection() {
               <tbody className="text-foreground">
                 <tr className="border-b border-border/50">
                   <td className="py-2 pr-3 font-semibold text-danger">Very High</td>
-                  <td className="py-2 pr-3">&lt;55 mg/dL</td>
+                  <td className="py-2 pr-3">&lt;55 mg/dL (&lt;1.4 mmol/L)</td>
                   <td className="py-2">&lt;55 mg/dL (0.55 g/L)</td>
                 </tr>
                 <tr className="border-b border-border/50">
                   <td className="py-2 pr-3 font-semibold text-warning">High</td>
-                  <td className="py-2 pr-3">&lt;70 mg/dL</td>
+                  <td className="py-2 pr-3">&lt;70 mg/dL (&lt;1.8 mmol/L)</td>
                   <td className="py-2">&lt;70 mg/dL (0.70 g/L)</td>
                 </tr>
                 <tr>
                   <td className="py-2 pr-3 font-semibold text-primary">Moderate</td>
-                  <td className="py-2 pr-3">&lt;100 mg/dL</td>
+                  <td className="py-2 pr-3">&lt;100 mg/dL (&lt;2.6 mmol/L)</td>
                   <td className="py-2">&lt;100 mg/dL (1.0 g/L)</td>
                 </tr>
               </tbody>
@@ -268,10 +268,10 @@ export default function EducationSection() {
                 </tr>
               </thead>
               <tbody className="text-foreground">
-                <tr className="border-b border-border/50"><td className="py-2.5 pr-3">0</td><td className="py-2.5 pr-3">Low risk</td><td className="py-2.5 font-semibold">&lt;100 mg/dL</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2.5 pr-3">1–99 AU</td><td className="py-2.5 pr-3">Start moderate statin</td><td className="py-2.5 font-semibold">&lt;70 mg/dL</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2.5 pr-3">100–399 AU</td><td className="py-2.5 pr-3">High-intensity statin</td><td className="py-2.5 font-semibold">&lt;55 mg/dL</td></tr>
-                <tr><td className="py-2.5 pr-3">≥400 AU</td><td className="py-2.5 pr-3">Very high-intensity</td><td className="py-2.5 font-semibold">&lt;40 mg/dL</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2.5 pr-3">0</td><td className="py-2.5 pr-3">Low risk</td><td className="py-2.5 font-semibold">&lt;100 mg/dL (&lt;2.6 mmol/L)</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2.5 pr-3">1–99 AU</td><td className="py-2.5 pr-3">Start moderate statin</td><td className="py-2.5 font-semibold">&lt;70 mg/dL (&lt;1.8 mmol/L)</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2.5 pr-3">100–399 AU</td><td className="py-2.5 pr-3">High-intensity statin</td><td className="py-2.5 font-semibold">&lt;55 mg/dL (&lt;1.4 mmol/L)</td></tr>
+                <tr><td className="py-2.5 pr-3">≥400 AU</td><td className="py-2.5 pr-3">Very high-intensity</td><td className="py-2.5 font-semibold">&lt;40 mg/dL (&lt;1.0 mmol/L)</td></tr>
               </tbody>
             </table>
           </div>
@@ -289,10 +289,10 @@ export default function EducationSection() {
                 </tr>
               </thead>
               <tbody className="text-foreground">
-                <tr className="border-b border-border/50"><td className="py-2 pr-3">Low (&lt;5%)</td><td className="py-2 font-semibold">&lt;100 mg/dL</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2 pr-3">Borderline (5–7.5%)</td><td className="py-2 font-semibold">&lt;100 mg/dL <span className="font-normal text-xs text-muted-foreground">(consider)</span></td></tr>
-                <tr className="border-b border-border/50"><td className="py-2 pr-3">Intermediate (7.5–20%)</td><td className="py-2 font-semibold">&lt;70 mg/dL</td></tr>
-                <tr><td className="py-2 pr-3">High (≥20%)</td><td className="py-2 font-semibold">&lt;55 mg/dL</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3">Low (&lt;5%)</td><td className="py-2 font-semibold">&lt;100 mg/dL (&lt;2.6 mmol/L)</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3">Borderline (5–7.5%)</td><td className="py-2 font-semibold">&lt;100 mg/dL (&lt;2.6 mmol/L) <span className="font-normal text-xs text-muted-foreground">(consider)</span></td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3">Intermediate (7.5–20%)</td><td className="py-2 font-semibold">&lt;70 mg/dL (&lt;1.8 mmol/L)</td></tr>
+                <tr><td className="py-2 pr-3">High (≥20%)</td><td className="py-2 font-semibold">&lt;55 mg/dL (&lt;1.4 mmol/L)</td></tr>
               </tbody>
             </table>
           </div>
@@ -303,7 +303,7 @@ export default function EducationSection() {
           <div className="rounded-lg border border-danger/20 bg-danger/5 p-4">
             <p className="text-xs font-semibold uppercase tracking-wider text-danger mb-2">Secondary Prevention: Very High Risk ASCVD</p>
             <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
-              <li>Start <strong>high-intensity statin</strong> → LDL &lt;55 mg/dL</li>
+              <li>Start <strong>high-intensity statin</strong> → LDL &lt;55 mg/dL (&lt;1.4 mmol/L)</li>
               <li>Add <strong>ezetimibe</strong> if not at goal</li>
               <li>Add <strong>PCSK9 inhibitor</strong> if still not at goal</li>
               <li>Monitor adherence and lifestyle</li>
@@ -319,7 +319,7 @@ export default function EducationSection() {
             </ol>
           </div>
           <div className="rounded-lg border border-purple-500/30 bg-purple-500/5 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-purple-500 mb-2">Severe Hypercholesterolemia (LDL-C ≥190 mg/dL)</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-purple-500 mb-2">Severe Hypercholesterolemia (LDL-C ≥190 mg/dL / ≥4.9 mmol/L)</p>
             <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
               <li><strong>Cascade screening</strong> + complete genetic testing</li>
               <li>Add <strong>ezetimibe</strong></li>
@@ -348,8 +348,8 @@ export default function EducationSection() {
           <p className="text-xs font-semibold uppercase tracking-wider text-cyan-500 mb-2">Statin-Intolerant Adults</p>
           <div className="space-y-1.5 text-sm text-foreground leading-relaxed">
             <p>• Evaluate muscle symptoms</p>
-            <p>• <strong>ASCVD absent:</strong> LDL &lt;100 mg/dL → ezetimibe</p>
-            <p>• <strong>ASCVD present:</strong> LDL &lt;70 mg/dL → ezetimibe + bempedoic acid</p>
+            <p>• <strong>ASCVD absent:</strong> LDL &lt;100 mg/dL (&lt;2.6 mmol/L) → ezetimibe</p>
+            <p>• <strong>ASCVD present:</strong> LDL &lt;70 mg/dL (&lt;1.8 mmol/L) → ezetimibe + bempedoic acid</p>
             <p>• If goals not met → Add <strong>PCSK9 inhibitor</strong></p>
           </div>
         </div>
@@ -410,7 +410,7 @@ export default function EducationSection() {
           <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Summary</p>
           <div className="space-y-1.5 text-sm text-foreground leading-relaxed">
             <p>• <strong>Screening:</strong> Lp(a) once in adults, lipid profile every 5y</p>
-            <p>• <strong>Targets:</strong> Very high-risk &lt;55, high &lt;70, moderate &lt;100 mg/dL</p>
+            <p>• <strong>Targets:</strong> Very high-risk &lt;55 mg/dL (&lt;1.4 mmol/L), high &lt;70 mg/dL (&lt;1.8 mmol/L), moderate &lt;100 mg/dL (&lt;2.6 mmol/L)</p>
             <p>• <strong>Key drugs:</strong> Statins first, then ezetimibe / PCSK9i / bempedoic acid</p>
             <p>• <strong>Special cases:</strong> TG ≥500 → fibrates/omega-3; severe hypercholesterolemia → cascade screening + PCSK9i</p>
           </div>
@@ -437,7 +437,7 @@ export default function EducationSection() {
               <Heart className="h-4 w-4 text-success" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-success">Optimal: ≤14 mg/dL</p>
+              <p className="text-sm font-semibold text-success">Optimal: ≤14 mg/dL (≤35 nmol/L)</p>
             </div>
           </div>
           
@@ -446,7 +446,7 @@ export default function EducationSection() {
               <Heart className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-primary">Normal: ≤30 mg/dL</p>
+              <p className="text-sm font-semibold text-primary">Normal: ≤30 mg/dL (≤75 nmol/L)</p>
             </div>
           </div>
           
@@ -455,7 +455,7 @@ export default function EducationSection() {
               <AlertTriangle className="h-4 w-4 text-danger" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-danger">Elevated: &gt;50 mg/dL</p>
+              <p className="text-sm font-semibold text-danger">Elevated: &gt;50 mg/dL (&gt;125 nmol/L)</p>
             </div>
           </div>
         </div>
@@ -467,7 +467,7 @@ export default function EducationSection() {
               <TrendingUp className="h-3 w-3 text-primary" />
             </div>
             <p className="text-sm text-foreground">
-              Lp(a) 10–49 mg/dL → <strong className="text-primary">28% higher</strong> cardiovascular risk
+              Lp(a) 10–49 mg/dL (25–124 nmol/L) → <strong className="text-primary">28% higher</strong> cardiovascular risk
             </p>
           </div>
           
@@ -476,7 +476,7 @@ export default function EducationSection() {
               <TrendingUp className="h-3 w-3 text-warning" />
             </div>
             <p className="text-sm text-foreground">
-              Lp(a) 50–99 mg/dL → <strong className="text-warning">44% higher</strong> cardiovascular risk
+              Lp(a) 50–99 mg/dL (125–249 nmol/L) → <strong className="text-warning">44% higher</strong> cardiovascular risk
             </p>
           </div>
           
@@ -485,7 +485,7 @@ export default function EducationSection() {
               <TrendingUp className="h-3 w-3 text-danger" />
             </div>
             <p className="text-sm text-foreground">
-              Lp(a) &gt;100 mg/dL → <strong className="text-danger font-bold">114% higher</strong> cardiovascular risk
+              Lp(a) &gt;100 mg/dL (&gt;250 nmol/L) → <strong className="text-danger font-bold">114% higher</strong> cardiovascular risk
             </p>
           </div>
         </div>
