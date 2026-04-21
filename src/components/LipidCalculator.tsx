@@ -33,7 +33,7 @@ import {
   type LabTone,
 } from "@/components/ui/lab-input";
 import { RiskFactorChip } from "@/components/ui/risk-factor-chip";
-import PrimaryPrevention from "@/components/calculator/PrimaryPrevention";
+
 import heroDoctorImg from "@/assets/hero-doctor.jpg";
 import cvRiskImg from "@/assets/cv-risk-measures.png";
 import lipidsImg from "@/assets/Lipids Gemini_Generated_Image_4o82814o82814o82.png";
@@ -107,11 +107,10 @@ const SUB_TONE_BY_PARENT: Record<string, LabTone> = {
 import EducationSection from "@/components/calculator/EducationSection";
 import { calculatePrevent, type PreventResult } from "@/lib/prevent";
 
-type TabKey = "calculator" | "primary" | "education";
+type TabKey = "calculator" | "education";
 
 const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
   { key: "calculator", label: "Calculator", icon: <Target className="h-4 w-4" /> },
-  { key: "primary", label: "Prevention", icon: <ShieldCheck className="h-4 w-4" /> },
   { key: "education", label: "Education", icon: <Heart className="h-4 w-4" /> },
 ];
 
@@ -1604,7 +1603,6 @@ export default function LipidCalculator() {
           </div>
         )}
 
-        {activeTab === "primary" && <PrimaryPrevention />}
         {activeTab === "education" && <EducationSection />}
 
         <p className="mt-8 text-center text-xs text-muted-foreground pb-6">
