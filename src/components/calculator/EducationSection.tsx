@@ -17,16 +17,16 @@ const PRIMARY_PREVENTION_STEPS = [
     title: "Step 2 — Decide on Lipid-Lowering Therapy",
     items: [
       "Threshold to treat: updated guideline recommends initiating lipid-lowering therapy at 10-year ASCVD risk ≥5%.",
-      "For adults 40–75 y with LDL-C 70–189 mg/dL and 10-year risk ≥7.5%, moderate- to high-intensity statin is recommended.",
+      "For adults 40–75 y with LDL-C 70–189 mg/dL (1.8–4.9 mmol/L) and 10-year risk ≥7.5%, moderate- to high-intensity statin is recommended.",
       "5–7.5% supports moderate-intensity statin after discussion.",
     ],
   },
   {
     title: "Step 3 — Apply LDL-C Thresholds",
     items: [
-      "General primary prevention goal: LDL-C <100 mg/dL to prevent a first MI or stroke.",
-      "Higher-risk primary prevention (e.g., diabetes, HIV, CKD) — target <70 mg/dL.",
-      "If the patient later develops ASCVD and is extremely high risk, aim for <55 mg/dL.",
+      "General primary prevention goal: LDL-C <100 mg/dL (<2.6 mmol/L) to prevent a first MI or stroke.",
+      "Higher-risk primary prevention (e.g., diabetes, HIV, CKD) — target <70 mg/dL (<1.8 mmol/L).",
+      "If the patient later develops ASCVD and is extremely high risk, aim for <55 mg/dL (<1.4 mmol/L).",
     ],
   },
   {
@@ -46,22 +46,22 @@ const PRIMARY_PREVENTION_STEPS = [
 ];
 
 const PRIMARY_PREVENTION_TIERS = [
-  { risk: "Low (<5%)",            ldl: "<100 mg/dL",                  color: "text-success",  bg: "bg-success/10"  },
-  { risk: "Borderline (5–7.5%)",  ldl: "<100 mg/dL — consider statin", color: "text-primary",  bg: "bg-primary/10"  },
-  { risk: "Intermediate (7.5–20%)", ldl: "<70 mg/dL",                 color: "text-warning",  bg: "bg-warning/10"  },
-  { risk: "High (≥20%)",          ldl: "<55 mg/dL",                   color: "text-danger",   bg: "bg-danger/10"   },
+  { risk: "Low (<5%)",              ldl: "<100 mg/dL (<2.6 mmol/L)",                  color: "text-success",  bg: "bg-success/10"  },
+  { risk: "Borderline (5–7.5%)",    ldl: "<100 mg/dL (<2.6 mmol/L) — consider statin", color: "text-primary",  bg: "bg-primary/10"  },
+  { risk: "Intermediate (7.5–20%)", ldl: "<70 mg/dL (<1.8 mmol/L)",                   color: "text-warning",  bg: "bg-warning/10"  },
+  { risk: "High (≥20%)",            ldl: "<55 mg/dL (<1.4 mmol/L)",                   color: "text-danger",   bg: "bg-danger/10"   },
 ];
 
 const DIABETES_PROTOCOL = [
-  { label: "Diabetes mellitus (baseline)", target: "<70 mg/dL" },
-  { label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL" },
-  { label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (optional)" },
-  { label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL" },
+  { label: "Diabetes mellitus (baseline)", target: "<70 mg/dL (<1.8 mmol/L)" },
+  { label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL (<1.3 mmol/L)" },
+  { label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (≤0.8 mmol/L) — optional" },
+  { label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL (≤0.8 mmol/L)" },
 ];
 
 const ACS_PROTOCOL = [
-  "All ASCVD patients must achieve LDL-C <50 mg/dL.",
-  "Recurrent ACS or polyvascular disease (Extreme Risk B): target ≤30 mg/dL.",
+  "All ASCVD patients must achieve LDL-C <50 mg/dL (<1.3 mmol/L).",
+  "Recurrent ACS or polyvascular disease (Extreme Risk B): target ≤30 mg/dL (≤0.8 mmol/L).",
   "Lipid profile at emergency triage; repeat within 2 weeks of initiating therapy.",
   "Start combination therapy (high-intensity statin + ezetimibe) at presentation to ED.",
   "Intensify every 2 weeks until goals achieved, preferably by week 4.",
