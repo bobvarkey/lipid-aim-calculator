@@ -520,6 +520,19 @@ export default function LipidCalculator() {
   const toggleLaiMod = (id: string) => setLaiModChecked(prev => ({ ...prev, [id]: !prev[id] }));
   const toggleLaiFeat = (id: string) => setLaiFeatChecked(prev => ({ ...prev, [id]: !prev[id] }));
 
+  // ─── Metabolic Syndrome auto-qualification (≥3 of 5) ───
+  const metsynCount = useMemo(
+    () => countCheckedItems(METSYN_CRITERIA, subChecked),
+    [subChecked]
+  );
+  const metsynQualified = metsynCount >= 3;
+
+  useEffect(() => {
+    setLaiFeatChecked((prev) =>
+      prev.feat_mets === metsynQualified ? prev : { ...prev, feat_mets: metsynQualified }
+    );
+  }, [metsynQualified]);
+
   // ─── Classification logic (LAI 2023) ───
   const classify = useCallback((): CategoryResult | null => {
     const v = modChecked;
@@ -1249,16 +1262,57 @@ export default function LipidCalculator() {
               <div className="space-y-2">
                 {HIGH_RISK_FEATURES_LAI.map((item) => {
                   const v = FEATURE_VISUALS[item.id] ?? { tone: "rose" as LabTone, icon: <AlertTriangle className="h-4 w-4" /> };
+                  const isMets = item.id === "feat_mets";
                   return (
-                    <RiskFactorChip
-                      key={item.id}
-                      label={item.label}
-                      qualifier={item.qualifier}
-                      icon={v.icon}
-                      tone={v.tone}
-                      checked={!!laiFeatChecked[item.id]}
-                      onToggle={() => toggleLaiFeat(item.id)}
-                    />
+                    <div key={item.id}>
+                      <RiskFactorChip
+                        label={item.label}
+                        qualifier={item.qualifier}
+                        icon={v.icon}
+                        tone={v.tone}
+                        checked={!!laiFeatChecked[item.id]}
+                        onToggle={() => toggleLaiFeat(item.id)}
+                        disabled={isMets}
+                        rightSlot={isMets ? (
+                          <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                            metsynQualified ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {metsynCount}/5 — {metsynQualified ? "Qualified ✓" : "≥3 required"}
+                          </span>
+                        ) : undefined}
+                      />
+                      {isMets && (
+                        <Collapsible
+                          open={subListOpen.feat_mets}
+                          onOpenChange={() => toggleSubList("feat_mets")}
+                          className="ml-8 mt-2 mb-1"
+                        >
+                          <CollapsibleTrigger asChild>
+                            <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                              <span className="text-xs font-semibold text-muted-foreground">
+                                Metabolic Syndrome Criteria ({metsynCount}/5)
+                              </span>
+                              <ChevronDown className={`h-4 w-4 transition-transform ${subListOpen.feat_mets ? "rotate-180" : ""}`} />
+                            </button>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="space-y-1.5 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
+                            <p className="text-[11px] text-muted-foreground leading-snug">
+                              ≥3 of 5 criteria qualifies as <strong className="text-foreground">Metabolic Syndrome</strong> (NCEP ATP III / IDF).
+                            </p>
+                            {METSYN_CRITERIA.map((crit) => (
+                              <RiskFactorChip
+                                key={crit.id}
+                                label={crit.label}
+                                tone="amber"
+                                size="sm"
+                                checked={!!subChecked[crit.id]}
+                                onToggle={() => toggleSub(crit.id)}
+                              />
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      )}
+                    </div>
                   );
                 })}
               </div>
