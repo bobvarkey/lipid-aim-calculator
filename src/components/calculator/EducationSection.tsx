@@ -312,10 +312,10 @@ export default function EducationSection() {
           <div className="rounded-lg border border-warning/20 bg-warning/5 p-4">
             <p className="text-xs font-semibold uppercase tracking-wider text-warning mb-2">Secondary Prevention: Not Very High Risk ASCVD</p>
             <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
-              <li>Start <strong>moderate statin</strong> → LDL &lt;70 mg/dL</li>
+              <li>Start <strong>moderate statin</strong> → LDL &lt;70 mg/dL (&lt;1.8 mmol/L)</li>
               <li>Add <strong>ezetimibe</strong> if not at goal</li>
               <li>Add <strong>bempedoic acid</strong> if statin-intolerant</li>
-              <li>Optional goal: &lt;55 mg/dL</li>
+              <li>Optional goal: &lt;55 mg/dL (&lt;1.4 mmol/L)</li>
             </ol>
           </div>
           <div className="rounded-lg border border-purple-500/30 bg-purple-500/5 p-4">
@@ -330,11 +330,11 @@ export default function EducationSection() {
 
         {/* TG ≥500 */}
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 mb-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-amber-500 mb-2">Adults with Triglycerides ≥500 mg/dL</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-500 mb-2">Adults with Triglycerides ≥500 mg/dL (≥5.6 mmol/L)</p>
           <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
             <li>Identify/manage <strong>secondary causes</strong></li>
             <li><strong>Lifestyle:</strong> Optimize diet/exercise</li>
-            <li>If TG persists ≥500 mg/dL:
+            <li>If TG persists ≥500 mg/dL (≥5.6 mmol/L):
               <ul className="ml-5 mt-1 space-y-1 list-disc">
                 <li><strong>Pancreatitis risk:</strong> Refer to lipid specialist</li>
                 <li><strong>Prevent ASCVD risk:</strong> Add fiber/omega-3, fenofibrate, or icosapent ethyl</li>
