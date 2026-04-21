@@ -1,6 +1,71 @@
 import { Card } from "@/components/ui/card";
-import { Heart, TrendingUp, AlertTriangle, Dna, Activity } from "lucide-react";
+import { Heart, TrendingUp, AlertTriangle, Dna, Activity, ShieldCheck, ListChecks, Stethoscope } from "lucide-react";
+import { SectionCard } from "@/components/ui/section-card";
 import MermaidChart from "@/components/MermaidChart";
+
+// ─── Primary Prevention reference content (migrated from former Prevention tab) ───
+const PRIMARY_PREVENTION_STEPS = [
+  {
+    title: "Step 1 — Define Population & Assess Baseline",
+    items: [
+      "Confirm no clinical ASCVD (no prior MI, stroke, PAD, revascularization).",
+      "Obtain fasting or nonfasting lipid panel, A1c, creatinine, urine albumin/creatinine, etc.",
+      "Calculate 10-year ASCVD risk with PREVENT-ASCVD for adults 30–79 y (updated ACC/AHA guideline) or Pooled Cohort Equations where PREVENT is not yet embedded.",
+    ],
+  },
+  {
+    title: "Step 2 — Decide on Lipid-Lowering Therapy",
+    items: [
+      "Threshold to treat: updated guideline recommends initiating lipid-lowering therapy at 10-year ASCVD risk ≥5%.",
+      "For adults 40–75 y with LDL-C 70–189 mg/dL and 10-year risk ≥7.5%, moderate- to high-intensity statin is recommended.",
+      "5–7.5% supports moderate-intensity statin after discussion.",
+    ],
+  },
+  {
+    title: "Step 3 — Apply LDL-C Thresholds",
+    items: [
+      "General primary prevention goal: LDL-C <100 mg/dL to prevent a first MI or stroke.",
+      "Higher-risk primary prevention (e.g., diabetes, HIV, CKD) — target <70 mg/dL.",
+      "If the patient later develops ASCVD and is extremely high risk, aim for <55 mg/dL.",
+    ],
+  },
+  {
+    title: "Step 4 — Refine Risk & Intensify If Needed",
+    items: [
+      "When treatment is uncertain or borderline, use CAC scoring, Lp(a), and apoB to reclassify risk and support earlier therapy.",
+      "Start with statin; add ezetimibe, PCSK9 inhibitor, or bempedoic acid if LDL-C goals are not reached or statin intolerance exists.",
+    ],
+  },
+  {
+    title: "Step 5 — Lifestyle & Follow-Up",
+    items: [
+      "Reinforce diet, weight, and physical activity at every visit.",
+      "Recheck lipids 4–12 weeks after therapy change, then every 3–12 months to assess adherence and goal attainment.",
+    ],
+  },
+];
+
+const PRIMARY_PREVENTION_TIERS = [
+  { risk: "Low (<5%)",            ldl: "<100 mg/dL",                  color: "text-success",  bg: "bg-success/10"  },
+  { risk: "Borderline (5–7.5%)",  ldl: "<100 mg/dL — consider statin", color: "text-primary",  bg: "bg-primary/10"  },
+  { risk: "Intermediate (7.5–20%)", ldl: "<70 mg/dL",                 color: "text-warning",  bg: "bg-warning/10"  },
+  { risk: "High (≥20%)",          ldl: "<55 mg/dL",                   color: "text-danger",   bg: "bg-danger/10"   },
+];
+
+const DIABETES_PROTOCOL = [
+  { label: "Diabetes mellitus (baseline)", target: "<70 mg/dL" },
+  { label: "Diabetes + target organ damage or ≥2 major ASCVD RF", target: "<50 mg/dL" },
+  { label: "Diabetes + ASCVD (Extreme Risk A)", target: "≤30 mg/dL (optional)" },
+  { label: "ASCVD + Diabetes with TOD or ≥2 major ASCVD RF", target: "≤30 mg/dL" },
+];
+
+const ACS_PROTOCOL = [
+  "All ASCVD patients must achieve LDL-C <50 mg/dL.",
+  "Recurrent ACS or polyvascular disease (Extreme Risk B): target ≤30 mg/dL.",
+  "Lipid profile at emergency triage; repeat within 2 weeks of initiating therapy.",
+  "Start combination therapy (high-intensity statin + ezetimibe) at presentation to ED.",
+  "Intensify every 2 weeks until goals achieved, preferably by week 4.",
+];
 
 export default function EducationSection() {
   return (
