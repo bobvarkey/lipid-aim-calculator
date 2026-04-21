@@ -63,6 +63,15 @@ const FEATURE_VISUALS: Record<string, { tone: LabTone; icon: React.ReactNode }> 
   feat_cacs:    { tone: "indigo",  icon: <CircleDot className="h-4 w-4" /> },
 };
 
+// ─── Metabolic Syndrome sub-criteria (≥3 of 5 qualifies — NCEP ATP III / IDF) ───
+const METSYN_CRITERIA: SubItem[] = [
+  { id: "lc_ms_waist",   label: "Large waistline — >40 in (102 cm) ♂, >35 in (88 cm) ♀ (Asian: >90 cm ♂, >80 cm ♀)" },
+  { id: "lc_ms_tg",      label: "High triglycerides — ≥150 mg/dL (1.7 mmol/L) or on TG medication" },
+  { id: "lc_ms_hdl",     label: "Low HDL-C — <40 mg/dL ♂, <50 mg/dL ♀ or on HDL medication" },
+  { id: "lc_ms_bp",      label: "Elevated BP — ≥130/85 mmHg or on antihypertensive therapy" },
+  { id: "lc_ms_glucose", label: "Elevated fasting glucose — ≥100 mg/dL (5.6 mmol/L) or on glucose-lowering therapy" },
+];
+
 const MODIFIER_VISUALS_LAI: Record<string, { tone: LabTone; icon: React.ReactNode }> = {
   mod_lpa:        { tone: "violet",  icon: <Dna className="h-4 w-4" /> },
   mod_ifg:        { tone: "amber",   icon: <Donut className="h-4 w-4" /> },
