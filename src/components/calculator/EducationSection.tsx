@@ -185,23 +185,23 @@ export default function EducationSection() {
                 <tbody className="text-foreground">
                   <tr className="border-b border-border/50">
                     <td className="py-2 pr-3 font-semibold text-primary">Optimal</td>
-                    <td className="py-2">&lt;80 mg/dL (&lt;60 mg/dL for high risk)</td>
+                    <td className="py-2">&lt;80 mg/dL (&lt;2.1 mmol/L) — &lt;60 mg/dL (&lt;1.6 mmol/L) for high risk</td>
                   </tr>
                   <tr className="border-b border-border/50">
                     <td className="py-2 pr-3 font-semibold text-warning">Borderline High</td>
-                    <td className="py-2">90–109 mg/dL</td>
+                    <td className="py-2">90–109 mg/dL (2.3–2.8 mmol/L)</td>
                   </tr>
                   <tr className="border-b border-border/50">
                     <td className="py-2 pr-3 font-semibold text-danger">High Risk</td>
-                    <td className="py-2">≥110 mg/dL (often ≥120 mg/dL)</td>
+                    <td className="py-2">≥110 mg/dL (≥2.8 mmol/L) — often ≥120 mg/dL (≥3.1 mmol/L)</td>
                   </tr>
                   <tr className="border-b border-border/50">
                     <td className="py-2 pr-3 text-muted-foreground">Male Typical</td>
-                    <td className="py-2">66–133 mg/dL</td>
+                    <td className="py-2">66–133 mg/dL (1.7–3.4 mmol/L)</td>
                   </tr>
                   <tr>
                     <td className="py-2 pr-3 text-muted-foreground">Female Typical</td>
-                    <td className="py-2">60–117 mg/dL</td>
+                    <td className="py-2">60–117 mg/dL (1.6–3.0 mmol/L)</td>
                   </tr>
                 </tbody>
               </table>
