@@ -655,6 +655,97 @@ export default function EducationSection() {
           ApoB is "sticky cholesterol" — it reflects the total number of atherogenic particles (LDL + Lp(a) + others).
         </p>
       </Card>
+
+      {/* ─── Primary Prevention Workflow Reference (migrated from Prevention tab) ─── */}
+      <SectionCard
+        title="Primary Prevention — 5-Step Workflow"
+        tone="emerald"
+        icon={<ListChecks className="h-4 w-4" />}
+        defaultOpen={false}
+      >
+        <p className="mb-3 text-xs text-muted-foreground">
+          Reference workflow for adults 40–75 y without clinical ASCVD. The interactive risk-factor counting and PREVENT calculation are available in the Calculator tab.
+        </p>
+        <div className="space-y-3">
+          {PRIMARY_PREVENTION_STEPS.map((step, i) => (
+            <div key={i} className="flex items-start gap-3 rounded-lg border border-border bg-muted/20 p-3">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                {i + 1}
+              </span>
+              <div className="flex-1">
+                <h4 className="font-display text-sm font-bold text-foreground mb-1.5">{step.title}</h4>
+                <ul className="space-y-1">
+                  {step.items.map((item, j) => (
+                    <li key={j} className="text-sm text-foreground leading-relaxed flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      {/* ─── LDL-C Targets by 10-Year Risk ─── */}
+      <SectionCard
+        title="Primary Prevention LDL-C Targets by 10-Year ASCVD Risk"
+        tone="primary"
+        icon={<ShieldCheck className="h-4 w-4" />}
+        defaultOpen={false}
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {PRIMARY_PREVENTION_TIERS.map((t) => (
+            <div key={t.risk} className={`rounded-lg ${t.bg} px-4 py-3`}>
+              <p className={`text-xs font-semibold ${t.color}`}>{t.risk}</p>
+              <p className="text-base font-bold text-foreground mt-1">{t.ldl}</p>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      {/* ─── Diabetes Day-1 Treatment Reference ─── */}
+      <SectionCard
+        title="Diabetes & Dyslipidemia — Day 1 Treatment Targets"
+        tone="danger"
+        icon={<Heart className="h-4 w-4" />}
+        defaultOpen={false}
+      >
+        <p className="mb-3 text-xs text-muted-foreground">
+          Initiate dyslipidemia treatment <strong className="text-foreground">on day 1</strong> of diabetes diagnosis. Targets must be attained by <strong className="text-foreground">week 12</strong>.
+        </p>
+        <div className="space-y-2">
+          {DIABETES_PROTOCOL.map((row) => (
+            <div
+              key={row.label}
+              className="flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/20 px-3 py-2.5"
+            >
+              <span className="text-sm leading-snug text-foreground flex-1">{row.label}</span>
+              <span className="rounded bg-danger/15 px-2 py-0.5 text-[11px] font-bold text-danger whitespace-nowrap">
+                {row.target}
+              </span>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      {/* ─── ASCVD & ACS Management Reference ─── */}
+      <SectionCard
+        title="ASCVD & ACS Management Principles"
+        tone="primary"
+        icon={<Stethoscope className="h-4 w-4" />}
+        defaultOpen={false}
+      >
+        <ul className="space-y-2 mt-1">
+          {ACS_PROTOCOL.map((line, i) => (
+            <li key={i} className="flex items-start gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2.5">
+              <span className="text-primary mt-1">•</span>
+              <span className="text-sm leading-snug text-foreground">{line}</span>
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
     </div>
   );
 }
