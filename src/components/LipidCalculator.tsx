@@ -22,9 +22,9 @@ import {
   TestTube, ChevronDown, Stethoscope, FileText, Home,
   Droplet, Beaker, FlaskConical, Gauge, Ruler, Scale, Waves,
   Wind, Zap, CircleDot, Cigarette, CalendarClock, HeartPulse,
-  Dna, Sparkles, Microscope, Brain, Footprints, Bone, FlameKindling,
-  Flame, Hourglass, GitBranch, Network, Layers, Cloud, Bug,
-  Donut, Soup, Eye, Pill, Repeat, AlertOctagon, Syringe,
+  Dna, Sparkles, Bone, FlameKindling,
+  Flame, GitBranch, Network, Layers, Cloud, Bug,
+  Donut, Soup, Eye, Repeat, AlertOctagon, Syringe,
 } from "lucide-react";
 import {
   LabInput,
@@ -40,8 +40,8 @@ import lipidsImg from "@/assets/Lipids Gemini_Generated_Image_4o82814o82814o82.p
 import lipoproteinImg from "@/assets/lipoprotein-particles.png";
 import cprFrameworkImg from "@/assets/cpr-framework.png";
 import {
-  ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
-  FH_ITEMS, FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
+  ASCVD_ESTABLISHED, HIGH_CAC_ITEMS, CKD_ITEMS,
+  FH_ITEMS, FHX_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
   TOD_ALL, countCheckedItems, type SubItem,
   RISK_MODIFIERS_LAI, HIGH_RISK_FEATURES_LAI,
 } from "@/lib/clinicalConstants";
@@ -190,23 +190,6 @@ function getBmiClass(bmiVal: number, ethnicity: string): { label: string; color:
 function getObesityThreshold(ethnicity: string): number {
   if (ethnicity === "asian" || ethnicity === "indian") return 25;
   return 30;
-}
-
-/** Collapsible qualifier text */
-function QualifierText({ text }: { text: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <button
-      type="button"
-      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
-      className="text-left w-full"
-    >
-      <span className="text-[11px] text-muted-foreground leading-snug mt-0.5 flex items-center gap-1 cursor-pointer hover:text-foreground/70 transition-colors">
-        <ChevronDown className={`h-3 w-3 shrink-0 transition-transform duration-200 ${open ? "rotate-0" : "-rotate-90"}`} />
-        <span className={open ? "" : "line-clamp-1"}>{text}</span>
-      </span>
-    </button>
-  );
 }
 
 // ─── Result buckets ───
