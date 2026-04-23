@@ -7,7 +7,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-export type SectionTone =
+type SectionTone =
   | "primary"
   | "accent"
   | "danger"

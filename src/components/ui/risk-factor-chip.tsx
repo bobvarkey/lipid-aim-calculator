@@ -28,7 +28,7 @@ const TONE: Record<
   slate:   { bar: "bg-[hsl(215_20%_50%)]",  iconBg: "bg-[hsl(215_20%_50%)]/15",  iconText: "text-[hsl(215_25%_35%)]",  ringOn: "ring-[hsl(215_20%_50%)]/40",  bgOn: "bg-[hsl(215_20%_50%)]/10",  labelOn: "text-foreground" },
 };
 
-export interface RiskFactorChipProps {
+interface RiskFactorChipProps {
   label: React.ReactNode;
   qualifier?: React.ReactNode;
   icon?: React.ReactNode;

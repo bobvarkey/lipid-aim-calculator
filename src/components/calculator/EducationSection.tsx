@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Heart, TrendingUp, AlertTriangle, Dna, Activity, ShieldCheck, ListChecks, Stethoscope } from "lucide-react";
 import { SectionCard } from "@/components/ui/section-card";
-import MermaidChart from "@/components/MermaidChart";
 
 // ─── Primary Prevention reference content (migrated from former Prevention tab) ───
 const PRIMARY_PREVENTION_STEPS = [

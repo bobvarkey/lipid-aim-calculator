@@ -40,7 +40,7 @@ const TONE: Record<
   slate:   { bar: "bg-[hsl(215_20%_50%)]",  label: "text-[hsl(215_25%_35%)]",  ring: "focus-within:ring-[hsl(215_20%_50%)]/40",  chipOn: "bg-[hsl(215_20%_50%)] text-white",  chipOff: "text-[hsl(215_25%_35%)] hover:bg-[hsl(215_20%_50%)]/10",  glow: "from-[hsl(215_20%_50%)]/10" },
 };
 
-export type Unit = {
+type Unit = {
   label: string;          // e.g. "mg/dL"
   /** Convert FROM canonical metric value TO this unit's value. */
   fromMetric: (v: number) => number;
@@ -52,7 +52,7 @@ export type Unit = {
   placeholder?: string;
 };
 
-export interface LabInputProps {
+interface LabInputProps {
   /** Short metric label, e.g. "LDL-C". */
   label: string;
   /** Icon shown inside the colored chip. */
@@ -225,8 +225,6 @@ export function LabInput({
 // First entry of each list is the CANONICAL metric unit (state is stored in it).
 // ─────────────────────────────────────────────────────────────────────────────
 
-const round = (n: number, p: number) => Number(n.toFixed(p));
-
 /** Cholesterol fractions: mg/dL ↔ mmol/L (factor 38.67). */
 export const UNITS_CHOL: Unit[] = [
   { label: "mg/dL",  fromMetric: (v) => v,            toMetric: (v) => v,            precision: 0, placeholder: "85" },
@@ -286,7 +284,3 @@ export const UNITS_EGFR: Unit[] = [
   { label: "mL/min/1.73m²", fromMetric: (v) => v, toMetric: (v) => v, precision: 0, placeholder: "90" },
 ];
 
-/** Age — years only (kept here for color treatment uniformity). */
-export const UNITS_YEARS: Unit[] = [
-  { label: "yrs", fromMetric: (v) => v, toMetric: (v) => v, precision: 0, placeholder: "55" },
-];
