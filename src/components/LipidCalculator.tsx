@@ -1415,7 +1415,7 @@ export default function LipidCalculator() {
                             </button>
                           </CollapsibleTrigger>
                           <CollapsibleContent className="space-y-1.5 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-0">
-                            {key === "fh" && (
+                            {key === "familyHistory" && (
                               <p className="text-[11px] text-muted-foreground leading-snug">
                                 "Premature" = CHD or atherosclerotic CVD event in a <strong className="text-foreground">male &lt;55 y</strong> or <strong className="text-foreground">female &lt;65 y</strong>. Includes MI, coronary revascularization, angina, ischemic stroke, or PAD.
                               </p>
