@@ -37,7 +37,14 @@ export const CKD_ITEMS: SubItem[] = [
   { id: "ckd_albumin", label: "Albuminuria: UACR ≥30 mg/g", qualifier: "Moderately increased (30–300) or severely increased (>300) albuminuria" },
 ];
 
-// ─── Family history sub-items ───
+// ─── Familial hypercholesterolemia sub-items ───
+export const FH_ITEMS: SubItem[] = [
+  { id: "fh_clinical", label: "Clinical heterozygous familial hypercholesterolemia", qualifier: "Definite/probable FH by Dutch Lipid Clinic Network, Simon Broome, or MEDPED criteria" },
+  { id: "fh_genetic", label: "Pathogenic FH mutation", qualifier: "LDLR, APOB, PCSK9, or other validated monogenic FH variant" },
+  { id: "fh_phenotype", label: "FH phenotype with LDL-C ≥190 mg/dL", qualifier: "Severe hypercholesterolemia with tendon xanthomas, corneal arcus at young age, or compatible family cascade pattern" },
+];
+
+// ─── Premature CHD / ASCVD family-history sub-items ───
 export const FHX_ITEMS: SubItem[] = [
   { id: "fhx_male", label: "1st-degree male relative with CHD before age 55", qualifier: "Father, brother, or son with MI, coronary revascularization, or angina <55 y" },
   { id: "fhx_female", label: "1st-degree female relative with CHD before age 65", qualifier: "Mother, sister, or daughter with MI, coronary revascularization, or angina <65 y" },
