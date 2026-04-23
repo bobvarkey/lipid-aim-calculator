@@ -225,8 +225,6 @@ export function LabInput({
 // First entry of each list is the CANONICAL metric unit (state is stored in it).
 // ─────────────────────────────────────────────────────────────────────────────
 
-const round = (n: number, p: number) => Number(n.toFixed(p));
-
 /** Cholesterol fractions: mg/dL ↔ mmol/L (factor 38.67). */
 export const UNITS_CHOL: Unit[] = [
   { label: "mg/dL",  fromMetric: (v) => v,            toMetric: (v) => v,            precision: 0, placeholder: "85" },

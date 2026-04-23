@@ -140,13 +140,12 @@ export function calculatePrevent(p: PreventInput): PreventResult {
     pct >= 5 ? "Borderline" :
     "Low";
 
-  const nextSteps = getNextSteps(pct, category, p);
+  const nextSteps = getNextSteps(category, p);
 
   return { risk10yr: risk, riskPct, category, nextSteps, valid: true, warnings: [] };
 }
 
 function getNextSteps(
-  pct: number,
   category: PreventResult["category"],
   p: PreventInput
 ): string[] {

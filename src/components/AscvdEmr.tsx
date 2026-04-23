@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -8,7 +7,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Activity, ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ShieldCheck, ChevronDown, User, TestTube, FileText, TrendingUp } from "lucide-react";
+import { ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ChevronDown, User, TestTube, FileText, TrendingUp } from "lucide-react";
 import { SectionCard } from "@/components/ui/section-card";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -185,7 +184,6 @@ export default function AscvdEmr() {
 
   const risk = calculateRisk();
   const category = !risk ? "—" : data.ascvd || risk >= 20 ? "HIGH" : risk >= 7.5 ? "INTERMEDIATE" : risk >= 5 ? "BORDERLINE" : "LOW";
-  const colorClass = category === "HIGH" ? "bg-danger/10 text-danger" : category === "LOW" ? "bg-success/10 text-success" : "bg-warning/10 text-warning";
   const ldlTarget = category === "HIGH" ? "<50 mg/dL" : category === "LOW" ? "<100 mg/dL" : "<70 mg/dL";
   const treatment = category === "HIGH" ? "High-intensity statin ± ezetimibe ± PCSK9" : category === "LOW" ? "Lifestyle only" : "Moderate-intensity statin";
 
