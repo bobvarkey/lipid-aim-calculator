@@ -428,7 +428,7 @@ export default function LipidCalculator() {
   // Auto-sync modChecked when sub-checklists qualify
   useEffect(() => {
     setModChecked((prev) => {
-      let next = { ...prev };
+      const next = { ...prev };
       let changed = false;
       for (const [key, qualified] of Object.entries(modAutoQual)) {
         if (qualified && !prev[key]) {
@@ -625,7 +625,13 @@ export default function LipidCalculator() {
   }, [result]);
 
   const copyNote = async () => {
-    try { await navigator.clipboard.writeText(generateNote()); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch {}
+    try {
+      await navigator.clipboard.writeText(generateNote());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
   };
 
   const reset = () => {
