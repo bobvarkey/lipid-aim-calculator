@@ -55,7 +55,7 @@ function mgdlToMmol(mgdl: number): number {
   return mgdl * 0.02586;
 }
 
-export interface PreventInput {
+interface PreventInput {
   age: number;       // 30–79
   sex: "male" | "female";
   sbp: number;       // 90–180 mmHg
