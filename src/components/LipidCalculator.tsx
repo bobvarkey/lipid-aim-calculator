@@ -41,7 +41,7 @@ import lipoproteinImg from "@/assets/lipoprotein-particles.png";
 import cprFrameworkImg from "@/assets/cpr-framework.png";
 import {
   ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
-  FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
+  FH_ITEMS, FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
   TOD_ALL, countCheckedItems, type SubItem,
   RISK_MODIFIERS_LAI, HIGH_RISK_FEATURES_LAI,
 } from "@/lib/clinicalConstants";
@@ -90,6 +90,7 @@ const ASCVD_MOD_VISUALS: Record<string, { tone: LabTone; icon: React.ReactNode }
   polyvascular: { tone: "fuchsia", icon: <Network className="h-4 w-4" /> },
   tod:          { tone: "amber",   icon: <Eye className="h-4 w-4" /> },
   fh:           { tone: "violet",  icon: <Dna className="h-4 w-4" /> },
+  familyHistory:{ tone: "sky",     icon: <GitBranch className="h-4 w-4" /> },
   hofh:         { tone: "fuchsia", icon: <Dna className="h-4 w-4" /> },
   subclinical:  { tone: "indigo",  icon: <CircleDot className="h-4 w-4" /> },
   ckd34:        { tone: "teal",    icon: <Activity className="h-4 w-4" /> },
@@ -100,7 +101,7 @@ const ASCVD_MOD_VISUALS: Record<string, { tone: LabTone; icon: React.ReactNode }
 
 // Tone for nested sub-items, derived from parent modifier
 const SUB_TONE_BY_PARENT: Record<string, LabTone> = {
-  ascvd: "rose", polyvascular: "fuchsia", tod: "amber", fh: "violet",
+  ascvd: "rose", polyvascular: "fuchsia", tod: "amber", fh: "violet", familyHistory: "sky",
   subclinical: "indigo", ckd34: "teal",
 };
 
@@ -129,7 +130,7 @@ const MAJOR_RF_LABELS: Record<string, string> = {
 // ─── ASCVD history & extreme-risk modifiers ───
 const MODIFIER_KEYS = [
   "ascvd", "polyvascular",
-  "tod", "fh", "hofh", "subclinical", "ckd34",
+  "tod", "fh", "familyHistory", "hofh", "subclinical", "ckd34",
   "recurrent50", "acs12", "sequelae30",
 ] as const;
 
@@ -137,7 +138,8 @@ const MODIFIER_LABELS: Record<string, string> = {
   ascvd: "Established ASCVD",
   polyvascular: "Polyvascular disease (≥2 arterial territories: CAD, cerebrovascular, PAD)",
   tod: "Diabetes target organ damage",
-  fh: "Familial hypercholesterolemia / strong family history",
+  fh: "Familial hypercholesterolemia",
+  familyHistory: "Premature CHD / ASCVD family history",
   hofh: "Homozygous familial hypercholesterolemia",
   subclinical: "High coronary calcium / extensive plaque burden / subclinical high-risk burden",
   ckd34: "CKD stage 3B or 4",
@@ -151,7 +153,8 @@ const MOD_SUB_MAP: Record<string, { items: SubItem[]; title: string }> = {
   ascvd: { items: ASCVD_ESTABLISHED, title: "Select applicable ASCVD manifestations (≥1 required):" },
   subclinical: { items: HIGH_CAC_ITEMS, title: "Select applicable high CAC / plaque burden findings (≥1 required):" },
   ckd34: { items: CKD_ITEMS, title: "Select CKD stage and albuminuria status (≥1 required):" },
-  fh: { items: FHX_ITEMS, title: "Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):" },
+  fh: { items: FH_ITEMS, title: "Select applicable familial hypercholesterolemia criteria (≥1 required):" },
+  familyHistory: { items: FHX_ITEMS, title: "Premature CHD / ASCVD: event in a 1st-degree relative before sex-specific age cutoff (≥1 required):" },
 };
 
 // Asian BMI classification helper
