@@ -87,6 +87,35 @@ export const RISK_MODIFIERS_LAI: SubItem[] = [
   { id: "mod_hiv", label: "HIV infection", qualifier: "Viral inflammatory risk" },
 ];
 
+// ─── 2019 ACC/AHA Risk-Enhancing Factors ───
+// Used to refine borderline (5–<7.5%) or intermediate (7.5–<20%) 10-yr ASCVD risk
+// Ref: Grundy SM et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline (operationalized in 2019 Primary Prevention Guideline)
+export interface EnhancerItem extends SubItem {
+  category: string;
+}
+
+export const RISK_ENHANCERS_2019: EnhancerItem[] = [
+  // Family History
+  { id: "enh_fhx", category: "Family History", label: "Premature ASCVD in 1st-degree relative", qualifier: "Male <55 y or female <65 y" },
+  // Lipid
+  { id: "enh_persistldl", category: "Lipid", label: "Persistent primary hypercholesterolemia", qualifier: "LDL-C 160–189 mg/dL or non-HDL-C 190–219 mg/dL" },
+  { id: "enh_tg", category: "Lipid", label: "Persistently elevated triglycerides", qualifier: "≥175 mg/dL (non-fasting)" },
+  { id: "enh_lpa", category: "Lipid", label: "Lipoprotein(a) ≥50 mg/dL (or ≥125 nmol/L)", qualifier: "Especially with family history of premature ASCVD" },
+  { id: "enh_apob", category: "Lipid", label: "ApoB ≥130 mg/dL", qualifier: "Corresponds to LDL-C ≥160 mg/dL" },
+  // Metabolic
+  { id: "enh_mets", category: "Metabolic", label: "Metabolic syndrome", qualifier: "≥3 of: ↑waist, ↑TG, ↑BP, ↑glucose, ↓HDL-C" },
+  // Chronic Conditions
+  { id: "enh_ckd", category: "Chronic Conditions", label: "Chronic kidney disease", qualifier: "eGFR 15–59 mL/min/1.73 m² (not on dialysis/transplant)" },
+  { id: "enh_inflam", category: "Chronic Conditions", label: "Chronic inflammatory condition", qualifier: "Psoriasis, RA, lupus, or HIV/AIDS" },
+  // Women's Health
+  { id: "enh_menopause", category: "Women's Health", label: "Premature menopause (<40 y)", qualifier: "Or pregnancy-associated conditions" },
+  { id: "enh_pregnancy", category: "Women's Health", label: "History of preeclampsia or pregnancy-associated HTN", qualifier: "Includes gestational diabetes" },
+  // Other Markers
+  { id: "enh_ethnicity", category: "Ethnicity", label: "High-risk race/ethnicity (e.g., South Asian)", qualifier: "Auto-set when 'Indian' ethnicity is selected" },
+  { id: "enh_hscrp", category: "Biomarker", label: "hs-CRP ≥2.0 mg/L", qualifier: "Marker of vascular inflammation" },
+  { id: "enh_abi", category: "Vascular", label: "ABI <0.9", qualifier: "Indicates peripheral atherosclerosis" },
+];
+
 // ─── LAI 2023 High-Risk Features ───
 export const HIGH_RISK_FEATURES_LAI: SubItem[] = [
   { id: "feat_apob", label: "Apolipoprotein B >130 mg/dL", qualifier: "Highly atherogenic particle burden" },

@@ -25,6 +25,7 @@ import {
   Dna, Sparkles, Bone, FlameKindling,
   Flame, GitBranch, Network, Layers, Cloud, Bug,
   Donut, Soup, Eye, Repeat, AlertOctagon, Syringe,
+  ShieldQuestion,
 } from "lucide-react";
 import {
   LabInput,
@@ -44,6 +45,7 @@ import {
   FH_ITEMS, FHX_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
   TOD_ALL, countCheckedItems, type SubItem,
   RISK_MODIFIERS_LAI, HIGH_RISK_FEATURES_LAI,
+  RISK_ENHANCERS_2019,
 } from "@/lib/clinicalConstants";
 
 // ─── Visual mapping: per-item tone + icon for risk-factor chips ───
@@ -517,6 +519,43 @@ export default function LipidCalculator() {
       prev.feat_mets === metsynQualified ? prev : { ...prev, feat_mets: metsynQualified }
     );
   }, [metsynQualified]);
+
+  // ─── 2019 ACC/AHA Risk-Enhancing Factors (Primary Prevention) ───
+  const [enhChecked, setEnhChecked] = useState<Record<string, boolean>>(
+    Object.fromEntries(RISK_ENHANCERS_2019.map(e => [e.id, false]))
+  );
+  const toggleEnh = (id: string) => setEnhChecked(prev => ({ ...prev, [id]: !prev[id] }));
+
+  // Auto-derive enhancers from numeric inputs / ethnicity / sub-checklists
+  useEffect(() => {
+    const ldlV = parseFloat(ldl);
+    const nonhdlV = parseFloat(nonhdl);
+    const tgV = parseFloat(""); // TG not directly tracked — use modifier checkbox proxy
+    const lpaV = parseFloat(lpa);
+    const apobV = parseFloat(apob);
+    const egfrV = parseFloat(egfr);
+    const hscrpV = parseFloat(hscrp);
+    setEnhChecked(prev => {
+      const next = { ...prev };
+      if (!isNaN(ldlV)) next.enh_persistldl = (ldlV >= 160 && ldlV <= 189);
+      else if (!isNaN(nonhdlV)) next.enh_persistldl = (nonhdlV >= 190 && nonhdlV <= 219);
+      if (!isNaN(lpaV)) next.enh_lpa = lpaV >= 50;
+      if (!isNaN(apobV)) next.enh_apob = apobV >= 130;
+      if (!isNaN(egfrV)) next.enh_ckd = egfrV >= 15 && egfrV < 60;
+      if (!isNaN(hscrpV)) next.enh_hscrp = hscrpV >= 2;
+      next.enh_ethnicity = ethnicity === "indian";
+      next.enh_mets = metsynQualified;
+      // FHx auto from sub-checklist
+      next.enh_fhx = countCheckedItems(FHX_ITEMS, subChecked) >= 1;
+      return next;
+    });
+  }, [ldl, nonhdl, lpa, apob, egfr, hscrp, ethnicity, metsynQualified, subChecked]);
+
+  const enhCount = Object.values(enhChecked).filter(Boolean).length;
+  const enhAutoIds = new Set([
+    "enh_persistldl", "enh_lpa", "enh_apob", "enh_ckd",
+    "enh_hscrp", "enh_ethnicity", "enh_mets", "enh_fhx",
+  ]);
 
   // ─── Classification logic (LAI 2023) ───
   const classify = useCallback((): CategoryResult | null => {
@@ -1204,6 +1243,78 @@ export default function LipidCalculator() {
 
             {/* ── Major RFs + Risk Modifiers (Primary only) ── */}
             {prevType === "primary" && (<>
+
+            {/* ── 2019 ACC/AHA Risk-Enhancing Factors ── */}
+            <Section
+              title="2019 ACC/AHA Risk-Enhancing Factors"
+              tone="indigo"
+              icon={<ShieldQuestion className="h-4 w-4" />}
+              defaultOpen={
+                preventResult?.valid &&
+                (preventResult.category === "Borderline" || preventResult.category === "Intermediate")
+              }
+              badge={<span className="ml-2 rounded-full bg-[hsl(245_70%_55%)]/15 px-2 py-0.5 text-xs font-bold text-[hsl(245_70%_55%)]">
+                {enhCount}/{RISK_ENHANCERS_2019.length}
+              </span>}
+            >
+              <p className="mb-3 text-[11px] text-muted-foreground leading-snug">
+                Use these factors to refine therapy decisions when 10-yr ASCVD risk is{" "}
+                <strong className="text-foreground">borderline (5–&lt;7.5%)</strong> or{" "}
+                <strong className="text-foreground">intermediate (7.5–&lt;20%)</strong>.
+                Presence of one or more favors statin initiation or intensification.
+                Auto-derived items are flagged below.
+              </p>
+
+              {Array.from(new Set(RISK_ENHANCERS_2019.map(e => e.category))).map((cat) => (
+                <div key={cat} className="mb-3">
+                  <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
+                  <div className="space-y-1.5">
+                    {RISK_ENHANCERS_2019.filter(e => e.category === cat).map((item) => {
+                      const isAuto = enhAutoIds.has(item.id);
+                      return (
+                        <RiskFactorChip
+                          key={item.id}
+                          label={item.label}
+                          qualifier={item.qualifier}
+                          tone="indigo"
+                          size="sm"
+                          checked={!!enhChecked[item.id]}
+                          onToggle={() => toggleEnh(item.id)}
+                          disabled={isAuto}
+                          rightSlot={isAuto ? (
+                            <span className="rounded-full bg-[hsl(245_70%_55%)]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[hsl(245_70%_55%)]">auto</span>
+                          ) : undefined}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+
+              {/* ── CAC tie-breaker callout ── */}
+              {preventResult?.valid &&
+               (preventResult.category === "Borderline" || preventResult.category === "Intermediate") && (
+                <div className="mt-3 rounded-lg border border-[hsl(245_70%_55%)]/30 bg-[hsl(245_70%_55%)]/5 p-3">
+                  <p className="text-xs font-bold text-[hsl(245_70%_55%)] mb-1">
+                    Coronary Artery Calcium (CAC) — Tie-Breaker
+                  </p>
+                  <p className="text-[11px] text-foreground leading-relaxed">
+                    If risk-enhancers do not clarify the decision, obtain a CAC score:
+                  </p>
+                  <ul className="mt-1.5 space-y-0.5 text-[11px] text-foreground">
+                    <li>• <strong>CAC = 0</strong> → reasonable to defer/avoid statin (reassess in 5–10 y)</li>
+                    <li>• <strong>CAC 1–99</strong> → favor statin, especially if age ≥55 y</li>
+                    <li>• <strong>CAC ≥100 AU or ≥75th percentile</strong> → initiate statin therapy</li>
+                  </ul>
+                </div>
+              )}
+            </Section>
+
+            {/* ── Divider ── */}
+            <div className="rounded-xl overflow-hidden opacity-60 my-1">
+              <img src={cprFrameworkImg} alt="CPR framework" className="w-full object-cover object-top" style={{ maxHeight: "80px" }} />
+            </div>
+
 
             {/* ── Section 4: Major ASCVD Risk Factors ── */}
             <Section
