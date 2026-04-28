@@ -1258,7 +1258,7 @@ export default function LipidCalculator() {
                 <strong className="text-foreground">borderline (5–&lt;7.5%)</strong> or{" "}
                 <strong className="text-foreground">intermediate (7.5–&lt;20%)</strong>.
                 Presence of one or more favors statin initiation or intensification.
-                Auto-derived items are flagged below.
+                A <strong className="text-foreground">"suggested"</strong> badge appears when an entered value meets the criterion — confirm clinically before checking.
               </p>
 
               {Array.from(new Set(RISK_ENHANCERS_2019.map(e => e.category))).map((cat) => (
@@ -1266,7 +1266,7 @@ export default function LipidCalculator() {
                   <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
                   <div className="space-y-1.5">
                     {RISK_ENHANCERS_2019.filter(e => e.category === cat).map((item) => {
-                      const isAuto = enhAutoIds.has(item.id);
+                      const isSuggested = !!enhSuggested[item.id] && !enhChecked[item.id];
                       return (
                         <RiskFactorChip
                           key={item.id}
@@ -1276,9 +1276,13 @@ export default function LipidCalculator() {
                           size="sm"
                           checked={!!enhChecked[item.id]}
                           onToggle={() => toggleEnh(item.id)}
-                          disabled={isAuto}
-                          rightSlot={isAuto ? (
-                            <span className="rounded-full bg-[hsl(245_70%_55%)]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[hsl(245_70%_55%)]">auto</span>
+                          rightSlot={isSuggested ? (
+                            <span
+                              className="rounded-full bg-[hsl(245_70%_55%)]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[hsl(245_70%_55%)]"
+                              title="Your entered value meets this criterion — click the chip to confirm."
+                            >
+                              suggested
+                            </span>
                           ) : undefined}
                         />
                       );
