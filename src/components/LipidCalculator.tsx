@@ -520,6 +520,43 @@ export default function LipidCalculator() {
     );
   }, [metsynQualified]);
 
+  // ─── 2019 ACC/AHA Risk-Enhancing Factors (Primary Prevention) ───
+  const [enhChecked, setEnhChecked] = useState<Record<string, boolean>>(
+    Object.fromEntries(RISK_ENHANCERS_2019.map(e => [e.id, false]))
+  );
+  const toggleEnh = (id: string) => setEnhChecked(prev => ({ ...prev, [id]: !prev[id] }));
+
+  // Auto-derive enhancers from numeric inputs / ethnicity / sub-checklists
+  useEffect(() => {
+    const ldlV = parseFloat(ldl);
+    const nonhdlV = parseFloat(nonhdl);
+    const tgV = parseFloat(""); // TG not directly tracked — use modifier checkbox proxy
+    const lpaV = parseFloat(lpa);
+    const apobV = parseFloat(apob);
+    const egfrV = parseFloat(egfr);
+    const hscrpV = parseFloat(hscrp);
+    setEnhChecked(prev => {
+      const next = { ...prev };
+      if (!isNaN(ldlV)) next.enh_persistldl = (ldlV >= 160 && ldlV <= 189);
+      else if (!isNaN(nonhdlV)) next.enh_persistldl = (nonhdlV >= 190 && nonhdlV <= 219);
+      if (!isNaN(lpaV)) next.enh_lpa = lpaV >= 50;
+      if (!isNaN(apobV)) next.enh_apob = apobV >= 130;
+      if (!isNaN(egfrV)) next.enh_ckd = egfrV >= 15 && egfrV < 60;
+      if (!isNaN(hscrpV)) next.enh_hscrp = hscrpV >= 2;
+      next.enh_ethnicity = ethnicity === "indian";
+      next.enh_mets = metsynQualified;
+      // FHx auto from sub-checklist
+      next.enh_fhx = countCheckedItems(FHX_ITEMS, subChecked) >= 1;
+      return next;
+    });
+  }, [ldl, nonhdl, lpa, apob, egfr, hscrp, ethnicity, metsynQualified, subChecked]);
+
+  const enhCount = Object.values(enhChecked).filter(Boolean).length;
+  const enhAutoIds = new Set([
+    "enh_persistldl", "enh_lpa", "enh_apob", "enh_ckd",
+    "enh_hscrp", "enh_ethnicity", "enh_mets", "enh_fhx",
+  ]);
+
   // ─── Classification logic (LAI 2023) ───
   const classify = useCallback((): CategoryResult | null => {
     const v = modChecked;
