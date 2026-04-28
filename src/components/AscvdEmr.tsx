@@ -389,6 +389,57 @@ export default function AscvdEmr() {
           </div>
         </SectionCard>
 
+        {/* ─── 2019 ACC/AHA Risk-Enhancing Factors ─── */}
+        <SectionCard
+          title="2019 ACC/AHA Risk-Enhancing Factors"
+          tone="indigo"
+          icon={<ShieldQuestion className="h-4 w-4" />}
+          collapsible={false}
+          badge={
+            <span className="rounded-full bg-[hsl(245_70%_55%)]/15 px-2 py-0.5 text-[10px] font-bold text-[hsl(245_70%_55%)]">
+              {enhCount}/{RISK_ENHANCERS_2019.length}
+            </span>
+          }
+        >
+          <p className="mb-3 text-[11px] text-muted-foreground leading-snug">
+            Use these factors to refine therapy decisions when 10-yr ASCVD risk is{" "}
+            <strong className="text-foreground">borderline (5–&lt;7.5%)</strong> or{" "}
+            <strong className="text-foreground">intermediate (7.5–&lt;20%)</strong>.
+            Presence of one or more favors statin initiation or intensification.
+            A <strong className="text-foreground">"suggested"</strong> badge appears when an entered value meets the criterion — confirm clinically before checking.
+          </p>
+
+          {Array.from(new Set(RISK_ENHANCERS_2019.map(e => e.category))).map((cat) => (
+            <div key={cat} className="mb-3">
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
+              <div className="space-y-1.5">
+                {RISK_ENHANCERS_2019.filter(e => e.category === cat).map((item) => {
+                  const isSuggested = !!enhSuggested[item.id] && !enhChecked[item.id];
+                  return (
+                    <RiskFactorChip
+                      key={item.id}
+                      label={item.label}
+                      qualifier={item.qualifier}
+                      tone="indigo"
+                      size="sm"
+                      checked={!!enhChecked[item.id]}
+                      onToggle={() => toggleEnh(item.id)}
+                      rightSlot={isSuggested ? (
+                        <span
+                          className="rounded-full bg-[hsl(245_70%_55%)]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[hsl(245_70%_55%)]"
+                          title="Your entered value meets this criterion — click the chip to confirm."
+                        >
+                          suggested
+                        </span>
+                      ) : undefined}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </SectionCard>
+
         {/* ─── ASCVD History & Extreme Risk Modifiers ─── */}
         <SectionCard
           title="ASCVD History & Extreme Risk Modifiers"
