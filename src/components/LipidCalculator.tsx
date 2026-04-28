@@ -25,6 +25,7 @@ import {
   Dna, Sparkles, Bone, FlameKindling,
   Flame, GitBranch, Network, Layers, Cloud, Bug,
   Donut, Soup, Eye, Repeat, AlertOctagon, Syringe,
+  ShieldQuestion,
 } from "lucide-react";
 import {
   LabInput,
@@ -44,6 +45,7 @@ import {
   FH_ITEMS, FHX_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
   TOD_ALL, countCheckedItems, type SubItem,
   RISK_MODIFIERS_LAI, HIGH_RISK_FEATURES_LAI,
+  RISK_ENHANCERS_2019,
 } from "@/lib/clinicalConstants";
 
 // ─── Visual mapping: per-item tone + icon for risk-factor chips ───
