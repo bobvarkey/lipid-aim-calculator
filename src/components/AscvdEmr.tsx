@@ -153,6 +153,28 @@ export default function AscvdEmr() {
   const toggleQ = (id: string) =>
     setQChecked((prev) => ({ ...prev, [id]: !prev[id] }));
 
+  // ─── 2019 ACC/AHA Risk-Enhancing Factors (user-driven) ───
+  const [enhChecked, setEnhChecked] = useState<Record<string, boolean>>(
+    Object.fromEntries(RISK_ENHANCERS_2019.map(e => [e.id, false]))
+  );
+  const toggleEnh = (id: string) => setEnhChecked(prev => ({ ...prev, [id]: !prev[id] }));
+
+  const enhSuggested = useMemo<Record<string, boolean>>(() => {
+    const ldlV = Number(data.ldl);
+    return {
+      enh_persistldl: !!ldlV && ldlV >= 160 && ldlV <= 189,
+      enh_lpa: false,
+      enh_apob: false,
+      enh_ckd: false,
+      enh_hscrp: false,
+      enh_ethnicity: false,
+      enh_mets: false,
+      enh_fhx: countCheckedItems(FHX_ITEMS, qChecked) >= 1,
+    };
+  }, [data.ldl, qChecked]);
+
+  const enhCount = Object.values(enhChecked).filter(Boolean).length;
+
   // ─── Auto-qualification logic ───
   const autoQual = useMemo(() => {
     const map: Record<string, boolean> = {};
