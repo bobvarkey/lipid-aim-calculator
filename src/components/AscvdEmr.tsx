@@ -7,14 +7,16 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ChevronDown, User, TestTube, FileText, TrendingUp } from "lucide-react";
+import { ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ChevronDown, User, TestTube, FileText, TrendingUp, ShieldQuestion } from "lucide-react";
 import { SectionCard } from "@/components/ui/section-card";
+import { RiskFactorChip } from "@/components/ui/risk-factor-chip";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
   ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
   FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
   TOD_ALL, countCheckedItems, type SubItem,
+  RISK_ENHANCERS_2019,
 } from "@/lib/clinicalConstants";
 
 // ─── Sub-checklist renderer ───
