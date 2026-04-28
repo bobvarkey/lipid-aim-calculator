@@ -521,41 +521,37 @@ export default function LipidCalculator() {
   }, [metsynQualified]);
 
   // ─── 2019 ACC/AHA Risk-Enhancing Factors (Primary Prevention) ───
+  // User-driven checkbox state — items are NEVER auto-flipped.
   const [enhChecked, setEnhChecked] = useState<Record<string, boolean>>(
     Object.fromEntries(RISK_ENHANCERS_2019.map(e => [e.id, false]))
   );
   const toggleEnh = (id: string) => setEnhChecked(prev => ({ ...prev, [id]: !prev[id] }));
 
-  // Auto-derive enhancers from numeric inputs / ethnicity / sub-checklists
-  useEffect(() => {
+  // Compute non-binding "suggestions" derived from numeric inputs / sub-lists.
+  // These power a "suggested" badge + one-click apply, but never override the user.
+  const enhSuggested = useMemo<Record<string, boolean>>(() => {
     const ldlV = parseFloat(ldl);
     const nonhdlV = parseFloat(nonhdl);
-    const tgV = parseFloat(""); // TG not directly tracked — use modifier checkbox proxy
     const lpaV = parseFloat(lpa);
     const apobV = parseFloat(apob);
     const egfrV = parseFloat(egfr);
     const hscrpV = parseFloat(hscrp);
-    setEnhChecked(prev => {
-      const next = { ...prev };
-      if (!isNaN(ldlV)) next.enh_persistldl = (ldlV >= 160 && ldlV <= 189);
-      else if (!isNaN(nonhdlV)) next.enh_persistldl = (nonhdlV >= 190 && nonhdlV <= 219);
-      if (!isNaN(lpaV)) next.enh_lpa = lpaV >= 50;
-      if (!isNaN(apobV)) next.enh_apob = apobV >= 130;
-      if (!isNaN(egfrV)) next.enh_ckd = egfrV >= 15 && egfrV < 60;
-      if (!isNaN(hscrpV)) next.enh_hscrp = hscrpV >= 2;
-      next.enh_ethnicity = ethnicity === "indian";
-      next.enh_mets = metsynQualified;
-      // FHx auto from sub-checklist
-      next.enh_fhx = countCheckedItems(FHX_ITEMS, subChecked) >= 1;
-      return next;
-    });
+    return {
+      enh_persistldl:
+        (!isNaN(ldlV) && ldlV >= 160 && ldlV <= 189) ||
+        (!isNaN(nonhdlV) && nonhdlV >= 190 && nonhdlV <= 219),
+      enh_lpa: !isNaN(lpaV) && lpaV >= 50,
+      enh_apob: !isNaN(apobV) && apobV >= 130,
+      enh_ckd: !isNaN(egfrV) && egfrV >= 15 && egfrV < 60,
+      enh_hscrp: !isNaN(hscrpV) && hscrpV >= 2,
+      enh_ethnicity: ethnicity === "indian",
+      enh_mets: metsynQualified,
+      enh_fhx: countCheckedItems(FHX_ITEMS, subChecked) >= 1,
+    };
   }, [ldl, nonhdl, lpa, apob, egfr, hscrp, ethnicity, metsynQualified, subChecked]);
 
   const enhCount = Object.values(enhChecked).filter(Boolean).length;
-  const enhAutoIds = new Set([
-    "enh_persistldl", "enh_lpa", "enh_apob", "enh_ckd",
-    "enh_hscrp", "enh_ethnicity", "enh_mets", "enh_fhx",
-  ]);
+
 
   // ─── Classification logic (LAI 2023) ───
   const classify = useCallback((): CategoryResult | null => {
@@ -1262,7 +1258,7 @@ export default function LipidCalculator() {
                 <strong className="text-foreground">borderline (5–&lt;7.5%)</strong> or{" "}
                 <strong className="text-foreground">intermediate (7.5–&lt;20%)</strong>.
                 Presence of one or more favors statin initiation or intensification.
-                Auto-derived items are flagged below.
+                A <strong className="text-foreground">"suggested"</strong> badge appears when an entered value meets the criterion — confirm clinically before checking.
               </p>
 
               {Array.from(new Set(RISK_ENHANCERS_2019.map(e => e.category))).map((cat) => (
@@ -1270,7 +1266,7 @@ export default function LipidCalculator() {
                   <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
                   <div className="space-y-1.5">
                     {RISK_ENHANCERS_2019.filter(e => e.category === cat).map((item) => {
-                      const isAuto = enhAutoIds.has(item.id);
+                      const isSuggested = !!enhSuggested[item.id] && !enhChecked[item.id];
                       return (
                         <RiskFactorChip
                           key={item.id}
@@ -1280,9 +1276,13 @@ export default function LipidCalculator() {
                           size="sm"
                           checked={!!enhChecked[item.id]}
                           onToggle={() => toggleEnh(item.id)}
-                          disabled={isAuto}
-                          rightSlot={isAuto ? (
-                            <span className="rounded-full bg-[hsl(245_70%_55%)]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[hsl(245_70%_55%)]">auto</span>
+                          rightSlot={isSuggested ? (
+                            <span
+                              className="rounded-full bg-[hsl(245_70%_55%)]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[hsl(245_70%_55%)]"
+                              title="Your entered value meets this criterion — click the chip to confirm."
+                            >
+                              suggested
+                            </span>
                           ) : undefined}
                         />
                       );

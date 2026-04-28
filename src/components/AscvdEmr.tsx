@@ -7,14 +7,16 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ChevronDown, User, TestTube, FileText, TrendingUp } from "lucide-react";
+import { ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ChevronDown, User, TestTube, FileText, TrendingUp, ShieldQuestion } from "lucide-react";
 import { SectionCard } from "@/components/ui/section-card";
+import { RiskFactorChip } from "@/components/ui/risk-factor-chip";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
   ASCVD_ESTABLISHED, SUBCLINICAL_ITEMS, HIGH_CAC_ITEMS, CKD_ITEMS,
   FHX_ITEMS, EXTREME_ELEVATION_ITEMS, TOD_MICROVASCULAR, TOD_MACROVASCULAR,
   TOD_ALL, countCheckedItems, type SubItem,
+  RISK_ENHANCERS_2019,
 } from "@/lib/clinicalConstants";
 
 // ─── Sub-checklist renderer ───
@@ -150,6 +152,28 @@ export default function AscvdEmr() {
 
   const toggleQ = (id: string) =>
     setQChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  // ─── 2019 ACC/AHA Risk-Enhancing Factors (user-driven) ───
+  const [enhChecked, setEnhChecked] = useState<Record<string, boolean>>(
+    Object.fromEntries(RISK_ENHANCERS_2019.map(e => [e.id, false]))
+  );
+  const toggleEnh = (id: string) => setEnhChecked(prev => ({ ...prev, [id]: !prev[id] }));
+
+  const enhSuggested = useMemo<Record<string, boolean>>(() => {
+    const ldlV = Number(data.ldl);
+    return {
+      enh_persistldl: !!ldlV && ldlV >= 160 && ldlV <= 189,
+      enh_lpa: false,
+      enh_apob: false,
+      enh_ckd: false,
+      enh_hscrp: false,
+      enh_ethnicity: false,
+      enh_mets: false,
+      enh_fhx: countCheckedItems(FHX_ITEMS, qChecked) >= 1,
+    };
+  }, [data.ldl, qChecked]);
+
+  const enhCount = Object.values(enhChecked).filter(Boolean).length;
 
   // ─── Auto-qualification logic ───
   const autoQual = useMemo(() => {
@@ -363,6 +387,57 @@ export default function AscvdEmr() {
               <span className="font-semibold text-foreground">Plan:</span> <span className="text-foreground">{treatment}</span>
             </div>
           </div>
+        </SectionCard>
+
+        {/* ─── 2019 ACC/AHA Risk-Enhancing Factors ─── */}
+        <SectionCard
+          title="2019 ACC/AHA Risk-Enhancing Factors"
+          tone="indigo"
+          icon={<ShieldQuestion className="h-4 w-4" />}
+          collapsible={false}
+          badge={
+            <span className="rounded-full bg-[hsl(245_70%_55%)]/15 px-2 py-0.5 text-[10px] font-bold text-[hsl(245_70%_55%)]">
+              {enhCount}/{RISK_ENHANCERS_2019.length}
+            </span>
+          }
+        >
+          <p className="mb-3 text-[11px] text-muted-foreground leading-snug">
+            Use these factors to refine therapy decisions when 10-yr ASCVD risk is{" "}
+            <strong className="text-foreground">borderline (5–&lt;7.5%)</strong> or{" "}
+            <strong className="text-foreground">intermediate (7.5–&lt;20%)</strong>.
+            Presence of one or more favors statin initiation or intensification.
+            A <strong className="text-foreground">"suggested"</strong> badge appears when an entered value meets the criterion — confirm clinically before checking.
+          </p>
+
+          {Array.from(new Set(RISK_ENHANCERS_2019.map(e => e.category))).map((cat) => (
+            <div key={cat} className="mb-3">
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
+              <div className="space-y-1.5">
+                {RISK_ENHANCERS_2019.filter(e => e.category === cat).map((item) => {
+                  const isSuggested = !!enhSuggested[item.id] && !enhChecked[item.id];
+                  return (
+                    <RiskFactorChip
+                      key={item.id}
+                      label={item.label}
+                      qualifier={item.qualifier}
+                      tone="indigo"
+                      size="sm"
+                      checked={!!enhChecked[item.id]}
+                      onToggle={() => toggleEnh(item.id)}
+                      rightSlot={isSuggested ? (
+                        <span
+                          className="rounded-full bg-[hsl(245_70%_55%)]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[hsl(245_70%_55%)]"
+                          title="Your entered value meets this criterion — click the chip to confirm."
+                        >
+                          suggested
+                        </span>
+                      ) : undefined}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </SectionCard>
 
         {/* ─── ASCVD History & Extreme Risk Modifiers ─── */}
