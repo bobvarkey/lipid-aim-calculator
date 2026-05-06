@@ -745,6 +745,38 @@ export default function EducationSection() {
           ))}
         </ul>
       </SectionCard>
+
+      {/* ─── ABI Reference ─── */}
+      <SectionCard
+        title="Ankle-Brachial Index (ABI) — PAD Severity"
+        tone="cyan"
+        icon={<Footprints className="h-4 w-4" />}
+        defaultOpen={false}
+      >
+        <p className="mb-3 text-xs text-muted-foreground">
+          ABI is the ratio of ankle to brachial systolic BP. An ABI <strong className="text-foreground">&lt;0.9</strong> confirms peripheral arterial disease and qualifies as ASCVD risk equivalent.
+        </p>
+        <div className="space-y-2">
+          {[
+            { range: "≥1.3",       interp: "Abnormal calcification (non-compressible vessels)", tone: "bg-warning/15 text-warning" },
+            { range: "1.0–1.29",   interp: "Normal value",                                       tone: "bg-success/15 text-success" },
+            { range: "0.9–0.99",   interp: "Borderline PAD",                                     tone: "bg-amber-500/15 text-amber-600 dark:text-amber-400" },
+            { range: "0.7–0.89",   interp: "Mild PAD",                                           tone: "bg-orange-500/15 text-orange-600 dark:text-orange-400" },
+            { range: "0.5–0.69",   interp: "Moderate PAD",                                       tone: "bg-danger/15 text-danger" },
+            { range: "<0.5",       interp: "Severe PAD with impending gangrene",                 tone: "bg-danger/25 text-danger font-bold" },
+          ].map((row) => (
+            <div
+              key={row.range}
+              className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/20 px-3 py-2.5"
+            >
+              <span className={`rounded px-2 py-0.5 text-[11px] font-bold whitespace-nowrap ${row.tone}`}>
+                {row.range}
+              </span>
+              <span className="text-sm leading-snug text-foreground flex-1 text-right">{row.interp}</span>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
     </div>
   );
 }
