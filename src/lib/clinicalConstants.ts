@@ -85,7 +85,7 @@ export const RISK_MODIFIERS_LAI: SubItem[] = [
   { id: "mod_hscrp", label: "hsCRP >2 mg/L", qualifier: "Inflammatory marker" },
   { id: "mod_tg", label: "Triglycerides >150 mg/dL (fasting) or >175 mg/dL (non-fasting)", qualifier: "Hypertriglyceridemia" },
   { id: "mod_autoimmune", label: "RA, Psoriasis, Spondyloarthropathies", qualifier: "Chronic inflammatory conditions" },
-  { id: "mod_pregnancy", label: "Premature menopause, Pre-eclampsia, GDM, PCOS", qualifier: "Women-specific risk modifiers" },
+  { id: "mod_pregnancy", label: "Premature menopause, Pre-eclampsia, GDM, PMOS/ PCOS", qualifier: "Women-specific risk modifiers" },
   { id: "mod_prs", label: "High polygenic risk score", qualifier: "Genetic predisposition" },
   { id: "mod_pollution", label: "Air pollution", qualifier: "Environmental risk factor" },
   { id: "mod_hiv", label: "HIV infection", qualifier: "Viral inflammatory risk" },
@@ -128,6 +128,63 @@ export const HIGH_RISK_FEATURES_LAI: SubItem[] = [
   { id: "feat_mets", label: "Metabolic syndrome", qualifier: "Clusters of cardiovascular risk factors" },
   { id: "feat_nafld", label: "NAFLD with fibrosis (Stage 2/3)", qualifier: "Non-alcoholic fatty liver disease" },
   { id: "feat_cacs", label: "CACS 1–99 and <75th percentile", qualifier: "Mild subclinical atherosclerosis burden" },
+];
+
+// ─── PMOS (Polyendocrine Metabolic Ovarian Syndrome) Diagnostic Criteria ───
+// 2026 Lancet Consensus: two-out-of-three Rotterdam structure with updated thresholds
+export interface PMOSCriterion {
+  id: string;
+  title: string;
+  description: string;
+  subCriteria: { label: string }[];
+}
+
+export const PMOS_DIAGNOSTIC_CRITERIA: PMOSCriterion[] = [
+  {
+    id: "pmos_ovulatory",
+    title: "1. Ovulatory Dysfunction (Oligo- or Anovulation)",
+    description: "",
+    subCriteria: [
+      { label: "< 1 year post-menarche: Irregular cycles are considered normal" },
+      { label: "1 to < 3 years post-menarche: Cycles < 21 or > 45 days" },
+      { label: "> 3 years post-menarche to perimenopause: Cycles < 21 or > 35 days or < 8 cycles per year" },
+      { label: "Amenorrhea: Absence of menstruation for 90 days or more after previously having cycles" },
+    ],
+  },
+  {
+    id: "pmos_hyperandrogenism",
+    title: "2. Hyperandrogenism (Clinical or Biochemical)",
+    description: "",
+    subCriteria: [
+      { label: "Total Testosterone: Elevated above lab reference range (often > 45–60 ng/dL)" },
+      { label: "Free Testosterone: Free Androgen Index (FAI) > 5%" },
+      { label: "Androstenedione and DHEA-S: Elevated above age-specific reference ranges" },
+      { label: "Modified Ferriman-Gallwey (mFG) Score ≥ 4–6 indicates hirsutism" },
+      { label: "Significant androgenic alopecia (male-pattern thinning) or persistent severe adult acne" },
+    ],
+  },
+  {
+    id: "pmos_ovarian",
+    title: "3. Ovarian Morphology or Elevated AMH",
+    description: "",
+    subCriteria: [
+      { label: "Follicle Number per Ovary (FNPO): ≥ 20 follicles (2–9 mm) using ≥ 8 MHz probe" },
+      { label: "Ovarian Volume: > 10 mL in either ovary (0.523 × L × W × T)" },
+      { label: "Serum AMH > 3.2 ng/mL (> 23 pmol/L) — accepted standalone marker in adults" },
+    ],
+  },
+];
+
+export const PMOS_ADULT_VS_ADOLESCENT: { feature: string; adult: string; adolescent: string }[] = [
+  { feature: "Requirements", adult: "2 out of 3", adolescent: "Both Irregular Cycles + Hyperandrogenism" },
+  { feature: "Ultrasound", adult: "Used as 3rd criterion", adolescent: "Not recommended (normal in puberty)" },
+  { feature: "AMH", adult: "Valid alternative to ultrasound", adolescent: "Not recommended for diagnosis" },
+];
+
+export const PMOS_METABOLIC_SCREENING: string[] = [
+  "Fasting Insulin: Often > 15–20 μIU/mL suggests insulin resistance",
+  "HOMA-IR: (Fasting Insulin × Fasting Glucose) / 405 — value > 2.5 = insulin resistance threshold",
+  "HbA1c: Checked for pre-diabetes/diabetes screening (≥ 5.7%)",
 ];
 
 // ─── Helper ───

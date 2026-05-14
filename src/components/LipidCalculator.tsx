@@ -46,6 +46,7 @@ import {
   TOD_ALL, countCheckedItems, type SubItem,
   RISK_MODIFIERS_LAI, HIGH_RISK_FEATURES_LAI,
   RISK_ENHANCERS_2019,
+  PMOS_DIAGNOSTIC_CRITERIA, PMOS_ADULT_VS_ADOLESCENT, PMOS_METABOLIC_SCREENING,
 } from "@/lib/clinicalConstants";
 
 // ─── Visual mapping: per-item tone + icon for risk-factor chips ───
@@ -383,6 +384,7 @@ export default function LipidCalculator() {
   // ─── Sub-checklist state for modifier auto-qualification ───
   const [subChecked, setSubChecked] = useState<Record<string, boolean>>({});
   const [subListOpen, setSubListOpen] = useState<Record<string, boolean>>({});
+  const [pmosOpen, setPmosOpen] = useState(false);
   
   const toggleSub = (id: string) =>
     setSubChecked((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -1438,16 +1440,99 @@ export default function LipidCalculator() {
               <div className="space-y-2">
                 {RISK_MODIFIERS_LAI.map((item) => {
                   const v = MODIFIER_VISUALS_LAI[item.id] ?? { tone: "sky" as LabTone, icon: <ShieldCheck className="h-4 w-4" /> };
+                  const isPmos = item.id === "mod_pregnancy";
                   return (
-                    <RiskFactorChip
-                      key={item.id}
-                      label={item.label}
-                      qualifier={item.qualifier}
-                      icon={v.icon}
-                      tone={v.tone}
-                      checked={!!laiModChecked[item.id]}
-                      onToggle={() => toggleLaiMod(item.id)}
-                    />
+                    <div key={item.id}>
+                      <RiskFactorChip
+                        label={item.label}
+                        qualifier={item.qualifier}
+                        icon={v.icon}
+                        tone={v.tone}
+                        checked={!!laiModChecked[item.id]}
+                        onToggle={() => toggleLaiMod(item.id)}
+                      />
+                      {isPmos && (
+                        <Collapsible open={pmosOpen} onOpenChange={setPmosOpen} className="ml-8 mt-2 mb-1">
+                          <CollapsibleTrigger asChild>
+                            <button className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                              <span className="text-xs font-semibold text-muted-foreground">
+                                PMOS Diagnostic Criteria (2026 Lancet Consensus)
+                              </span>
+                              <ChevronDown className={`h-4 w-4 transition-transform ${pmosOpen ? "rotate-180" : ""}`} />
+                            </button>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="space-y-3 rounded-b-lg border-x border-b border-border bg-muted/30 p-3 pt-2">
+                            <p className="text-[11px] text-muted-foreground leading-snug">
+                              The PMOS (Polyendocrine Metabolic Ovarian Syndrome) diagnostic framework maintains the core "two-out-of-three" Rotterdam structure with updated biochemical thresholds and follicle counting. At least two of three criteria must be met <strong className="text-foreground">after excluding other mimics</strong> (thyroid disease, hyperprolactinemia, non-classic CAH).
+                            </p>
+                            {PMOS_DIAGNOSTIC_CRITERIA.map((criterion) => (
+                              <div key={criterion.id}>
+                                <p className="text-[11px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wide mb-1.5">
+                                  {criterion.title}
+                                </p>
+                                <ul className="space-y-1">
+                                  {criterion.subCriteria.map((sub, i) => (
+                                    <li key={i} className="flex items-start gap-2 text-[11px] text-foreground leading-snug">
+                                      <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400 mt-[5px]" />
+                                      {sub.label}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+
+                            {/* Adult vs Adolescent Comparison */}
+                            <div>
+                              <p className="text-[11px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wide mb-1.5">
+                                Adult vs. Adolescent Criteria
+                              </p>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-[10px] border-collapse">
+                                  <thead>
+                                    <tr className="border-b border-border">
+                                      <th className="text-left py-1 pr-2 font-bold text-foreground">Feature</th>
+                                      <th className="text-center py-1 px-2 font-bold text-foreground">Adult (PMOS)</th>
+                                      <th className="text-center py-1 pl-2 font-bold text-foreground">Adolescent</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="text-muted-foreground">
+                                    {PMOS_ADULT_VS_ADOLESCENT.map((row, i) => (
+                                      <tr key={i} className="border-b border-border/50 last:border-0">
+                                        <td className="py-1 pr-2 font-medium text-foreground">{row.feature}</td>
+                                        <td className="text-center py-1 px-2">{row.adult}</td>
+                                        <td className="text-center py-1 pl-2">{row.adolescent}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+
+                            {/* Metabolic Screening */}
+                            <div>
+                              <p className="text-[11px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wide mb-1.5">
+                                Metabolic Screening (M Severity)
+                              </p>
+                              <p className="text-[10px] text-muted-foreground mb-1.5">
+                                Required to categorize Metabolic severity, though not strictly diagnostic.
+                              </p>
+                              <ul className="space-y-1">
+                                {PMOS_METABOLIC_SCREENING.map((item, i) => (
+                                  <li key={i} className="flex items-start gap-2 text-[11px] text-foreground leading-snug">
+                                    <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400 mt-[5px]" />
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <p className="text-[10px] text-muted-foreground italic border-t border-border pt-2">
+                              Ref: 2026 Lancet Consensus on PMOS Diagnostic Framework
+                            </p>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      )}
+                    </div>
                   );
                 })}
               </div>
