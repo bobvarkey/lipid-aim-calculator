@@ -806,23 +806,70 @@ export default function EducationSection() {
         defaultOpen={false}
       >
         <p className="mb-3 text-sm text-foreground leading-relaxed">
-          A CAC score above 100 doesn't literally change the PREVENT equation, but it <strong>reclassifies risk upward</strong> when used as a decision aid alongside PREVENT. CAC &gt;100 typically pushes an intermediate-risk patient toward more aggressive prevention — especially statin therapy — because event rates and expected treatment benefit are higher.
+          A CAC score above 100 doesn't literally change the PREVENT equation, but it <strong>reclassifies risk upward</strong> when used as a decision aid alongside PREVENT.<Cite n={1} source="Grundy SM, et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline. Circulation. 2019;139(25):e1082–e1143." /> CAC &gt;100 typically pushes an intermediate-risk patient toward more aggressive prevention — especially statin therapy — because event rates and expected treatment benefit are higher.<Cite n={2} source="Budoff MJ, et al. Ten-year association of CAC with all-cause and cause-specific mortality. JACC. 2018;72(4):434–447." />
         </p>
 
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 mb-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1.5">How to Interpret</p>
           <p className="text-sm text-foreground leading-relaxed">
-            PREVENT is a clinical risk estimator based on traditional risk factors; CAC is a <strong>direct measure of coronary atherosclerotic burden</strong>. The 2018 ACC/AHA cholesterol guidance encourages statin initiation when CAC ≥100 AU or ≥75th percentile for age/sex/ethnicity.
+            PREVENT is a clinical risk estimator based on traditional risk factors;<Cite n={3} source="Khan SS, et al. Development and validation of the PREVENT equations. Circulation. 2024;149:430–449." /> CAC is a <strong>direct measure of coronary atherosclerotic burden</strong>. The 2018 ACC/AHA cholesterol guidance encourages statin initiation when CAC ≥100 AU or ≥75th percentile for age/sex/ethnicity.<Cite n={1} source="Grundy SM, et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline. Circulation. 2019;139(25):e1082–e1143." />
           </p>
         </div>
 
         <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 mb-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1.5">Practical Impact</p>
           <ul className="text-sm text-foreground leading-relaxed space-y-1.5 list-disc list-inside marker:text-primary">
-            <li>If PREVENT is borderline or intermediate, CAC &gt;100 supports <strong>starting or intensifying statin therapy</strong> rather than deferring treatment.</li>
-            <li>CAC &gt;100 implies the patient's true risk is likely <strong>higher than PREVENT alone suggests</strong> — it adds direct evidence of established plaque burden.</li>
-            <li>In some studies, CAC ≥100 conferred risk approaching <strong>secondary-prevention-like levels</strong>, especially at higher CAC burdens.</li>
+            <li>If PREVENT is borderline or intermediate, CAC &gt;100 supports <strong>starting or intensifying statin therapy</strong> rather than deferring treatment.<Cite n={1} source="Grundy SM, et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline. Circulation. 2019;139(25):e1082–e1143." /></li>
+            <li>CAC &gt;100 implies the patient's true risk is likely <strong>higher than PREVENT alone suggests</strong> — it adds direct evidence of established plaque burden.<Cite n={4} source="MESA (Multi-Ethnic Study of Atherosclerosis): CAC improves discrimination over traditional risk factors. McClelland RL, et al. JACC. 2015;66:1643–1653." /></li>
+            <li>In some studies, CAC ≥100 conferred risk approaching <strong>secondary-prevention-like levels</strong>, especially at higher CAC burdens.<Cite n={5} source="Mortensen MB, et al. Association of CAC with risk approaching secondary prevention. JAMA Cardiol. 2022;7(2):192–201." /></li>
           </ul>
+        </div>
+
+        {/* What to do next — guideline-style action callout */}
+        <div className="rounded-lg border-2 border-primary/40 bg-gradient-to-br from-primary/10 to-primary/5 p-4 mb-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/20">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+            </span>
+            <p className="text-xs font-bold uppercase tracking-wider text-primary">What to Do Next — Guideline-Directed Action</p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="rounded-md border border-orange-500/30 bg-orange-500/5 p-3">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="rounded bg-orange-500/20 px-2 py-0.5 text-[11px] font-bold text-orange-600 dark:text-orange-400">
+                  CAC ≥100 AU
+                </span>
+                <span className="text-xs font-semibold text-foreground">→ START or INTENSIFY statin</span>
+              </div>
+              <ul className="text-xs text-foreground leading-relaxed space-y-1 ml-1">
+                <li>• Initiate <strong>high-intensity statin</strong> (atorvastatin 40–80 mg or rosuvastatin 20–40 mg).<Cite n={1} source="2018 AHA/ACC/Multisociety Cholesterol Guideline — Class IIa recommendation." /></li>
+                <li>• LDL-C target <strong>&lt;55 mg/dL (&lt;1.4 mmol/L)</strong>; non-HDL-C &lt;85 mg/dL.</li>
+                <li>• Add <strong>ezetimibe 10 mg</strong> if LDL-C goal not met at 4–12 weeks.</li>
+                <li>• Lifestyle reinforcement, BP &lt;130/80, A1c optimization.</li>
+              </ul>
+            </div>
+
+            <div className="rounded-md border border-danger/30 bg-danger/5 p-3">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="rounded bg-danger/20 px-2 py-0.5 text-[11px] font-bold text-danger">
+                  CAC ≥300 AU
+                </span>
+                <span className="text-xs font-semibold text-foreground">→ MAXIMAL statin + add-on therapy</span>
+              </div>
+              <ul className="text-xs text-foreground leading-relaxed space-y-1 ml-1">
+                <li>• <strong>Maximally tolerated high-intensity statin</strong> + ezetimibe upfront.<Cite n={5} source="Mortensen MB, et al. CAC ≥300 confers risk approaching established ASCVD. JAMA Cardiol. 2022." /></li>
+                <li>• LDL-C target <strong>&lt;55 mg/dL</strong>; consider <strong>&lt;40 mg/dL if CAC ≥1000</strong>.</li>
+                <li>• Add <strong>PCSK9 inhibitor or bempedoic acid</strong> if LDL-C goals unmet.</li>
+                <li>• Consider <strong>low-dose aspirin</strong> after shared decision-making (bleeding risk vs. event risk).<Cite n={6} source="Cainzos-Achirica M, et al. Aspirin for primary prevention: CAC-guided decision-making. JACC. 2020;76:1499–1511." /></li>
+                <li>• Functional/anatomic testing if symptoms — consider CCTA or stress imaging.</li>
+              </ul>
+            </div>
+          </div>
+
+          <p className="mt-3 text-[11px] text-muted-foreground italic leading-relaxed">
+            These actions reflect 2018 ACC/AHA cholesterol guideline recommendations operationalized for CAC-defined high risk. Always individualize via shared decision-making.
+          </p>
         </div>
 
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">CAC Rule of Thumb</p>
