@@ -777,6 +777,59 @@ export default function EducationSection() {
           ))}
         </div>
       </SectionCard>
+
+      {/* ─── CAC >100 with PREVENT ─── */}
+      <SectionCard
+        title="CAC >100 — How It Reclassifies PREVENT-Based Risk"
+        tone="amber"
+        icon={<ScanLine className="h-4 w-4" />}
+        defaultOpen={false}
+      >
+        <p className="mb-3 text-sm text-foreground leading-relaxed">
+          A CAC score above 100 doesn't literally change the PREVENT equation, but it <strong>reclassifies risk upward</strong> when used as a decision aid alongside PREVENT. CAC &gt;100 typically pushes an intermediate-risk patient toward more aggressive prevention — especially statin therapy — because event rates and expected treatment benefit are higher.
+        </p>
+
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 mb-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1.5">How to Interpret</p>
+          <p className="text-sm text-foreground leading-relaxed">
+            PREVENT is a clinical risk estimator based on traditional risk factors; CAC is a <strong>direct measure of coronary atherosclerotic burden</strong>. The 2018 ACC/AHA cholesterol guidance encourages statin initiation when CAC ≥100 AU or ≥75th percentile for age/sex/ethnicity.
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 mb-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1.5">Practical Impact</p>
+          <ul className="text-sm text-foreground leading-relaxed space-y-1.5 list-disc list-inside marker:text-primary">
+            <li>If PREVENT is borderline or intermediate, CAC &gt;100 supports <strong>starting or intensifying statin therapy</strong> rather than deferring treatment.</li>
+            <li>CAC &gt;100 implies the patient's true risk is likely <strong>higher than PREVENT alone suggests</strong> — it adds direct evidence of established plaque burden.</li>
+            <li>In some studies, CAC ≥100 conferred risk approaching <strong>secondary-prevention-like levels</strong>, especially at higher CAC burdens.</li>
+          </ul>
+        </div>
+
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">CAC Rule of Thumb</p>
+        <div className="space-y-2">
+          {[
+            { range: "0",        interp: "Risk often LOWER than PREVENT alone suggests — defer/avoid statin reasonable", tone: "bg-success/15 text-success" },
+            { range: "1–99",     interp: "Modest upward shift — moderate-intensity statin generally favored",            tone: "bg-amber-500/15 text-amber-600 dark:text-amber-400" },
+            { range: "≥100",     interp: "Meaningful upward shift — favors pharmacologic prevention (high-intensity statin)", tone: "bg-orange-500/15 text-orange-600 dark:text-orange-400" },
+            { range: "≥300",     interp: "Very high risk — treat aggressively; consider tighter LDL-C targets",          tone: "bg-danger/15 text-danger" },
+            { range: "≥1000",    interp: "Risk approaching secondary prevention — maximal therapy warranted",            tone: "bg-danger/25 text-danger font-bold" },
+          ].map((row) => (
+            <div
+              key={row.range}
+              className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/20 px-3 py-2.5"
+            >
+              <span className={`rounded px-2 py-0.5 text-[11px] font-bold whitespace-nowrap ${row.tone}`}>
+                CAC {row.range}
+              </span>
+              <span className="text-sm leading-snug text-foreground flex-1 text-right">{row.interp}</span>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-3 text-xs text-muted-foreground italic leading-relaxed">
+          Bottom line: CAC &gt;100 upgrades the PREVENT-based risk discussion and usually strengthens the case for statins and tighter preventive targets.
+        </p>
+      </SectionCard>
     </div>
   );
 }
