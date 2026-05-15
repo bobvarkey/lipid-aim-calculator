@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Heart, TrendingUp, AlertTriangle, Dna, Activity, ShieldCheck, ListChecks, Stethoscope, Footprints, ScanLine } from "lucide-react";
+import { Heart, TrendingUp, AlertTriangle, Dna, Activity, ShieldCheck, ListChecks, Stethoscope, Footprints, ScanLine, ChevronDown } from "lucide-react";
 import { SectionCard } from "@/components/ui/section-card";
 
 // ─── Primary Prevention reference content (migrated from former Prevention tab) ───
@@ -829,6 +829,87 @@ export default function EducationSection() {
         <p className="mt-3 text-xs text-muted-foreground italic leading-relaxed">
           Bottom line: CAC &gt;100 upgrades the PREVENT-based risk discussion and usually strengthens the case for statins and tighter preventive targets.
         </p>
+      </SectionCard>
+
+      {/* ─── CAC Threshold Quick-Guide (clickable) ─── */}
+      <SectionCard
+        title="CAC Threshold Quick-Guide"
+        tone="indigo"
+        icon={<ScanLine className="h-4 w-4" />}
+        defaultOpen={false}
+      >
+        <p className="mb-3 text-xs text-muted-foreground">
+          Click any range to expand its clinical interpretation, expected event risk, and recommended action.
+        </p>
+        <div className="space-y-2">
+          {[
+            {
+              range: "0",
+              label: "CAC 0",
+              tone: "bg-success/15 text-success border-success/30",
+              summary: "No detectable calcified plaque",
+              risk: "Very low 10-yr ASCVD risk (~1–2%)",
+              interp: "Risk is often LOWER than PREVENT alone suggests. The 'power of zero' — strong negative predictive value out to 10 years in low/intermediate-risk adults.",
+              action: "Reasonable to DEFER statin in borderline/intermediate PREVENT risk (unless diabetes, FH, smoker, or strong family history). Reassess CAC in 5–10 years.",
+            },
+            {
+              range: "1–99",
+              label: "CAC 1–99 AU",
+              tone: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30",
+              summary: "Mild calcified plaque burden",
+              risk: "Modest upward shift in risk vs. CAC 0",
+              interp: "Confirms presence of subclinical atherosclerosis. Particularly meaningful in younger adults (<55 y) where any CAC is abnormal.",
+              action: "Initiate moderate-intensity statin. LDL-C target <70 mg/dL (<1.8 mmol/L). Address all risk factors aggressively.",
+            },
+            {
+              range: "≥100",
+              label: "CAC ≥100 AU",
+              tone: "bg-orange-500/15 text-orange-600 dark:text-orange-400 border-orange-500/30",
+              summary: "Significant plaque burden — 2018 ACC/AHA statin trigger",
+              risk: "Meaningful upward shift; risk often >7.5%/10-yr regardless of PREVENT estimate",
+              interp: "True risk is likely higher than PREVENT alone suggests. CAC ≥100 OR ≥75th percentile is the guideline-endorsed threshold favoring statin initiation when treatment decision is uncertain.",
+              action: "Start (or intensify to) high-intensity statin. LDL-C target <55 mg/dL (<1.4 mmol/L). Consider ezetimibe add-on if LDL-C goal not met.",
+            },
+            {
+              range: "≥300",
+              label: "CAC ≥300 AU",
+              tone: "bg-danger/15 text-danger border-danger/30",
+              summary: "Extensive coronary calcification",
+              risk: "Very high risk — approaching secondary-prevention event rates in some cohorts",
+              interp: "Patient is functionally in a 'CAC-defined high-risk' category. Treat as if established ASCVD risk equivalent for lipid targets.",
+              action: "Maximal-intensity statin + ezetimibe. LDL-C target <55 mg/dL (consider <40 mg/dL if CAC ≥1000). Add PCSK9 inhibitor if goals unmet. Aspirin discussion warranted.",
+            },
+          ].map((row) => (
+            <details
+              key={row.range}
+              className={`group rounded-lg border bg-muted/10 transition-colors ${row.tone.split(" ").filter(c => c.startsWith("border-")).join(" ")}`}
+            >
+              <summary className="flex cursor-pointer items-center justify-between gap-3 px-3 py-2.5 list-none [&::-webkit-details-marker]:hidden">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <span className={`rounded px-2 py-0.5 text-[11px] font-bold whitespace-nowrap ${row.tone.split(" ").filter(c => !c.startsWith("border-")).join(" ")}`}>
+                    {row.label}
+                  </span>
+                  <span className="text-sm text-foreground truncate">{row.summary}</span>
+                </div>
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180 shrink-0" />
+              </summary>
+              <div className="space-y-2 border-t border-border/50 px-3 py-3 text-sm">
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Event Risk: </span>
+                  <span className="text-foreground">{row.risk}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Interpretation: </span>
+                  <span className="text-foreground leading-relaxed">{row.interp}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-primary">Recommended Action: </span>
+                  <span className="text-foreground leading-relaxed">{row.action}</span>
+                </div>
+              </div>
+            </details>
+          ))}
+        </div>
       </SectionCard>
     </div>
   );
