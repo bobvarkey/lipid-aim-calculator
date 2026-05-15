@@ -1,6 +1,26 @@
 import { Card } from "@/components/ui/card";
-import { Heart, TrendingUp, AlertTriangle, Dna, Activity, ShieldCheck, ListChecks, Stethoscope, Footprints, ScanLine, ChevronDown } from "lucide-react";
+import { Heart, TrendingUp, AlertTriangle, Dna, Activity, ShieldCheck, ListChecks, Stethoscope, Footprints, ScanLine, ChevronDown, Sparkles, BookOpen } from "lucide-react";
 import { SectionCard } from "@/components/ui/section-card";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+
+// Inline citation marker — renders a clickable superscript with a tooltip
+function Cite({ n, source }: { n: number; source: string }) {
+  return (
+    <Tooltip delayDuration={150}>
+      <TooltipTrigger asChild>
+        <sup className="ml-0.5 cursor-help rounded bg-primary/15 px-1 py-0.5 text-[9px] font-bold text-primary hover:bg-primary/25 transition-colors">
+          [{n}]
+        </sup>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-sm">
+        <div className="flex gap-1.5">
+          <BookOpen className="h-3 w-3 mt-0.5 shrink-0 text-primary" />
+          <span className="leading-relaxed">{source}</span>
+        </div>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
 
 // ─── Primary Prevention reference content (migrated from former Prevention tab) ───
 const PRIMARY_PREVENTION_STEPS = [
