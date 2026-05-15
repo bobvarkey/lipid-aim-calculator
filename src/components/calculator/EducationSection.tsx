@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Heart, TrendingUp, AlertTriangle, Dna, Activity, ShieldCheck, ListChecks, Stethoscope, Footprints, ScanLine } from "lucide-react";
+import { Heart, TrendingUp, AlertTriangle, Dna, Activity, ShieldCheck, ListChecks, Stethoscope, Footprints, ScanLine, ChevronDown } from "lucide-react";
 import { SectionCard } from "@/components/ui/section-card";
 
 // ─── Primary Prevention reference content (migrated from former Prevention tab) ───
