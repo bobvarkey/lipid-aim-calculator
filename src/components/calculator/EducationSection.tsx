@@ -891,7 +891,7 @@ export default function EducationSection() {
                   </span>
                   <span className="text-sm text-foreground truncate">{row.summary}</span>
                 </div>
-                <ChevronIcon />
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180 shrink-0" />
               </summary>
               <div className="space-y-2 border-t border-border/50 px-3 py-3 text-sm">
                 <div>
