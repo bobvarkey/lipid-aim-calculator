@@ -1310,6 +1310,9 @@ export default function LipidCalculator() {
                   </ul>
                 </div>
               )}
+
+              {/* ── CAC-driven LDL-C target guide (auto-updates on selection) ── */}
+              <CacLdlTargetGuide />
             </Section>
 
             {/* ── Divider ── */}
