@@ -34,6 +34,7 @@ import {
   type LabTone,
 } from "@/components/ui/lab-input";
 import { RiskFactorChip } from "@/components/ui/risk-factor-chip";
+import { CacLdlTargetGuide } from "@/components/calculator/CacLdlTargetGuide";
 
 import heroDoctorImg from "@/assets/hero-doctor.jpg";
 import cvRiskImg from "@/assets/cv-risk-measures.png";
