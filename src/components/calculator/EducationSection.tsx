@@ -934,7 +934,7 @@ export default function EducationSection() {
               tone: "bg-orange-500/15 text-orange-600 dark:text-orange-400 border-orange-500/30",
               summary: "Significant plaque burden — 2018 ACC/AHA statin trigger",
               risk: "Meaningful upward shift; risk often >7.5%/10-yr regardless of 10-year risk estimate",
-              interp: "True risk is likely higher than PREVENT alone suggests. CAC ≥100 OR ≥75th percentile is the guideline-endorsed threshold favoring statin initiation when treatment decision is uncertain.",
+              interp: "True risk is likely higher than the 10-year estimate alone suggests. CAC ≥100 OR ≥75th percentile is the guideline-endorsed threshold favoring statin initiation when treatment decision is uncertain.",
               action: "Start (or intensify to) high-intensity statin. LDL-C target <55 mg/dL (<1.4 mmol/L). Consider ezetimibe add-on if LDL-C goal not met.",
             },
             {
