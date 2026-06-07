@@ -29,7 +29,7 @@ const PRIMARY_PREVENTION_STEPS = [
     items: [
       "Confirm no clinical ASCVD (no prior MI, stroke, PAD, revascularization).",
       "Obtain fasting or nonfasting lipid panel, A1c, creatinine, urine albumin/creatinine, etc.",
-      "Calculate 10-year ASCVD risk with PREVENT-ASCVD for adults 30–79 y (updated ACC/AHA guideline) or Pooled Cohort Equations where PREVENT is not yet embedded.",
+      "Calculate 10-year ASCVD risk for adults 30–79 y per 2026 ACC/AHA guidelines and LAI 2023 Consensus Statement IV.",
     ],
   },
   {
@@ -683,7 +683,7 @@ export default function EducationSection() {
         defaultOpen={false}
       >
         <p className="mb-3 text-xs text-muted-foreground">
-          Reference workflow for adults 40–75 y without clinical ASCVD. The interactive risk-factor counting and PREVENT calculation are available in the Calculator tab.
+          Reference workflow for adults 40–75 y without clinical ASCVD. The interactive risk-factor counting and 10-year ASCVD risk estimation are available in the Calculator tab.
         </p>
         <div className="space-y-3">
           {PRIMARY_PREVENTION_STEPS.map((step, i) => (
@@ -800,27 +800,27 @@ export default function EducationSection() {
 
       {/* ─── CAC >100 with PREVENT ─── */}
       <SectionCard
-        title="CAC >100 — How It Reclassifies PREVENT-Based Risk"
+        title="CAC >100 — How It Reclassifies Risk"
         tone="amber"
         icon={<ScanLine className="h-4 w-4" />}
         defaultOpen={false}
       >
         <p className="mb-3 text-sm text-foreground leading-relaxed">
-          A CAC score above 100 doesn't literally change the PREVENT equation, but it <strong>reclassifies risk upward</strong> when used as a decision aid alongside PREVENT.<Cite n={1} source="Grundy SM, et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline. Circulation. 2019;139(25):e1082–e1143." /> CAC &gt;100 typically pushes an intermediate-risk patient toward more aggressive prevention — especially statin therapy — because event rates and expected treatment benefit are higher.<Cite n={2} source="Budoff MJ, et al. Ten-year association of CAC with all-cause and cause-specific mortality. JACC. 2018;72(4):434–447." />
+          A CAC score above 100 doesn't literally change the 10-year risk equation, but it <strong>reclassifies risk upward</strong> when used as a decision aid alongside 10-year risk estimates.<Cite n={1} source="Grundy SM, et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline. Circulation. 2019;139(25):e1082–e1143." /> CAC &gt;100 typically pushes an intermediate-risk patient toward more aggressive prevention — especially statin therapy — because event rates and expected treatment benefit are higher.<Cite n={2} source="Budoff MJ, et al. Ten-year association of CAC with all-cause and cause-specific mortality. JACC. 2018;72(4):434–447." />
         </p>
 
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 mb-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1.5">How to Interpret</p>
           <p className="text-sm text-foreground leading-relaxed">
-            PREVENT is a clinical risk estimator based on traditional risk factors;<Cite n={3} source="Khan SS, et al. Development and validation of the PREVENT equations. Circulation. 2024;149:430–449." /> CAC is a <strong>direct measure of coronary atherosclerotic burden</strong>. The 2018 ACC/AHA cholesterol guidance encourages statin initiation when CAC ≥100 AU or ≥75th percentile for age/sex/ethnicity.<Cite n={1} source="Grundy SM, et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline. Circulation. 2019;139(25):e1082–e1143." />
+            The 10-year ASCVD risk estimate is a clinical risk estimator based on traditional risk factors;<Cite n={3} source="Khan SS, et al. Development and validation of the PREVENT equations. Circulation. 2024;149:430–449." /> CAC is a <strong>direct measure of coronary atherosclerotic burden</strong>. The 2018 ACC/AHA cholesterol guidance encourages statin initiation when CAC ≥100 AU or ≥75th percentile for age/sex/ethnicity.<Cite n={1} source="Grundy SM, et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline. Circulation. 2019;139(25):e1082–e1143." />
           </p>
         </div>
 
         <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 mb-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1.5">Practical Impact</p>
           <ul className="text-sm text-foreground leading-relaxed space-y-1.5 list-disc list-inside marker:text-primary">
-            <li>If PREVENT is borderline or intermediate, CAC &gt;100 supports <strong>starting or intensifying statin therapy</strong> rather than deferring treatment.<Cite n={1} source="Grundy SM, et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline. Circulation. 2019;139(25):e1082–e1143." /></li>
-            <li>CAC &gt;100 implies the patient's true risk is likely <strong>higher than PREVENT alone suggests</strong> — it adds direct evidence of established plaque burden.<Cite n={4} source="MESA (Multi-Ethnic Study of Atherosclerosis): CAC improves discrimination over traditional risk factors. McClelland RL, et al. JACC. 2015;66:1643–1653." /></li>
+            <li>If the 10-year risk estimate is borderline or intermediate, CAC &gt;100 supports <strong>starting or intensifying statin therapy</strong> rather than deferring treatment.<Cite n={1} source="Grundy SM, et al. 2018 AHA/ACC/Multisociety Cholesterol Guideline. Circulation. 2019;139(25):e1082–e1143." /></li>
+            <li>CAC &gt;100 implies the patient's true risk is likely <strong>higher than the 10-year estimate alone suggests</strong> — it adds direct evidence of established plaque burden.<Cite n={4} source="MESA (Multi-Ethnic Study of Atherosclerosis): CAC improves discrimination over traditional risk factors. McClelland RL, et al. JACC. 2015;66:1643–1653." /></li>
             <li>In some studies, CAC ≥100 conferred risk approaching <strong>secondary-prevention-like levels</strong>, especially at higher CAC burdens.<Cite n={5} source="Mortensen MB, et al. Association of CAC with risk approaching secondary prevention. JAMA Cardiol. 2022;7(2):192–201." /></li>
           </ul>
         </div>
@@ -875,7 +875,7 @@ export default function EducationSection() {
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">CAC Rule of Thumb</p>
         <div className="space-y-2">
           {[
-            { range: "0",        interp: "Risk often LOWER than PREVENT alone suggests — defer/avoid statin reasonable", tone: "bg-success/15 text-success" },
+            { range: "0",        interp: "Risk often LOWER than 10-year estimate alone suggests — defer/avoid statin reasonable", tone: "bg-success/15 text-success" },
             { range: "1–99",     interp: "Modest upward shift — moderate-intensity statin generally favored",            tone: "bg-amber-500/15 text-amber-600 dark:text-amber-400" },
             { range: "≥100",     interp: "Meaningful upward shift — favors pharmacologic prevention (high-intensity statin)", tone: "bg-orange-500/15 text-orange-600 dark:text-orange-400" },
             { range: "≥300",     interp: "Very high risk — treat aggressively; consider tighter LDL-C targets",          tone: "bg-danger/15 text-danger" },
@@ -894,7 +894,7 @@ export default function EducationSection() {
         </div>
 
         <p className="mt-3 text-xs text-muted-foreground italic leading-relaxed">
-          Bottom line: CAC &gt;100 upgrades the PREVENT-based risk discussion and usually strengthens the case for statins and tighter preventive targets.
+          Bottom line: CAC &gt;100 upgrades the risk-based prevention discussion and usually strengthens the case for statins and tighter preventive targets.
         </p>
       </SectionCard>
 
@@ -916,8 +916,8 @@ export default function EducationSection() {
               tone: "bg-success/15 text-success border-success/30",
               summary: "No detectable calcified plaque",
               risk: "Very low 10-yr ASCVD risk (~1–2%)",
-              interp: "Risk is often LOWER than PREVENT alone suggests. The 'power of zero' — strong negative predictive value out to 10 years in low/intermediate-risk adults.",
-              action: "Reasonable to DEFER statin in borderline/intermediate PREVENT risk (unless diabetes, FH, smoker, or strong family history). Reassess CAC in 5–10 years.",
+              interp: "Risk is often LOWER than 10-year estimate alone suggests. The 'power of zero' — strong negative predictive value out to 10 years in low/intermediate-risk adults.",
+              action: "Reasonable to DEFER statin in borderline/intermediate risk (unless diabetes, FH, smoker, or strong family history). Reassess CAC in 5–10 years.",
             },
             {
               range: "1–99",
@@ -933,7 +933,7 @@ export default function EducationSection() {
               label: "CAC ≥100 AU",
               tone: "bg-orange-500/15 text-orange-600 dark:text-orange-400 border-orange-500/30",
               summary: "Significant plaque burden — 2018 ACC/AHA statin trigger",
-              risk: "Meaningful upward shift; risk often >7.5%/10-yr regardless of PREVENT estimate",
+              risk: "Meaningful upward shift; risk often >7.5%/10-yr regardless of 10-year risk estimate",
               interp: "True risk is likely higher than PREVENT alone suggests. CAC ≥100 OR ≥75th percentile is the guideline-endorsed threshold favoring statin initiation when treatment decision is uncertain.",
               action: "Start (or intensify to) high-intensity statin. LDL-C target <55 mg/dL (<1.4 mmol/L). Consider ezetimibe add-on if LDL-C goal not met.",
             },
