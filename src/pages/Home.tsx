@@ -17,7 +17,7 @@ const Home = () => {
     {
       icon: ActivitySquare,
       title: "ASCVD Assessment",
-      description: "10-year risk stratification using PREVENT equations, aligned with ACC/AHA guidelines.",
+      description: "10-year risk stratification aligned with 2026 ACC/AHA guidelines and LAI 2023 Consensus Statement IV.",
       iconBg: "bg-[hsl(207,90%,54%)]",
       path: "/ascvd",
     },
