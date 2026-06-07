@@ -17,7 +17,7 @@ const CAC_OPTIONS: {
     ldlTarget: "No specific LDL-C threshold required from CAC",
     intensity: "Statin generally deferrable",
     rationale:
-      "No detectable plaque. Risk often LOWER than PREVENT alone suggests. Reasonable to defer statin in borderline / intermediate PREVENT risk; reassess CAC in 5–10 y.",
+      "No detectable plaque. Risk often LOWER than 10-year risk estimate alone suggests. Reasonable to defer statin in borderline / intermediate risk; reassess CAC in 5–10 y.",
     tone: "emerald",
   },
   {
@@ -26,7 +26,7 @@ const CAC_OPTIONS: {
     ldlTarget: "LDL-C < 100 mg/dL (consider < 70 mg/dL)",
     intensity: "Moderate-intensity statin",
     rationale:
-      "Mild plaque burden — modest upward risk shift over PREVENT estimate. Initiate moderate-intensity statin, especially if age ≥ 55 y or risk-enhancers present.",
+      "Mild plaque burden — modest upward risk shift over 10-year risk estimate. Initiate moderate-intensity statin, especially if age ≥ 55 y or risk-enhancers present.",
     tone: "amber",
   },
   {
@@ -35,7 +35,7 @@ const CAC_OPTIONS: {
     ldlTarget: "LDL-C < 70 mg/dL (target < 55 mg/dL if enhancers)",
     intensity: "High-intensity statin — START or INTENSIFY",
     rationale:
-      "Guideline-endorsed statin trigger (2018 ACC/AHA). Meaningful upward risk shift; PREVENT alone underestimates true ASCVD risk. Initiate high-intensity statin; add ezetimibe if LDL-C above goal.",
+      "Guideline-endorsed statin trigger (2018 ACC/AHA). Meaningful upward risk shift; 10-year risk estimate alone may underestimate true ASCVD risk. Initiate high-intensity statin; add ezetimibe if LDL-C above goal.",
     tone: "orange",
   },
   {

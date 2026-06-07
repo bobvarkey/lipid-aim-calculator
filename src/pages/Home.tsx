@@ -17,7 +17,7 @@ const Home = () => {
     {
       icon: ActivitySquare,
       title: "ASCVD Assessment",
-      description: "10-year risk stratification using PREVENT equations, aligned with ACC/AHA guidelines.",
+      description: "10-year risk stratification aligned with 2026 ACC/AHA guidelines and LAI 2023 Consensus Statement IV.",
       iconBg: "bg-[hsl(207,90%,54%)]",
       path: "/ascvd",
     },
@@ -119,7 +119,7 @@ const Home = () => {
                       10-Year ASCVD Risk
                     </p>
                     <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                      PREVENT 2024 Equations
+                      2026 ACC/AHA & LAI 2023
                     </p>
                   </div>
                 </div>
@@ -176,7 +176,7 @@ const Home = () => {
               </h2>
               <p className="text-[hsl(var(--muted-foreground))] mb-6 leading-relaxed">
                 Precision medicine at your fingertips. Our validated algorithms
-                combine the PREVENT equations and dual-guideline logic
+                combine current 2026 ACC/AHA and LAI 2023 guideline logic
                 (ACC/AHA 2026 &amp; LAI 2023) to deliver accurate, actionable
                 risk profiles for every patient.
               </p>
@@ -215,7 +215,7 @@ const Home = () => {
                 <div>
                   <p className="text-sm font-bold">Comprehensive Diagnostics</p>
                   <p className="text-xs opacity-90 mt-0.5">
-                    LDL-C · Non-HDL-C · ApoB · Lp(a) · PREVENT Score
+                    LDL-C · Non-HDL-C · ApoB · Lp(a) · 10-Yr ASCVD Risk
                   </p>
                 </div>
               </div>

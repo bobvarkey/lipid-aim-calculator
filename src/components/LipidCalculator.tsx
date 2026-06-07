@@ -804,7 +804,7 @@ export default function LipidCalculator() {
                   : "text-rose-800 dark:text-rose-300"
               }`}>
                 {prevType === "primary"
-                  ? "No established ASCVD — uses PREVENT 10-yr risk + risk-factor counting"
+                  ? "No established ASCVD — uses 10-yr ASCVD risk estimation + risk-factor counting"
                   : "Established ASCVD — auto-classifies VHR / Extreme A·B·C buckets"}
               </p>
             </div>
@@ -1127,7 +1127,7 @@ export default function LipidCalculator() {
               </div>
               {/* PREVENT-specific */}
               <div className="border-t border-border pt-3 mt-1">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">PREVENT Calculator Inputs</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">ASCVD Risk Calculator Inputs</p>
                 <div className="grid grid-cols-2 gap-3 mb-2">
                   <LabInput
                     label="Systolic BP"
@@ -1168,7 +1168,7 @@ export default function LipidCalculator() {
             {prevType === "primary" && (<>
             {/* ── Section 3: PREVENT Risk Score ── */}
             <Section
-              title="AHA PREVENT — 10-Year ASCVD Risk"
+              title="10-Year ASCVD Risk Estimate"
               tone="accent"
               icon={<TrendingUp className="h-4 w-4" />}
               defaultOpen={true}
@@ -1217,7 +1217,7 @@ export default function LipidCalculator() {
                     ))}
                   </ul>
                   <p className="text-[10px] text-muted-foreground italic">
-                    Ref: Khan SS et al. Circulation 2024;149(6):430-449.
+                    Ref: 2026 ACC/AHA Guideline on the Management of Dyslipidemia; LAI 2023 Consensus Statement IV.
                   </p>
                 </div>
               ) : preventResult && !preventResult.valid ? (
