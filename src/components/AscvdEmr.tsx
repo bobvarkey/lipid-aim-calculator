@@ -10,6 +10,7 @@ import {
 import { ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ChevronDown, User, TestTube, FileText, TrendingUp, ShieldQuestion } from "lucide-react";
 import { SectionCard } from "@/components/ui/section-card";
 import { RiskFactorChip } from "@/components/ui/risk-factor-chip";
+import { CacManagementFootnote } from "@/components/calculator/CacManagementFootnote";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
