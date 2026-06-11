@@ -10,6 +10,7 @@ import {
 import { ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ChevronDown, User, TestTube, FileText, TrendingUp, ShieldQuestion } from "lucide-react";
 import { SectionCard } from "@/components/ui/section-card";
 import { RiskFactorChip } from "@/components/ui/risk-factor-chip";
+import { CacManagementFootnote } from "@/components/calculator/CacManagementFootnote";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -557,45 +558,8 @@ export default function AscvdEmr() {
           </Button>
         </SectionCard>
 
-        {/* ── Footnote: Subclinical Atherosclerosis — CAC Score Management ── */}
-        <footer className="mt-4 rounded-lg border border-border bg-muted/30 p-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-            Footnote — Subclinical Atherosclerosis: CAC Score Management
-          </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-[11px] sm:text-xs">
-              <thead>
-                <tr className="border-b border-border text-left text-muted-foreground">
-                  <th className="py-1.5 pr-3 font-semibold">CAC Score</th>
-                  <th className="py-1.5 pr-3 font-semibold">Risk / Action</th>
-                  <th className="py-1.5 font-semibold">LDL-C Target</th>
-                </tr>
-              </thead>
-              <tbody className="text-foreground">
-                <tr className="border-b border-border/50">
-                  <td className="py-1.5 pr-3 font-semibold">0</td>
-                  <td className="py-1.5 pr-3">Low risk</td>
-                  <td className="py-1.5">&lt;100 mg/dL (&lt;2.6 mmol/L)</td>
-                </tr>
-                <tr className="border-b border-border/50">
-                  <td className="py-1.5 pr-3 font-semibold">1–99 AU</td>
-                  <td className="py-1.5 pr-3">Start moderate statin</td>
-                  <td className="py-1.5">&lt;70 mg/dL (&lt;1.8 mmol/L)</td>
-                </tr>
-                <tr className="border-b border-border/50">
-                  <td className="py-1.5 pr-3 font-semibold">100–399 AU</td>
-                  <td className="py-1.5 pr-3">High-intensity statin</td>
-                  <td className="py-1.5">&lt;55 mg/dL (&lt;1.4 mmol/L)</td>
-                </tr>
-                <tr>
-                  <td className="py-1.5 pr-3 font-semibold text-danger">≥400 AU</td>
-                  <td className="py-1.5 pr-3">Very high-intensity</td>
-                  <td className="py-1.5 font-semibold">&lt;40 mg/dL (&lt;1.0 mmol/L)</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </footer>
+        {/* ── Interactive Footnote: CAC Score Management mini-app ── */}
+        <CacManagementFootnote />
       </div>
     </div>
   );
