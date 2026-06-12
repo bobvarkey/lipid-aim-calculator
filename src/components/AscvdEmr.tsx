@@ -11,6 +11,7 @@ import { ClipboardCopy, ArrowLeft, AlertTriangle, Heart, ChevronDown, User, Test
 import { SectionCard } from "@/components/ui/section-card";
 import { RiskFactorChip } from "@/components/ui/risk-factor-chip";
 import { CacManagementFootnote } from "@/components/calculator/CacManagementFootnote";
+import { HypothyroidismCaveat } from "@/components/calculator/HypothyroidismCaveat";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -560,6 +561,9 @@ export default function AscvdEmr() {
 
         {/* ── Interactive Footnote: CAC Score Management mini-app ── */}
         <CacManagementFootnote />
+
+        {/* ── Clinical Caveat: Rule out Hypothyroidism before statin ── */}
+        <HypothyroidismCaveat />
       </div>
     </div>
   );
