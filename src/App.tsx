@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Index from "./pages/Index";
+import MiniApp from "./pages/MiniApp";
 import NotFound from "./pages/NotFound";
 import AscvdEmr from "./components/AscvdEmr";
 
@@ -17,7 +18,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<MiniApp />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/calculator" element={<Index />} />
           <Route path="/ascvd" element={<AscvdEmr />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
