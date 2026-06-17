@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/select";
 import { calculatePrevent } from "@/lib/prevent";
 import { useToast } from "@/hooks/use-toast";
-import HypothyroidismCaveat from "@/components/calculator/HypothyroidismCaveat";
+import { HypothyroidismCaveat } from "@/components/calculator/HypothyroidismCaveat";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
