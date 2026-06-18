@@ -860,19 +860,30 @@ export default function MiniApp() {
         <MiniSection icon={<AlertTriangle className="h-3.5 w-3.5" />} title="Advanced Risk Enhancers" tone="amber"
           collapsible defaultOpen={false}>
           <div className="space-y-2">
-            {[
-              ["metsyn", "Metabolic Syndrome"],
-              ["inflammatory", "Chronic Inflammatory Disease"],
-              ["prematureMenopause", "Premature Menopause"],
-              ["preeclampsia", "History of Preeclampsia"],
-              ["hsCRP", "hs-CRP >2 mg/L"],
-              ["abi", "ABI <0.9"],
-              ["subclinical", "Subclinical Atherosclerosis (CAC/Plaque)"],
-            ].map(([k, label]) => (
-              <label key={k} className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm cursor-pointer hover:bg-muted/30">
-                <Checkbox checked={(enhancer as any)[k]} onCheckedChange={(c) => setEnhancer({ ...enhancer, [k]: !!c } as EnhancerState)} />
-                <span>{label}</span>
-              </label>
+            {([
+              ["metsyn", "Metabolic Syndrome", "Cluster of ≥3: abdominal obesity, ↑TG, ↓HDL, ↑BP, ↑fasting glucose. Multiplies ASCVD risk."],
+              ["inflammatory", "Chronic Inflammatory Disease", "RA, psoriasis, lupus, IBD, or HIV — chronic systemic inflammation accelerates atherosclerosis."],
+              ["prematureMenopause", "Premature Menopause", "Menopause before age 40 (natural) or 45 (surgical) — loss of estrogen protection."],
+              ["preeclampsia", "Adverse Pregnancy Outcome", "Preeclampsia, GDM, or pregnancy-induced hypertension — long-term ASCVD risk."],
+              ["hsCRP", "Elevated hs-CRP", "≥2 mg/L marks vascular inflammation — risk-enhancing factor in primary prevention."],
+              ["abi", "Abnormal ABI", "Ankle-brachial index <0.9 (PAD) or >1.4 (non-compressible) — vascular disease marker."],
+              ["subclinical", "Subclinical Atherosclerosis", "CAC ≥100 AU, carotid plaque, or elevated CIMT on imaging — direct evidence of plaque."],
+              ["nafld", "NAFLD / MASLD with fibrosis", "Hepatic steatosis with significant fibrosis — independent ASCVD risk factor."],
+              ["sleepApnea", "Obstructive Sleep Apnea", "AHI ≥5 — moderate-severe disease (AHI ≥15) independently raises CVD risk."],
+              ["pcos", "Polycystic Ovary Syndrome", "Hyperandrogenism + ovulatory dysfunction ± insulin resistance — early ASCVD risk."],
+              ["highPRS", "High Polygenic Risk / Monogenic FH", "Top-decile PRS for CAD or pathogenic FH variant — genetic ASCVD predisposition."],
+            ] as const).map(([k, label, expl]) => (
+              <RiskFactorRow
+                key={k}
+                id={`enh-${k}`}
+                label={label}
+                checked={(enhancer as any)[k]}
+                onChange={(v) => setEnhancer({ ...enhancer, [k]: v } as EnhancerState)}
+                explanation={expl}
+                criteria={CRITERIA[k]}
+                details={details}
+                onToggleDetail={toggleDetail}
+              />
             ))}
           </div>
         </MiniSection>
