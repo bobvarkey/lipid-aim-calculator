@@ -53,6 +53,8 @@ interface PatientState {
 
 interface MajorRiskState {
   ascvd: boolean;
+  polyvascular: boolean;
+  recurrentAscvd: boolean;
   diabetes: boolean;
   diabetesTOD: boolean;
   htn: boolean;
