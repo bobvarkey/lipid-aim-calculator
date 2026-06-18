@@ -83,6 +83,10 @@ interface EnhancerState {
   hsCRP: boolean;
   abi: boolean;
   subclinical: boolean;
+  nafld: boolean;
+  sleepApnea: boolean;
+  pcos: boolean;
+  highPRS: boolean;
 }
 
 interface VitalsState {
