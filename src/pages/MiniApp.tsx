@@ -521,6 +521,8 @@ export default function MiniApp() {
     nafld: false, sleepApnea: false, pcos: false, highPRS: false,
   });
   const [details, setDetails] = useState<Record<string, boolean>>({});
+  const toggleDetail = (id: string, v: boolean) =>
+    setDetails((d) => ({ ...d, [id]: v }));
   const [vitals, setVitals] = useState<VitalsState>({
     sbp: { ...blankRange }, heightCm: "", weightKg: "", egfr: "",
   });
