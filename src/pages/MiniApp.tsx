@@ -739,10 +739,21 @@ export default function MiniApp() {
           subtitle="Tap the chevron for guideline rationale">
           <div className="space-y-2">
             <RiskFactorRow id="ascvd" label="Established ASCVD" checked={risk.ascvd}
-              onChange={(v) => setRisk({ ...risk, ascvd: v })} explanation={RISK_EXPLANATIONS.ascvd} />
+              onChange={(v) => setRisk({ ...risk, ascvd: v })}
+              explanation={RISK_EXPLANATIONS.ascvd}
+              criteria={CRITERIA.ascvd} details={details} onToggleDetail={toggleDetail} />
+            <RiskFactorRow id="polyvascular" label="Polyvascular Disease" checked={risk.polyvascular}
+              onChange={(v) => setRisk({ ...risk, polyvascular: v })}
+              explanation={RISK_EXPLANATIONS.polyvascular}
+              criteria={CRITERIA.polyvascular} details={details} onToggleDetail={toggleDetail} />
+            <RiskFactorRow id="recurrentAscvd" label="Recurrent ASCVD (LDL ≤30 mg/dL on therapy)" checked={risk.recurrentAscvd}
+              onChange={(v) => setRisk({ ...risk, recurrentAscvd: v })}
+              explanation={RISK_EXPLANATIONS.recurrentAscvd}
+              criteria={CRITERIA.recurrentAscvd} details={details} onToggleDetail={toggleDetail} />
             <RiskFactorRow id="dm" label="Diabetes" checked={risk.diabetes}
               onChange={(v) => setRisk({ ...risk, diabetes: v, diabetesTOD: v ? risk.diabetesTOD : false })}
-              explanation={RISK_EXPLANATIONS.diabetes}>
+              explanation={RISK_EXPLANATIONS.diabetes}
+              criteria={CRITERIA.diabetes} details={details} onToggleDetail={toggleDetail}>
               <div className="flex items-center gap-2">
                 <Checkbox id="tod" checked={risk.diabetesTOD} onCheckedChange={(c) => setRisk({ ...risk, diabetesTOD: !!c })} />
                 <label htmlFor="tod" className="text-xs font-medium cursor-pointer">
@@ -751,12 +762,17 @@ export default function MiniApp() {
               </div>
             </RiskFactorRow>
             <RiskFactorRow id="htn" label="Hypertension" checked={risk.htn}
-              onChange={(v) => setRisk({ ...risk, htn: v })} explanation={RISK_EXPLANATIONS.htn} />
+              onChange={(v) => setRisk({ ...risk, htn: v })}
+              explanation={RISK_EXPLANATIONS.htn}
+              criteria={CRITERIA.htn} details={details} onToggleDetail={toggleDetail} />
             <RiskFactorRow id="smk" label="Current Smoker" checked={risk.smoker}
-              onChange={(v) => setRisk({ ...risk, smoker: v })} explanation={RISK_EXPLANATIONS.smoker} />
+              onChange={(v) => setRisk({ ...risk, smoker: v })}
+              explanation={RISK_EXPLANATIONS.smoker}
+              criteria={CRITERIA.smoker} details={details} onToggleDetail={toggleDetail} />
             <RiskFactorRow id="ckd" label="Chronic Kidney Disease" checked={risk.ckd}
               onChange={(v) => setRisk({ ...risk, ckd: v, ckdStage: v ? risk.ckdStage : "" })}
               explanation={RISK_EXPLANATIONS.ckd}
+              criteria={CRITERIA.ckd} details={details} onToggleDetail={toggleDetail}
               autoBadge={auto.ckdStaged ? `Stage ${risk.ckdStage}` : undefined}>
               <div>
                 <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">CKD Stage</label>
@@ -772,9 +788,13 @@ export default function MiniApp() {
               </div>
             </RiskFactorRow>
             <RiskFactorRow id="fhx" label="Family History of Premature ASCVD" checked={risk.familyHx}
-              onChange={(v) => setRisk({ ...risk, familyHx: v })} explanation={RISK_EXPLANATIONS.familyHx} />
+              onChange={(v) => setRisk({ ...risk, familyHx: v })}
+              explanation={RISK_EXPLANATIONS.familyHx}
+              criteria={CRITERIA.familyHx} details={details} onToggleDetail={toggleDetail} />
             <RiskFactorRow id="sa" label="South Asian Ethnicity" checked={risk.southAsian}
-              onChange={(v) => setRisk({ ...risk, southAsian: v })} explanation={RISK_EXPLANATIONS.southAsian} />
+              onChange={(v) => setRisk({ ...risk, southAsian: v })}
+              explanation={RISK_EXPLANATIONS.southAsian}
+              criteria={CRITERIA.southAsian} details={details} onToggleDetail={toggleDetail} />
           </div>
         </MiniSection>
 
