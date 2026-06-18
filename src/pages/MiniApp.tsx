@@ -639,6 +639,8 @@ export default function MiniApp() {
   // ─── EMR Note ───────────────────────────────────────────────────────────
   const emrNote = useMemo(() => {
     const factors = [
+      risk.recurrentAscvd && "Recurrent ASCVD despite LDL-C ≤30 on therapy",
+      risk.polyvascular && "Polyvascular atherosclerotic disease",
       risk.ascvd && "Established ASCVD",
       risk.diabetes && (risk.diabetesTOD ? "Diabetes mellitus with target-organ damage" : "Diabetes mellitus"),
       risk.htn && "Hypertension",
