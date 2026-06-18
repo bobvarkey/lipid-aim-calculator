@@ -200,22 +200,177 @@ function SingleInput({
   );
 }
 
-const RISK_EXPLANATIONS: Record<keyof MajorRiskState | string, string> = {
+const RISK_EXPLANATIONS: Record<string, string> = {
   ascvd:
-    "Prior MI, ischemic stroke/TIA, stable/unstable angina, coronary or peripheral revascularization, PAD, or aortic aneurysm. These patients are automatically high-risk (secondary prevention) → high-intensity statin; LDL-C goal <55 mg/dL.",
+    "Prior MI, ischemic stroke/TIA, stable/unstable angina, coronary or peripheral revascularization, PAD, or aortic aneurysm. Secondary prevention → high-intensity statin; LDL-C goal <55 mg/dL.",
+  polyvascular:
+    "Atherosclerotic disease in ≥2 vascular beds (coronary + carotid/cerebrovascular + peripheral/aortic). Confers extreme-risk status — LDL-C goal ≤40 mg/dL with high-intensity statin + ezetimibe ± PCSK9i.",
+  recurrentAscvd:
+    "Recurrent ASCVD event despite LDL-C ≤30 mg/dL on maximally tolerated therapy = extreme residual risk. Evaluate Lp(a), inflammation (hs-CRP), adherence, and consider adding PCSK9i, bempedoic acid, or inclisiran.",
   diabetes:
-    "Type 1 or 2 diabetes ≥10 yr duration, age ≥40 yr, or with target-organ damage shifts patients into high-risk. Default LDL-C goal <70 mg/dL; <55 mg/dL with TOD or additional risk factors.",
+    "Type 1 or 2 diabetes ≥10 yr duration, age ≥40 yr, or with target-organ damage → high risk. Default LDL-C <70 mg/dL; <55 mg/dL with TOD or extra risk factors.",
   htn:
-    "BP ≥130/80 or on antihypertensive therapy. Add SBP to the vitals panel for accurate PREVENT calculation.",
+    "BP ≥130/80 or on antihypertensive therapy. Enter SBP in vitals for accurate PREVENT calculation.",
   smoker:
-    "Current cigarette use (within ~30 days). Smoking cessation is the single most impactful lifestyle intervention.",
+    "Current cigarette use within ~30 days. Cessation is the single most impactful lifestyle intervention.",
   ckd:
-    "eGFR <60 mL/min/1.73m² and/or albuminuria. CKD is an independent ASCVD enhancer; stage 3B–5 ranks as high/very-high risk regardless of PREVENT score.",
+    "eGFR <60 mL/min/1.73m² and/or albuminuria. Independent ASCVD enhancer; stage 3B–5 ranks as high/very-high risk regardless of PREVENT.",
   familyHx:
-    "Premature ASCVD in first-degree relative — male <55 yr or female <65 yr. Counts as a risk-enhancing factor in borderline/intermediate risk.",
+    "Premature ASCVD in first-degree relative — male <55 yr or female <65 yr. Risk-enhancing factor in borderline/intermediate risk.",
   southAsian:
-    "Ethnicity-based enhancer (per LAI 2023). Lower BMI and ApoB thresholds apply; consider more aggressive LDL targets at borderline/intermediate risk.",
+    "Ethnicity-based enhancer (per LAI 2023). Lower BMI/ApoB thresholds; consider more aggressive LDL-C targets at borderline/intermediate risk.",
 };
+
+interface Criterion {
+  id: string;
+  label: string;
+  qualifier: string;
+}
+
+const CRITERIA: Record<string, Criterion[]> = {
+  ascvd: [
+    { id: "as_cad", label: "CAD / Coronary ASCVD", qualifier: "Prior MI, angina requiring revascularization, or angiographic stenosis ≥50%" },
+    { id: "as_stroke", label: "Ischemic stroke or TIA", qualifier: "Imaging-confirmed ischemic stroke or TIA with neurovascular evidence of atherosclerosis" },
+    { id: "as_pad", label: "Peripheral arterial disease", qualifier: "ABI <0.9, claudication with imaging, or prior peripheral revascularization" },
+    { id: "as_aaa", label: "Abdominal aortic aneurysm", qualifier: "AAA ≥3 cm by ultrasound or CT — atherosclerotic in origin" },
+  ],
+  polyvascular: [
+    { id: "pv_coro_carot", label: "Coronary + carotid disease", qualifier: "CAD plus carotid stenosis ≥50% or prior carotid revascularization" },
+    { id: "pv_coro_pad", label: "Coronary + PAD", qualifier: "CAD plus ABI <0.9, claudication, or prior peripheral revascularization" },
+    { id: "pv_carot_pad", label: "Carotid + PAD", qualifier: "Carotid stenosis ≥50% plus PAD in lower extremities" },
+    { id: "pv_three", label: "≥3 vascular beds involved", qualifier: "Coronary + carotid + peripheral/aortic — extreme atherosclerotic burden" },
+  ],
+  recurrentAscvd: [
+    { id: "rec_event", label: "Recurrent MI / stroke / revascularization", qualifier: "New event despite maximally tolerated statin therapy" },
+    { id: "rec_ldl30", label: "LDL-C ≤30 mg/dL on therapy", qualifier: "Persistent residual risk despite aggressive LDL reduction — pursue Lp(a) and inflammation pathways" },
+    { id: "rec_lpa", label: "Elevated Lp(a) contributing", qualifier: "Lp(a) ≥50 mg/dL or ≥125 nmol/L as residual driver" },
+    { id: "rec_inflam", label: "Residual inflammatory risk", qualifier: "hs-CRP ≥2 mg/L despite LDL goal — consider colchicine or anti-inflammatory strategies" },
+  ],
+  diabetes: [
+    { id: "dm_duration", label: "Duration ≥10 years", qualifier: "Long-standing diabetes confers higher ASCVD risk independent of glycemic control" },
+    { id: "dm_age40", label: "Age ≥40 with diabetes", qualifier: "Threshold for moderate–high intensity statin in primary prevention" },
+    { id: "dm_retinopathy", label: "Retinopathy", qualifier: "Microaneurysms, hemorrhages, or macular edema on fundoscopy" },
+    { id: "dm_nephropathy", label: "Nephropathy / albuminuria", qualifier: "UACR ≥30 mg/g or reduced eGFR" },
+    { id: "dm_neuropathy", label: "Neuropathy", qualifier: "Distal symmetric polyneuropathy or autonomic neuropathy" },
+  ],
+  htn: [
+    { id: "htn_stage1", label: "Stage 1: 130–139 / 80–89", qualifier: "Lifestyle ± pharmacotherapy if ASCVD risk ≥10%" },
+    { id: "htn_stage2", label: "Stage 2: ≥140 / ≥90", qualifier: "Pharmacotherapy indicated alongside lifestyle" },
+    { id: "htn_crisis", label: "Hypertensive urgency/emergency ≥180/120", qualifier: "Immediate evaluation and BP reduction" },
+    { id: "htn_meds", label: "On antihypertensive medication", qualifier: "Counts as hypertension regardless of current reading" },
+  ],
+  smoker: [
+    { id: "sm_current", label: "Current daily smoker", qualifier: "Use within the past 30 days" },
+    { id: "sm_heavy", label: "Heavy use (>1 pack/day)", qualifier: "Extreme risk-factor per LAI 2023" },
+    { id: "sm_former", label: "Former smoker (<1 year cessation)", qualifier: "Residual elevated risk during first year off tobacco" },
+    { id: "sm_vape", label: "E-cigarette / vaping use", qualifier: "Emerging cardiovascular risk — counsel cessation" },
+  ],
+  ckd: [
+    { id: "ckd_3a", label: "Stage 3A: eGFR 45–59", qualifier: "Mildly–moderately decreased kidney function" },
+    { id: "ckd_3b", label: "Stage 3B: eGFR 30–44", qualifier: "Moderately–severely decreased — high ASCVD risk" },
+    { id: "ckd_4", label: "Stage 4: eGFR 15–29", qualifier: "Severely decreased — very-high ASCVD risk" },
+    { id: "ckd_alb", label: "Albuminuria UACR ≥30 mg/g", qualifier: "Independent ASCVD risk marker" },
+  ],
+  familyHx: [
+    { id: "fhx_male", label: "Male 1st-degree relative <55 y", qualifier: "Father, brother, or son with MI, revascularization, or angina before 55" },
+    { id: "fhx_female", label: "Female 1st-degree relative <65 y", qualifier: "Mother, sister, or daughter with MI, revascularization, or angina before 65" },
+    { id: "fhx_sudden", label: "Sudden cardiac death in family", qualifier: "Premature SCD in 1st-degree relative — pursue lipid/genetic workup" },
+  ],
+  southAsian: [
+    { id: "sa_origin", label: "Indian / Pakistani / Bangladeshi / Sri Lankan origin", qualifier: "Higher ASCVD risk at lower BMI and ApoB thresholds" },
+    { id: "sa_bmi", label: "Asian-specific BMI cutoffs apply", qualifier: "Overweight ≥23, Obesity ≥27.5 kg/m² (WHO Asia-Pacific)" },
+    { id: "sa_waist", label: "Increased waist circumference", qualifier: ">90 cm men, >80 cm women (South Asian-specific)" },
+  ],
+  // Advanced enhancers
+  metsyn: [
+    { id: "ms_waist", label: "↑ Waist circumference", qualifier: ">102 cm men, >88 cm women (>90/>80 South Asian)" },
+    { id: "ms_tg", label: "TG ≥150 mg/dL", qualifier: "Or on TG-lowering therapy" },
+    { id: "ms_hdl", label: "Low HDL-C", qualifier: "<40 mg/dL men, <50 mg/dL women" },
+    { id: "ms_bp", label: "BP ≥130/85 or on antihypertensives", qualifier: "Hypertension component" },
+    { id: "ms_glu", label: "Fasting glucose ≥100 mg/dL", qualifier: "Impaired fasting glucose or diabetes" },
+  ],
+  inflammatory: [
+    { id: "in_ra", label: "Rheumatoid arthritis", qualifier: "Doubles ASCVD risk; treat inflammation aggressively" },
+    { id: "in_psoriasis", label: "Psoriasis / psoriatic arthritis", qualifier: "Severe disease confers higher ASCVD risk" },
+    { id: "in_lupus", label: "Systemic lupus erythematosus", qualifier: "Markedly elevated cardiovascular risk" },
+    { id: "in_hiv", label: "HIV infection", qualifier: "Chronic inflammation + ART-related dyslipidemia" },
+    { id: "in_ibd", label: "Inflammatory bowel disease", qualifier: "Moderate cardiovascular risk increase" },
+  ],
+  prematureMenopause: [
+    { id: "pm_natural", label: "Natural menopause before age 40", qualifier: "Premature ovarian insufficiency increases ASCVD risk" },
+    { id: "pm_surgical", label: "Surgical menopause before age 45", qualifier: "Bilateral oophorectomy without HRT" },
+    { id: "pm_chemo", label: "Iatrogenic (chemo/radiation)", qualifier: "Treatment-induced ovarian failure" },
+  ],
+  preeclampsia: [
+    { id: "pe_severe", label: "Severe preeclampsia / eclampsia", qualifier: "Doubles long-term ASCVD risk" },
+    { id: "pe_recurrent", label: "Recurrent preeclampsia", qualifier: ">1 affected pregnancy — higher residual risk" },
+    { id: "pe_gdm", label: "Gestational diabetes", qualifier: "Increases diabetes and ASCVD risk later in life" },
+    { id: "pe_ghtn", label: "Pregnancy-induced hypertension", qualifier: "Predicts future hypertension and ASCVD" },
+  ],
+  hsCRP: [
+    { id: "cr_mild", label: "hs-CRP 2–10 mg/L", qualifier: "Vascular inflammation — risk-enhancing factor" },
+    { id: "cr_high", label: "hs-CRP >10 mg/L (persistent)", qualifier: "Rule out infection; if chronic, consider anti-inflammatory strategy" },
+  ],
+  abi: [
+    { id: "abi_low", label: "ABI <0.9", qualifier: "Peripheral atherosclerosis — risk-enhancing factor" },
+    { id: "abi_vlow", label: "ABI ≤0.7 or rest pain", qualifier: "Severe PAD — vascular referral" },
+    { id: "abi_high", label: "ABI >1.4", qualifier: "Non-compressible arteries (often diabetes/CKD) — use toe-brachial index" },
+  ],
+  subclinical: [
+    { id: "sc_cac1_99", label: "CAC 1–99 AU", qualifier: "Mild plaque burden — moderate-intensity statin reasonable" },
+    { id: "sc_cac100", label: "CAC ≥100 AU or ≥75th %ile", qualifier: "Significant atherosclerosis — initiate statin" },
+    { id: "sc_cimt", label: "Elevated carotid IMT (>75th %ile)", qualifier: "Subclinical atherosclerosis marker" },
+    { id: "sc_plaque", label: "Carotid or femoral plaque", qualifier: "Focal wall thickening ≥1.5 mm on ultrasound" },
+  ],
+  nafld: [
+    { id: "nf_steatosis", label: "Hepatic steatosis on imaging", qualifier: "Bright liver on US or ≥5% steatosis on MRI-PDFF" },
+    { id: "nf_fib2", label: "Fibrosis stage F2", qualifier: "Significant fibrosis (FIB-4 or transient elastography)" },
+    { id: "nf_fib34", label: "Advanced fibrosis F3–F4", qualifier: "High ASCVD and liver morbidity risk" },
+  ],
+  sleepApnea: [
+    { id: "sa_mild", label: "Mild OSA (AHI 5–14)", qualifier: "Lifestyle interventions; consider CPAP if symptomatic" },
+    { id: "sa_modsev", label: "Moderate–severe OSA (AHI ≥15)", qualifier: "CPAP indicated; independent ASCVD risk factor" },
+  ],
+  pcos: [
+    { id: "pc_oligo", label: "Oligo-/anovulation", qualifier: "Cycles >35 days or <8/year" },
+    { id: "pc_hyper", label: "Hyperandrogenism", qualifier: "Clinical (hirsutism/acne) or biochemical (↑testosterone)" },
+    { id: "pc_morph", label: "Polycystic ovarian morphology / ↑ AMH", qualifier: "≥20 follicles per ovary or AMH >3.2 ng/mL" },
+    { id: "pc_ir", label: "Insulin resistance / HOMA-IR >2.5", qualifier: "Common metabolic accompaniment — increases ASCVD risk" },
+  ],
+  highPRS: [
+    { id: "pr_score", label: "High polygenic risk score for CAD", qualifier: "Top decile PRS — confers ≈2-fold ASCVD risk" },
+    { id: "pr_fh", label: "Pathogenic FH variant (LDLR/APOB/PCSK9)", qualifier: "Monogenic familial hypercholesterolemia" },
+  ],
+};
+
+function CriteriaList({
+  items,
+  details,
+  onToggle,
+}: {
+  items: Criterion[];
+  details: Record<string, boolean>;
+  onToggle: (id: string, v: boolean) => void;
+}) {
+  return (
+    <ul className="space-y-1.5">
+      {items.map((c) => (
+        <li key={c.id} className="flex gap-2 rounded-md border border-border/60 bg-background/60 px-2.5 py-2">
+          <Checkbox
+            id={c.id}
+            checked={!!details[c.id]}
+            onCheckedChange={(v) => onToggle(c.id, !!v)}
+            className="mt-0.5"
+          />
+          <label htmlFor={c.id} className="flex-1 text-xs cursor-pointer leading-snug">
+            <span className="font-semibold text-foreground">{c.label}</span>
+            <span className="block text-[11px] text-muted-foreground mt-0.5">{c.qualifier}</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 function RiskFactorRow({
   id,
@@ -223,6 +378,9 @@ function RiskFactorRow({
   checked,
   onChange,
   explanation,
+  criteria,
+  details,
+  onToggleDetail,
   children,
   autoBadge,
 }: {
@@ -231,10 +389,16 @@ function RiskFactorRow({
   checked: boolean;
   onChange: (v: boolean) => void;
   explanation: string;
+  criteria?: Criterion[];
+  details?: Record<string, boolean>;
+  onToggleDetail?: (id: string, v: boolean) => void;
   children?: React.ReactNode;
   autoBadge?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const selectedCount = criteria && details
+    ? criteria.filter((c) => details[c.id]).length
+    : 0;
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="flex items-center gap-2 px-3 py-2">
@@ -246,6 +410,11 @@ function RiskFactorRow({
         <label htmlFor={id} className="flex-1 text-sm font-medium cursor-pointer select-none">
           {label}
         </label>
+        {selectedCount > 0 && (
+          <span className="text-[9px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 bg-muted text-foreground">
+            {selectedCount}
+          </span>
+        )}
         {autoBadge && (
           <span className="text-[9px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 bg-primary/15 text-primary">
             {autoBadge}
@@ -261,8 +430,11 @@ function RiskFactorRow({
         </button>
       </div>
       {open && (
-        <div className="border-t border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground leading-relaxed">
-          {explanation}
+        <div className="border-t border-border bg-muted/30 px-3 py-2.5 space-y-2.5">
+          <p className="text-xs text-muted-foreground leading-relaxed">{explanation}</p>
+          {criteria && details && onToggleDetail && (
+            <CriteriaList items={criteria} details={details} onToggle={onToggleDetail} />
+          )}
         </div>
       )}
       {checked && children && (
