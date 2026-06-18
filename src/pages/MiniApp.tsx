@@ -577,6 +577,8 @@ export default function MiniApp() {
   // ─── Decision: category, LDL goal, therapy ──────────────────────────────
   const summary = useMemo(() => {
     const drivers: string[] = [];
+    if (risk.recurrentAscvd) drivers.push("Recurrent ASCVD on therapy");
+    if (risk.polyvascular) drivers.push("Polyvascular disease");
     if (risk.ascvd) drivers.push("Established ASCVD");
     if (risk.diabetes) drivers.push(risk.diabetesTOD ? "Diabetes + TOD" : "Diabetes");
     if (risk.ckd && risk.ckdStage) drivers.push(`CKD stage ${risk.ckdStage}`);
@@ -589,11 +591,15 @@ export default function MiniApp() {
     if (auto.lpaHigh) drivers.push(`Lp(a) ${fmtRange(lipid.lpa, lipid.lpaUnit)}`);
 
     // Category override hierarchy
-    let category: "Very High" | "High" | "Intermediate" | "Borderline" | "Low" | "Pending" = "Pending";
+    let category: "Extreme" | "Very High" | "High" | "Intermediate" | "Borderline" | "Low" | "Pending" = "Pending";
     let ldlGoal = "—";
     let therapy = "—";
 
-    if (risk.ascvd) {
+    if (risk.recurrentAscvd || risk.polyvascular) {
+      category = "Extreme";
+      ldlGoal = "≤40 mg/dL (1.0 mmol/L)";
+      therapy = "Max-intensity statin + ezetimibe + PCSK9i (or inclisiran/bempedoic acid); address Lp(a) & inflammation";
+    } else if (risk.ascvd) {
       category = "Very High";
       ldlGoal = "<55 mg/dL (1.4 mmol/L)";
       therapy = "High-intensity statin ± ezetimibe; add PCSK9i if LDL above goal";
