@@ -334,7 +334,8 @@ export default function MiniApp() {
   const { toast } = useToast();
   const [patient, setPatient] = useState<PatientState>({ name: "", mrn: "", age: "", sex: "male" });
   const [risk, setRisk] = useState<MajorRiskState>({
-    ascvd: false, diabetes: false, diabetesTOD: false, htn: false,
+    ascvd: false, polyvascular: false, recurrentAscvd: false,
+    diabetes: false, diabetesTOD: false, htn: false,
     smoker: false, ckd: false, ckdStage: "", familyHx: false, southAsian: false,
   });
   const [lipid, setLipid] = useState<LipidState>({
@@ -345,7 +346,9 @@ export default function MiniApp() {
   const [enhancer, setEnhancer] = useState<EnhancerState>({
     metsyn: false, inflammatory: false, prematureMenopause: false,
     preeclampsia: false, hsCRP: false, abi: false, subclinical: false,
+    nafld: false, sleepApnea: false, pcos: false, highPRS: false,
   });
+  const [details, setDetails] = useState<Record<string, boolean>>({});
   const [vitals, setVitals] = useState<VitalsState>({
     sbp: { ...blankRange }, heightCm: "", weightKg: "", egfr: "",
   });
