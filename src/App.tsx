@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import MiniApp from "./pages/MiniApp";
 import NotFound from "./pages/NotFound";
 import AscvdEmr from "./components/AscvdEmr";
+import LaiTest from "./pages/LaiTest";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/home" element={<Home />} />
           <Route path="/calculator" element={<Index />} />
           <Route path="/ascvd" element={<AscvdEmr />} />
+          <Route path="/test-lai" element={<LaiTest />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
