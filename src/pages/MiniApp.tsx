@@ -590,47 +590,63 @@ export default function MiniApp() {
     if (auto.apoBHigh) drivers.push(`ApoB ${fmtRange(lipid.apoB, "mg/dL")}`);
     if (auto.lpaHigh) drivers.push(`Lp(a) ${fmtRange(lipid.lpa, lipid.lpaUnit)}`);
 
-    // Category override hierarchy
-    let category: "Extreme" | "Very High" | "High" | "Intermediate" | "Borderline" | "Low" | "Pending" = "Pending";
+    // Category hierarchy — LAI 2023 (Lipid Association of India)
+    // Tiers: Low / Moderate / High / Very High / Extreme
+    // LDL-C goals: <100 / <70 / <55 / <50 / ≤30 mg/dL
+    let category: "Extreme" | "Very High" | "High" | "Moderate" | "Low" | "Pending" = "Pending";
     let ldlGoal = "—";
     let therapy = "—";
 
+    // Count classical major risk factors (excludes ASCVD/DM/CKD which trigger higher tiers directly)
+    const majorCount = [
+      risk.htn,
+      risk.smoker,
+      risk.familyHx,
+      auto.hyperchol,                                    // LDL ≥160
+      auto.lpaHigh,                                      // Lp(a) high
+      risk.southAsian,                                   // ethnicity enhancer (LAI 2023)
+    ].filter(Boolean).length;
+
     if (risk.recurrentAscvd || risk.polyvascular) {
+      // Extreme Risk Group (LAI 2023): polyvascular disease, recurrent ASCVD on therapy, FH + ASCVD, DM + ASCVD
       category = "Extreme";
-      ldlGoal = "≤40 mg/dL (1.0 mmol/L)";
-      therapy = "Max-intensity statin + ezetimibe + PCSK9i (or inclisiran/bempedoic acid); address Lp(a) & inflammation";
-    } else if (risk.ascvd) {
-      category = "Very High";
-      ldlGoal = "<55 mg/dL (1.4 mmol/L)";
-      therapy = "High-intensity statin ± ezetimibe; add PCSK9i if LDL above goal";
+      ldlGoal = "≤30 mg/dL (0.8 mmol/L); non-HDL-C <60";
+      therapy = "Max-intensity statin + ezetimibe + PCSK9i (or inclisiran / bempedoic acid); address Lp(a) & inflammation";
     } else if (
+      risk.ascvd ||
       (risk.diabetes && risk.diabetesTOD) ||
-      (risk.ckd && ["3B", "4", "5"].includes(risk.ckdStage)) ||
-      auto.lpaHigh
+      (risk.ckd && ["4", "5"].includes(risk.ckdStage))
     ) {
+      // Very High Risk (LAI 2023): established ASCVD, DM with TOD, CKD stage 4–5
+      category = "Very High";
+      ldlGoal = "<50 mg/dL (1.3 mmol/L); non-HDL-C <80";
+      therapy = "High-intensity statin + ezetimibe; add PCSK9i if LDL above goal";
+    } else if (
+      risk.diabetes ||
+      (risk.ckd && ["3A", "3B"].includes(risk.ckdStage)) ||
+      majorCount >= 3 ||
+      (riskHigh?.valid && riskHigh.category === "High")
+    ) {
+      // High Risk (LAI 2023): DM without TOD, CKD 3A–3B, ≥3 major RFs, 10-y risk ≥20%
       category = "High";
-      ldlGoal = "<70 mg/dL (1.8 mmol/L)";
+      ldlGoal = "<55 mg/dL (1.4 mmol/L); non-HDL-C <85";
       therapy = "High-intensity statin; add ezetimibe if LDL not at goal";
-    } else if (riskHigh?.valid) {
-      const cat = riskHigh.category;
-      category = cat as any;
-      if (cat === "High") {
-        ldlGoal = "<70 mg/dL";
-        therapy = "High-intensity statin";
-      } else if (cat === "Intermediate") {
-        ldlGoal = "<100 mg/dL (≥50% LDL reduction)";
-        therapy = "Moderate→high intensity statin; consider CAC if uncertain";
-      } else if (cat === "Borderline") {
-        ldlGoal = "<130 mg/dL";
-        therapy = "Lifestyle; consider statin if ≥1 enhancer or CAC ≥100";
-      } else {
-        ldlGoal = "<160 mg/dL (lifestyle)";
-        therapy = "Lifestyle; pharmacotherapy not routinely indicated";
-      }
-    } else if (auto.hyperchol && num(patient.age) >= 20) {
-      category = "Intermediate";
-      ldlGoal = "<100 mg/dL";
-      therapy = "Moderate-intensity statin (primary hypercholesterolemia)";
+    } else if (
+      majorCount === 2 ||
+      (riskHigh?.valid && riskHigh.category === "Intermediate")
+    ) {
+      // Moderate Risk (LAI 2023): 2 major RFs, or 10-y risk 7.5–<20%
+      category = "Moderate";
+      ldlGoal = "<70 mg/dL (1.8 mmol/L); non-HDL-C <100";
+      therapy = "Moderate→high-intensity statin; consider CAC if uncertain";
+    } else if (
+      majorCount <= 1 ||
+      (riskHigh?.valid && (riskHigh.category === "Borderline" || riskHigh.category === "Low"))
+    ) {
+      // Low Risk (LAI 2023): 0–1 major RF and 10-y risk <7.5%
+      category = "Low";
+      ldlGoal = "<100 mg/dL (2.6 mmol/L); non-HDL-C <130";
+      therapy = "Lifestyle; pharmacotherapy if CAC ≥100 or risk enhancer present";
     }
 
     return { drivers, category, ldlGoal, therapy };
