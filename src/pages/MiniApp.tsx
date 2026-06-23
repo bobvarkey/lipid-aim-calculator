@@ -55,6 +55,10 @@ interface MajorRiskState {
   ascvd: boolean;
   polyvascular: boolean;
   recurrentAscvd: boolean;
+  subclinical: boolean;       // ASCVD-equivalent (LAI 2023 — South Asians)
+  heFH: boolean;              // Heterozygous FH
+  hoFH: boolean;              // Homozygous FH
+  cacScore: string;           // Agatston score (AU)
   diabetes: boolean;
   diabetesTOD: boolean;
   htn: boolean;
