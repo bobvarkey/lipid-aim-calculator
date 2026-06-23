@@ -1077,6 +1077,7 @@ export default function MiniApp() {
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Category</p>
                 <p className="font-display text-base font-bold leading-tight">{summary.category}</p>
+                <p className="text-[10px] text-muted-foreground">{summary.guideline}</p>
               </div>
               <div className="col-span-2">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">LDL Goal</p>
@@ -1086,6 +1087,18 @@ export default function MiniApp() {
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Recommended Therapy</p>
                 <p className="text-sm">{summary.therapy}</p>
               </div>
+              {risk.southAsian && summary.laiExtreme && (
+                <div className="col-span-2 rounded-lg border-2 border-[hsl(346_77%_55%)/0.4] bg-[hsl(346_77%_55%)/0.06] p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[hsl(346_77%_45%)] flex items-center gap-1.5">
+                    <ShieldAlert className="h-3 w-3" />
+                    LAI 2023 Extreme Risk · Group {summary.laiExtreme.group}
+                  </p>
+                  <p className="text-xs mt-1.5 leading-snug"><span className="font-semibold">Criterion:</span> {summary.laiExtreme.criterion}</p>
+                  <p className="text-xs mt-1 leading-snug"><span className="font-semibold">LDL-C target:</span> {summary.laiExtreme.ldl}</p>
+                  <p className="text-xs mt-1 leading-snug"><span className="font-semibold">Therapy:</span> {summary.laiExtreme.therapy}</p>
+                  <p className="text-[10px] mt-1.5 text-muted-foreground">Shown because South Asian ethnicity is selected — LAI 2023 Consensus Statement IV.</p>
+                </div>
+              )}
               {summary.drivers.length > 0 && (
                 <div className="col-span-2">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Key Drivers</p>
