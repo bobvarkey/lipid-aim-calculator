@@ -511,6 +511,7 @@ export default function MiniApp() {
   const [patient, setPatient] = useState<PatientState>({ name: "", mrn: "", age: "", sex: "male" });
   const [risk, setRisk] = useState<MajorRiskState>({
     ascvd: false, polyvascular: false, recurrentAscvd: false,
+    subclinical: false, heFH: false, hoFH: false, cacScore: "",
     diabetes: false, diabetesTOD: false, htn: false,
     smoker: false, ckd: false, ckdStage: "", familyHx: false, southAsian: false,
   });
