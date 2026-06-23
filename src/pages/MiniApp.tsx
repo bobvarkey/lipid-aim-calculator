@@ -222,7 +222,15 @@ const RISK_EXPLANATIONS: Record<string, string> = {
   familyHx:
     "Premature ASCVD in first-degree relative — male <55 yr or female <65 yr. Risk-enhancing factor in borderline/intermediate risk.",
   southAsian:
-    "Ethnicity-based enhancer (per LAI 2023). Lower BMI/ApoB thresholds; consider more aggressive LDL-C targets at borderline/intermediate risk.",
+    "Ethnicity-based enhancer (per LAI 2023). Lower BMI/ApoB thresholds; consider more aggressive LDL-C targets at borderline/intermediate risk. When selected, LAI Extreme sub-groups (A/B/C) are also computed.",
+  subclinical:
+    "LAI 2023: Any subclinical atherosclerosis — nonobstructive carotid/femoral/coronary plaque, or ABI <0.9 — is treated as ASCVD-equivalent in South Asians, with the same LDL-C targets as clinically manifest ASCVD.",
+  heFH:
+    "Heterozygous familial hypercholesterolemia (HeFH). Without ASCVD → Very High risk, LDL-C <50 mg/dL. With ASCVD → LAI Extreme Group A, optional LDL-C ≤30 mg/dL.",
+  hoFH:
+    "Homozygous familial hypercholesterolemia (HoFH). Without ASCVD → LAI Extreme Group A, LDL-C <50 mg/dL (optional ≤30). With ASCVD → LAI Extreme Group B, mandatory LDL-C ≤30 mg/dL.",
+  cacScore:
+    "LAI 2023 CAC mapping — 1–99 AU & <75th %ile: High risk, LDL <70 · 100–299 or ≥75th %ile: Very High, LDL <50 · ≥300 AU: Extreme Group A, optional LDL ≤30.",
 };
 
 interface Criterion {
