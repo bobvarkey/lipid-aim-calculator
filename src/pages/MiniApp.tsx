@@ -609,6 +609,9 @@ export default function MiniApp() {
     if (risk.recurrentAscvd) drivers.push("Recurrent ASCVD on therapy");
     if (risk.polyvascular) drivers.push("Polyvascular disease");
     if (risk.ascvd) drivers.push("Established ASCVD");
+    if (risk.subclinical) drivers.push("Subclinical atherosclerosis (ASCVD-equivalent)");
+    if (risk.hoFH) drivers.push("Homozygous FH");
+    if (risk.heFH) drivers.push("Heterozygous FH");
     if (risk.diabetes) drivers.push(risk.diabetesTOD ? "Diabetes + TOD" : "Diabetes");
     if (risk.ckd && risk.ckdStage) drivers.push(`CKD stage ${risk.ckdStage}`);
     if (risk.smoker) drivers.push("Current smoker");
@@ -619,66 +622,125 @@ export default function MiniApp() {
     if (auto.apoBHigh) drivers.push(`ApoB ${fmtRange(lipid.apoB, "mg/dL")}`);
     if (auto.lpaHigh) drivers.push(`Lp(a) ${fmtRange(lipid.lpa, lipid.lpaUnit)}`);
 
-    // Category hierarchy — LAI 2023 (Lipid Association of India)
-    // Tiers: Low / Moderate / High / Very High / Extreme
-    // LDL-C goals: <100 / <70 / <55 / <50 / ≤30 mg/dL
+    const cac = num(risk.cacScore);
+    if (isFinite(cac)) drivers.push(`CAC ${cac} AU`);
+
+    // Subclinical atherosclerosis = ASCVD-equivalent (LAI 2023, South Asians)
+    const ascvdEq = risk.ascvd || risk.subclinical;
+
+    // High-risk feature count (used for ACC 2022 + LAI Extreme group A)
+    const highRiskFeatures = [
+      risk.diabetes, risk.htn, risk.smoker, risk.familyHx,
+      auto.hyperchol, auto.lpaHigh, auto.apoBHigh,
+      risk.ckd && (risk.ckdStage === "3A" || risk.ckdStage === "3B" || risk.ckdStage === "4" || risk.ckdStage === "5"),
+    ].filter(Boolean).length;
+
+    // Major-risk-factor count for primary-prevention tiering
+    const majorCount = [
+      risk.htn, risk.smoker, risk.familyHx,
+      auto.hyperchol, auto.lpaHigh, risk.southAsian,
+    ].filter(Boolean).length;
+
+    // ── ACC/AHA 2022 Expert Consensus default ──
+    // LDL-C <55 mg/dL for: ≥2 ASCVD events (recurrent / polyvascular)
+    //                   OR 1 major ASCVD event + ≥1 high-risk condition
     let category: "Extreme" | "Very High" | "High" | "Moderate" | "Low" | "Pending" = "Pending";
     let ldlGoal = "—";
     let therapy = "—";
+    let guideline = "ACC/AHA 2022 Consensus";
 
-    // Count classical major risk factors (excludes ASCVD/DM/CKD which trigger higher tiers directly)
-    const majorCount = [
-      risk.htn,
-      risk.smoker,
-      risk.familyHx,
-      auto.hyperchol,                                    // LDL ≥160
-      auto.lpaHigh,                                      // Lp(a) high
-      risk.southAsian,                                   // ethnicity enhancer (LAI 2023)
-    ].filter(Boolean).length;
-
-    if (risk.recurrentAscvd || risk.polyvascular) {
-      // Extreme Risk Group (LAI 2023): polyvascular disease, recurrent ASCVD on therapy, FH + ASCVD, DM + ASCVD
+    if (risk.recurrentAscvd) {
       category = "Extreme";
-      ldlGoal = "≤30 mg/dL (0.8 mmol/L); non-HDL-C <60";
-      therapy = "Max-intensity statin + ezetimibe + PCSK9i (or inclisiran / bempedoic acid); address Lp(a) & inflammation";
-    } else if (
-      risk.ascvd ||
-      (risk.diabetes && risk.diabetesTOD) ||
-      (risk.ckd && ["4", "5"].includes(risk.ckdStage))
-    ) {
-      // Very High Risk (LAI 2023): established ASCVD, DM with TOD, CKD stage 4–5
+      ldlGoal = "≤30 mg/dL (LAI Extreme Group C: target 10–15 mg/dL)";
+      therapy = "Max statin + ezetimibe + PCSK9i / inclisiran / bempedoic acid; address Lp(a), hs-CRP, adherence";
+    } else if (risk.polyvascular || (ascvdEq && highRiskFeatures >= 1) || (risk.heFH && ascvdEq) || risk.hoFH) {
+      // Multiple ASCVD events / 1 event + high-risk condition → ACC 2022 LDL <55
+      // Also captures HeFH+ASCVD and HoFH (LAI Extreme A/B)
       category = "Very High";
-      ldlGoal = "<50 mg/dL (1.3 mmol/L); non-HDL-C <80";
+      ldlGoal = "<55 mg/dL (ACC 2022) · LAI: <50 mg/dL";
       therapy = "High-intensity statin + ezetimibe; add PCSK9i if LDL above goal";
+    } else if (ascvdEq || (risk.diabetes && risk.diabetesTOD) || (risk.ckd && (risk.ckdStage === "4" || risk.ckdStage === "5"))) {
+      category = "Very High";
+      ldlGoal = "<55 mg/dL (ACC 2022) · LAI: <50 mg/dL";
+      therapy = "High-intensity statin + ezetimibe; add PCSK9i if LDL above goal";
+    } else if (isFinite(cac) && cac >= 300) {
+      category = "Extreme";
+      ldlGoal = "LAI Extreme Group A: optional ≤30 mg/dL (otherwise <50)";
+      therapy = "High-intensity statin + ezetimibe ± PCSK9i — CAC ≥300 carries ASCVD-event risk";
+    } else if (isFinite(cac) && cac >= 100) {
+      category = "Very High";
+      ldlGoal = "<50 mg/dL (LAI 2023: CAC 100–299 or ≥75th %ile)";
+      therapy = "High-intensity statin; ezetimibe if not at goal";
+    } else if (isFinite(cac) && cac >= 1) {
+      category = "High";
+      ldlGoal = "<70 mg/dL (LAI 2023: CAC 1–99 and <75th %ile)";
+      therapy = "Moderate–high intensity statin";
     } else if (
       risk.diabetes ||
-      (risk.ckd && ["3A", "3B"].includes(risk.ckdStage)) ||
+      (risk.ckd && (risk.ckdStage === "3A" || risk.ckdStage === "3B")) ||
       majorCount >= 3 ||
       (riskHigh?.valid && riskHigh.category === "High")
     ) {
-      // High Risk (LAI 2023): DM without TOD, CKD 3A–3B, ≥3 major RFs, 10-y risk ≥20%
       category = "High";
-      ldlGoal = "<55 mg/dL (1.4 mmol/L); non-HDL-C <85";
+      ldlGoal = "<70 mg/dL (ACC 2022) · LAI: <55 mg/dL";
       therapy = "High-intensity statin; add ezetimibe if LDL not at goal";
-    } else if (
-      majorCount === 2 ||
-      (riskHigh?.valid && riskHigh.category === "Intermediate")
-    ) {
-      // Moderate Risk (LAI 2023): 2 major RFs, or 10-y risk 7.5–<20%
+    } else if (majorCount === 2 || (riskHigh?.valid && riskHigh.category === "Intermediate")) {
       category = "Moderate";
-      ldlGoal = "<70 mg/dL (1.8 mmol/L); non-HDL-C <100";
+      ldlGoal = "<100 mg/dL (ACC 2022) · LAI: <70 mg/dL";
       therapy = "Moderate→high-intensity statin; consider CAC if uncertain";
-    } else if (
-      majorCount <= 1 ||
-      (riskHigh?.valid && (riskHigh.category === "Borderline" || riskHigh.category === "Low"))
-    ) {
-      // Low Risk (LAI 2023): 0–1 major RF and 10-y risk <7.5%
+    } else {
       category = "Low";
-      ldlGoal = "<100 mg/dL (2.6 mmol/L); non-HDL-C <130";
+      ldlGoal = "<116 mg/dL (ACC 2022) · LAI: <100 mg/dL";
       therapy = "Lifestyle; pharmacotherapy if CAC ≥100 or risk enhancer present";
     }
 
-    return { drivers, category, ldlGoal, therapy };
+    // ── LAI 2023 Extreme Risk Sub-groups (shown when South Asian) ──
+    let laiExtreme: null | {
+      group: "A" | "B" | "C";
+      criterion: string;
+      ldl: string;
+      therapy: string;
+    } = null;
+
+    if (risk.recurrentAscvd) {
+      laiExtreme = {
+        group: "C",
+        criterion: "Recurrent ASCVD events despite holistic ASCVD risk reduction and LDL-C ≈30 mg/dL on max therapy",
+        ldl: "Target LDL-C 10–15 mg/dL",
+        therapy: "Max statin + ezetimibe + PCSK9i / inclisiran ± bempedoic acid; anti-inflammatory therapy (colchicine); optimise DM/HTN; address Lp(a)",
+      };
+    } else if (risk.polyvascular || (risk.hoFH && ascvdEq)) {
+      laiExtreme = {
+        group: "B",
+        criterion: risk.hoFH && ascvdEq
+          ? "Homozygous FH with ASCVD"
+          : "Polyvascular disease (or recurrent ACS / ASCVD with ≥1 very-high-risk feature)",
+        ldl: "Mandatory LDL-C ≤30 mg/dL",
+        therapy: "Max statin + ezetimibe + PCSK9i / inclisiran; aggressive secondary-prevention bundle",
+      };
+    } else if (
+      (ascvdEq && highRiskFeatures > 1) ||
+      (isFinite(cac) && cac >= 300) ||
+      (risk.heFH && ascvdEq) ||
+      (risk.hoFH && !ascvdEq)
+    ) {
+      laiExtreme = {
+        group: "A",
+        criterion: risk.hoFH
+          ? "Homozygous FH (without ASCVD)"
+          : risk.heFH && ascvdEq
+          ? "Heterozygous FH with ASCVD"
+          : isFinite(cac) && cac >= 300
+          ? `CAC ≥300 (current: ${cac} AU)`
+          : "ASCVD with >1 high-risk feature",
+        ldl: risk.hoFH && !ascvdEq
+          ? "LDL-C <50 mg/dL (optional ≤30)"
+          : "Optional LDL-C ≤30 mg/dL (otherwise <50)",
+        therapy: "Max-intensity statin + ezetimibe + PCSK9i / inclisiran (lipoprotein apheresis for HoFH)",
+      };
+    }
+
+    return { drivers, category, ldlGoal, therapy, guideline, laiExtreme, highRiskFeatures, majorCount };
   }, [risk, auto, riskHigh, lipid, patient.age]);
 
   // ─── EMR Note ───────────────────────────────────────────────────────────
