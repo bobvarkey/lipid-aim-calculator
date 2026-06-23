@@ -293,6 +293,22 @@ const CRITERIA: Record<string, Criterion[]> = {
     { id: "sa_bmi", label: "Asian-specific BMI cutoffs apply", qualifier: "Overweight ≥23, Obesity ≥27.5 kg/m² (WHO Asia-Pacific)" },
     { id: "sa_waist", label: "Increased waist circumference", qualifier: ">90 cm men, >80 cm women (South Asian-specific)" },
   ],
+  subclinical_eq: [
+    { id: "sceq_carotid", label: "Nonobstructive carotid plaque", qualifier: "Focal wall thickening ≥1.5 mm without ≥50% luminal stenosis" },
+    { id: "sceq_femoral", label: "Nonobstructive femoral plaque", qualifier: "Atherosclerotic plaque on femoral artery ultrasound" },
+    { id: "sceq_coronary", label: "Nonobstructive coronary plaque (CCTA)", qualifier: "Any coronary plaque without obstructive stenosis on CT angiography" },
+    { id: "sceq_abi", label: "ABI <0.9", qualifier: "Indicates peripheral atherosclerosis — ASCVD-equivalent in South Asians (LAI 2023)" },
+  ],
+  heFH: [
+    { id: "hefh_clinical", label: "Clinical HeFH (DLCN ≥6 / Simon Broome definite)", qualifier: "Definite or probable heterozygous FH by validated criteria" },
+    { id: "hefh_genetic", label: "Pathogenic heterozygous LDLR/APOB/PCSK9 variant", qualifier: "Confirmed monogenic FH" },
+    { id: "hefh_ldl190", label: "LDL-C ≥190 mg/dL with FH phenotype", qualifier: "Severe hypercholesterolemia with tendon xanthoma, corneal arcus <45 y, or cascade pattern" },
+  ],
+  hoFH: [
+    { id: "hofh_clinical", label: "Clinical HoFH (LDL-C ≥400 mg/dL untreated)", qualifier: "Often >500 mg/dL; tendon/cutaneous xanthomata in childhood" },
+    { id: "hofh_genetic", label: "Biallelic pathogenic LDLR/APOB/PCSK9/LDLRAP1", qualifier: "Confirmed homozygous or compound-heterozygous FH" },
+    { id: "hofh_early_ascvd", label: "ASCVD before age 20", qualifier: "Premature coronary or aortic disease pathognomonic of HoFH" },
+  ],
   // Advanced enhancers
   metsyn: [
     { id: "ms_waist", label: "↑ Waist circumference", qualifier: ">102 cm men, >88 cm women (>90/>80 South Asian)" },
