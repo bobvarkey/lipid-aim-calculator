@@ -952,10 +952,6 @@ export default function MiniApp() {
               onChange={(v) => setRisk({ ...risk, familyHx: v })}
               explanation={RISK_EXPLANATIONS.familyHx}
               criteria={CRITERIA.familyHx} details={details} onToggleDetail={toggleDetail} />
-            <RiskFactorRow id="sa" label="South Asian Ethnicity" checked={risk.southAsian}
-              onChange={(v) => setRisk({ ...risk, southAsian: v })}
-              explanation={RISK_EXPLANATIONS.southAsian}
-              criteria={CRITERIA.southAsian} details={details} onToggleDetail={toggleDetail} />
           </div>
         </MiniSection>
 
