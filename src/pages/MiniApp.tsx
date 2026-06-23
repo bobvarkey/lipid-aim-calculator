@@ -845,6 +845,24 @@ export default function MiniApp() {
               </Select>
             </div>
             <div className="col-span-2">
+              <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Ethnicity</label>
+              <Select
+                value={risk.southAsian ? "south_asian" : "other"}
+                onValueChange={(v) => setRisk({ ...risk, southAsian: v === "south_asian" })}
+              >
+                <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="other">Other / Not specified</SelectItem>
+                  <SelectItem value="south_asian">South Asian (Indian / Pakistani / Bangladeshi / Sri Lankan)</SelectItem>
+                </SelectContent>
+              </Select>
+              {risk.southAsian && (
+                <p className="text-[10px] text-muted-foreground mt-1 leading-snug">
+                  LAI 2023 applies: Asian-specific BMI/waist cutoffs · Extreme Risk Group A/B/C surfaced when applicable.
+                </p>
+              )}
+            </div>
+            <div className="col-span-2">
               <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">MRN (optional)</label>
               <Input value={patient.mrn} onChange={(e) => setPatient({ ...patient, mrn: e.target.value })} className="h-9 text-sm" placeholder="e.g. 0012345" />
             </div>
@@ -934,10 +952,6 @@ export default function MiniApp() {
               onChange={(v) => setRisk({ ...risk, familyHx: v })}
               explanation={RISK_EXPLANATIONS.familyHx}
               criteria={CRITERIA.familyHx} details={details} onToggleDetail={toggleDetail} />
-            <RiskFactorRow id="sa" label="South Asian Ethnicity" checked={risk.southAsian}
-              onChange={(v) => setRisk({ ...risk, southAsian: v })}
-              explanation={RISK_EXPLANATIONS.southAsian}
-              criteria={CRITERIA.southAsian} details={details} onToggleDetail={toggleDetail} />
           </div>
         </MiniSection>
 
