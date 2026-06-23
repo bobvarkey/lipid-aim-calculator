@@ -867,6 +867,32 @@ export default function MiniApp() {
               onChange={(v) => setRisk({ ...risk, recurrentAscvd: v })}
               explanation={RISK_EXPLANATIONS.recurrentAscvd}
               criteria={CRITERIA.recurrentAscvd} details={details} onToggleDetail={toggleDetail} />
+            <RiskFactorRow id="subclinical-eq" label="Subclinical Atherosclerosis (ASCVD-equivalent — South Asians)"
+              checked={risk.subclinical}
+              onChange={(v) => setRisk({ ...risk, subclinical: v })}
+              explanation={RISK_EXPLANATIONS.subclinical}
+              criteria={CRITERIA.subclinical_eq} details={details} onToggleDetail={toggleDetail}
+              autoBadge={risk.southAsian ? "LAI" : undefined} />
+            <RiskFactorRow id="hefh" label="Heterozygous Familial Hypercholesterolemia (HeFH)"
+              checked={risk.heFH}
+              onChange={(v) => setRisk({ ...risk, heFH: v })}
+              explanation={RISK_EXPLANATIONS.heFH}
+              criteria={CRITERIA.heFH} details={details} onToggleDetail={toggleDetail} />
+            <RiskFactorRow id="hofh" label="Homozygous Familial Hypercholesterolemia (HoFH)"
+              checked={risk.hoFH}
+              onChange={(v) => setRisk({ ...risk, hoFH: v })}
+              explanation={RISK_EXPLANATIONS.hoFH}
+              criteria={CRITERIA.hoFH} details={details} onToggleDetail={toggleDetail} />
+            <div className="rounded-lg border border-border bg-card px-3 py-2.5">
+              <label className="text-[11px] font-semibold text-muted-foreground mb-1 flex items-center justify-between">
+                <span>Coronary Artery Calcium (CAC) Score</span>
+                <span className="text-[10px] uppercase tracking-wider opacity-70">AU</span>
+              </label>
+              <Input type="number" inputMode="decimal" value={risk.cacScore}
+                onChange={(e) => setRisk({ ...risk, cacScore: e.target.value })}
+                placeholder="e.g. 150" className="h-9 text-sm" />
+              <p className="text-[10px] text-muted-foreground mt-1 leading-snug">{RISK_EXPLANATIONS.cacScore}</p>
+            </div>
             <RiskFactorRow id="dm" label="Diabetes" checked={risk.diabetes}
               onChange={(v) => setRisk({ ...risk, diabetes: v, diabetesTOD: v ? risk.diabetesTOD : false })}
               explanation={RISK_EXPLANATIONS.diabetes}
