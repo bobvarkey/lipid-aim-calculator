@@ -1113,6 +1113,51 @@ export default function MiniApp() {
                   <p className="text-[10px] mt-1.5 text-muted-foreground">Shown because South Asian ethnicity is selected — LAI 2023 Consensus Statement IV.</p>
                 </div>
               )}
+              {risk.southAsian && (() => {
+                const grp = summary.laiExtreme?.group;
+                const key =
+                  summary.category === "Extreme"
+                    ? (grp ? `Extreme-${grp}` : "Extreme-A")
+                    : summary.category;
+                const TARGETS: Record<string, { label: string; ldl: string; nonHdl: string; apoB: string }> = {
+                  Low:         { label: "Low-risk",         ldl: "<100",                       nonHdl: "<130",                       apoB: "<90" },
+                  Moderate:    { label: "Moderate-risk",    ldl: "<100 (optional <70)",        nonHdl: "<130 (optional <100)",       apoB: "<90" },
+                  High:        { label: "High-risk",        ldl: "<70",                        nonHdl: "<100",                       apoB: "<80" },
+                  "Very High": { label: "Very high-risk",   ldl: "<50",                        nonHdl: "<80",                        apoB: "<65" },
+                  "Extreme-A": { label: "Extreme · Group A", ldl: "<50 (optional ≤30)",        nonHdl: "<80 (optional ≤60)",         apoB: "<65" },
+                  "Extreme-B": { label: "Extreme · Group B", ldl: "≤30",                        nonHdl: "≤60",                        apoB: "<50" },
+                  "Extreme-C": { label: "Extreme · Group C", ldl: "10–15",                      nonHdl: "40–45",                      apoB: "—" },
+                };
+                const t = TARGETS[key];
+                if (!t) return null;
+                return (
+                  <div className="col-span-2 rounded-lg border border-[hsl(245_70%_55%)]/30 bg-[hsl(245_70%_55%)]/[0.05] p-3">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[hsl(245_70%_55%)] mb-2">
+                      LAI 2023 lipid targets · {t.label} (mg/dL)
+                    </p>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="rounded-md bg-card border border-border px-2 py-1.5">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">LDL-C</p>
+                        <p className="text-sm font-bold text-foreground">{t.ldl}</p>
+                        <p className="text-[9px] text-muted-foreground">Primary</p>
+                      </div>
+                      <div className="rounded-md bg-card border border-border px-2 py-1.5">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Non-HDL-C</p>
+                        <p className="text-sm font-bold text-foreground">{t.nonHdl}</p>
+                        <p className="text-[9px] text-muted-foreground">Co-primary</p>
+                      </div>
+                      <div className="rounded-md bg-card border border-border px-2 py-1.5">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Apo-B</p>
+                        <p className="text-sm font-bold text-foreground">{t.apoB}</p>
+                        <p className="text-[9px] text-muted-foreground">Secondary</p>
+                      </div>
+                    </div>
+                    <p className="text-[10px] mt-2 text-muted-foreground">
+                      Lipid Association of India 2023 — treatment targets for South Asian patients.
+                    </p>
+                  </div>
+                );
+              })()}
               {summary.drivers.length > 0 && (
                 <div className="col-span-2">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Key Drivers</p>
