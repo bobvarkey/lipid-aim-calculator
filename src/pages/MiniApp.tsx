@@ -1113,7 +1113,7 @@ export default function MiniApp() {
                   <p className="text-[10px] mt-1.5 text-muted-foreground">Shown because South Asian ethnicity is selected — LAI 2023 Consensus Statement IV.</p>
                 </div>
               )}
-              {risk.southAsian && summary.category !== "Pending" && (() => {
+              {risk.southAsian && (() => {
                 const grp = summary.laiExtreme?.group;
                 const key =
                   summary.category === "Extreme"
