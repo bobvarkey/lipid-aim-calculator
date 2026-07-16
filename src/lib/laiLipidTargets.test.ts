@@ -83,7 +83,7 @@ describe("LAI 2023 South Asian lipid-target mapping", () => {
 
     it("LDL-C targets tighten monotonically from Low → Extreme-C", () => {
       // Extract the primary numeric threshold from each label
-      const primary = (s: string) => parseInt(s.replace(/[^\d]+/, ""), 10);
+      const primary = (s: string) => parseInt(s.match(/\d+/)?.[0] ?? "", 10);
       const order: LaiTargetKey[] = [
         "Low", "Moderate", "High", "Very High", "Extreme-A", "Extreme-B", "Extreme-C",
       ];
