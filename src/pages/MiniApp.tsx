@@ -717,7 +717,7 @@ export default function MiniApp() {
           ? "Homozygous FH with ASCVD"
           : "Polyvascular disease (or recurrent ACS / ASCVD with ≥1 very-high-risk feature)",
         ldl: "Mandatory LDL-C ≤30 mg/dL",
-        therapy: "Max statin + ezetimibe + PCSK9i / inclisiran; aggressive secondary-prevention bundle",
+        therapy: "Max statin + ezetimibe + PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra); aggressive secondary-prevention bundle",
       };
     } else if (
       (ascvdEq && highRiskFeatures > 1) ||
