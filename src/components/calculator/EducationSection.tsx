@@ -324,7 +324,7 @@ export default function EducationSection() {
             <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
               <li>Start <strong>high-intensity statin</strong> → LDL &lt;55 mg/dL (&lt;1.4 mmol/L)</li>
               <li>Add <strong>ezetimibe</strong> if not at goal</li>
-              <li>Add <strong>PCSK9 inhibitor</strong> if still not at goal</li>
+              <li>Add <strong>PCSK9 inhibitor</strong> — injectable (evolocumab/alirocumab), siRNA (inclisiran), or oral <strong>Lipfendra (enlicitide) 20 mg PO daily</strong> if still not at goal<Cite n={101} source="U.S. FDA. LIPFENDRA (enlicitide decanoate) tablets — Prescribing Information. Merck & Co., Inc. Approved July 2026." /><Cite n={103} source="2026 AHA/ACC Multisociety Dyslipidemia Guideline — Lipid-Lowering Therapy Add-On Options." /></li>
               <li>Monitor adherence and lifestyle</li>
             </ol>
           </div>
