@@ -737,7 +737,7 @@ export default function MiniApp() {
         ldl: risk.hoFH && !ascvdEq
           ? "LDL-C <50 mg/dL (optional ≤30)"
           : "Optional LDL-C ≤30 mg/dL (otherwise <50)",
-        therapy: "Max-intensity statin + ezetimibe + PCSK9i / inclisiran (lipoprotein apheresis for HoFH)",
+        therapy: "Max-intensity statin + ezetimibe + PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra); lipoprotein apheresis for HoFH",
       };
     }
 
