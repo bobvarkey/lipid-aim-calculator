@@ -667,7 +667,7 @@ export default function MiniApp() {
     } else if (isFinite(cac) && cac >= 300) {
       category = "Extreme";
       ldlGoal = "LAI Extreme Group A: optional ≤30 mg/dL (otherwise <50)";
-      therapy = "High-intensity statin + ezetimibe ± PCSK9i — CAC ≥300 carries ASCVD-event risk";
+      therapy = "High-intensity statin + ezetimibe ± PCSK9i (injectable, inclisiran, or oral enlicitide/Lipfendra) — CAC ≥300 carries ASCVD-event risk";
     } else if (isFinite(cac) && cac >= 100) {
       category = "Very High";
       ldlGoal = "<50 mg/dL (LAI 2023: CAC 100–299 or ≥75th %ile)";
