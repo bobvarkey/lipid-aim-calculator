@@ -29,6 +29,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { calculatePrevent } from "@/lib/prevent";
+import { LAI_LIPID_TARGETS, resolveLaiTargetKey } from "@/lib/laiLipidTargets";
 import { useToast } from "@/hooks/use-toast";
 import { HypothyroidismCaveat } from "@/components/calculator/HypothyroidismCaveat";
 
