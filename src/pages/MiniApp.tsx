@@ -1114,21 +1114,11 @@ export default function MiniApp() {
                 </div>
               )}
               {risk.southAsian && (() => {
-                const grp = summary.laiExtreme?.group;
-                const key =
-                  summary.category === "Extreme"
-                    ? (grp ? `Extreme-${grp}` : "Extreme-A")
-                    : summary.category;
-                const TARGETS: Record<string, { label: string; ldl: string; nonHdl: string; apoB: string }> = {
-                  Low:         { label: "Low-risk",         ldl: "<100",                       nonHdl: "<130",                       apoB: "<90" },
-                  Moderate:    { label: "Moderate-risk",    ldl: "<100 (optional <70)",        nonHdl: "<130 (optional <100)",       apoB: "<90" },
-                  High:        { label: "High-risk",        ldl: "<70",                        nonHdl: "<100",                       apoB: "<80" },
-                  "Very High": { label: "Very high-risk",   ldl: "<50",                        nonHdl: "<80",                        apoB: "<65" },
-                  "Extreme-A": { label: "Extreme · Group A", ldl: "<50 (optional ≤30)",        nonHdl: "<80 (optional ≤60)",         apoB: "<65" },
-                  "Extreme-B": { label: "Extreme · Group B", ldl: "≤30",                        nonHdl: "≤60",                        apoB: "<50" },
-                  "Extreme-C": { label: "Extreme · Group C", ldl: "10–15",                      nonHdl: "40–45",                      apoB: "—" },
-                };
-                const t = TARGETS[key];
+                const key = resolveLaiTargetKey(
+                  summary.category,
+                  (summary.laiExtreme?.group ?? null) as "A" | "B" | "C" | null,
+                );
+                const t = key ? LAI_LIPID_TARGETS[key] : null;
                 if (!t) return null;
                 return (
                   <div className="col-span-2 rounded-lg border border-[hsl(245_70%_55%)]/30 bg-[hsl(245_70%_55%)]/[0.05] p-3">
