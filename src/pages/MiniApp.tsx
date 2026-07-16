@@ -653,21 +653,21 @@ export default function MiniApp() {
     if (risk.recurrentAscvd) {
       category = "Extreme";
       ldlGoal = "≤30 mg/dL (LAI Extreme Group C: target 10–15 mg/dL)";
-      therapy = "Max statin + ezetimibe + PCSK9i / inclisiran / bempedoic acid; address Lp(a), hs-CRP, adherence";
+      therapy = "Max statin + ezetimibe + PCSK9i (injectable evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra 20 mg PO daily) / bempedoic acid; address Lp(a), hs-CRP, adherence";
     } else if (risk.polyvascular || (ascvdEq && highRiskFeatures >= 1) || (risk.heFH && ascvdEq) || risk.hoFH) {
       // Multiple ASCVD events / 1 event + high-risk condition → ACC 2022 LDL <55
       // Also captures HeFH+ASCVD and HoFH (LAI Extreme A/B)
       category = "Very High";
       ldlGoal = "<55 mg/dL (ACC 2022) · LAI: <50 mg/dL";
-      therapy = "High-intensity statin + ezetimibe; add PCSK9i if LDL above goal";
+      therapy = "High-intensity statin + ezetimibe; add PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra) if LDL above goal";
     } else if (ascvdEq || (risk.diabetes && risk.diabetesTOD) || (risk.ckd && (risk.ckdStage === "4" || risk.ckdStage === "5"))) {
       category = "Very High";
       ldlGoal = "<55 mg/dL (ACC 2022) · LAI: <50 mg/dL";
-      therapy = "High-intensity statin + ezetimibe; add PCSK9i if LDL above goal";
+      therapy = "High-intensity statin + ezetimibe; add PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra) if LDL above goal";
     } else if (isFinite(cac) && cac >= 300) {
       category = "Extreme";
       ldlGoal = "LAI Extreme Group A: optional ≤30 mg/dL (otherwise <50)";
-      therapy = "High-intensity statin + ezetimibe ± PCSK9i — CAC ≥300 carries ASCVD-event risk";
+      therapy = "High-intensity statin + ezetimibe ± PCSK9i (injectable, inclisiran, or oral enlicitide/Lipfendra) — CAC ≥300 carries ASCVD-event risk";
     } else if (isFinite(cac) && cac >= 100) {
       category = "Very High";
       ldlGoal = "<50 mg/dL (LAI 2023: CAC 100–299 or ≥75th %ile)";
@@ -708,7 +708,7 @@ export default function MiniApp() {
         group: "C",
         criterion: "Recurrent ASCVD events despite holistic ASCVD risk reduction and LDL-C ≈30 mg/dL on max therapy",
         ldl: "Target LDL-C 10–15 mg/dL",
-        therapy: "Max statin + ezetimibe + PCSK9i / inclisiran ± bempedoic acid; anti-inflammatory therapy (colchicine); optimise DM/HTN; address Lp(a)",
+        therapy: "Max statin + ezetimibe + PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra 20 mg PO daily) ± bempedoic acid; anti-inflammatory therapy (colchicine); optimise DM/HTN; address Lp(a)",
       };
     } else if (risk.polyvascular || (risk.hoFH && ascvdEq)) {
       laiExtreme = {
@@ -717,7 +717,7 @@ export default function MiniApp() {
           ? "Homozygous FH with ASCVD"
           : "Polyvascular disease (or recurrent ACS / ASCVD with ≥1 very-high-risk feature)",
         ldl: "Mandatory LDL-C ≤30 mg/dL",
-        therapy: "Max statin + ezetimibe + PCSK9i / inclisiran; aggressive secondary-prevention bundle",
+        therapy: "Max statin + ezetimibe + PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra); aggressive secondary-prevention bundle",
       };
     } else if (
       (ascvdEq && highRiskFeatures > 1) ||
@@ -737,7 +737,7 @@ export default function MiniApp() {
         ldl: risk.hoFH && !ascvdEq
           ? "LDL-C <50 mg/dL (optional ≤30)"
           : "Optional LDL-C ≤30 mg/dL (otherwise <50)",
-        therapy: "Max-intensity statin + ezetimibe + PCSK9i / inclisiran (lipoprotein apheresis for HoFH)",
+        therapy: "Max-intensity statin + ezetimibe + PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra); lipoprotein apheresis for HoFH",
       };
     }
 
