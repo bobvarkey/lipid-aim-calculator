@@ -653,7 +653,7 @@ export default function MiniApp() {
     if (risk.recurrentAscvd) {
       category = "Extreme";
       ldlGoal = "≤30 mg/dL (LAI Extreme Group C: target 10–15 mg/dL)";
-      therapy = "Max statin + ezetimibe + PCSK9i / inclisiran / bempedoic acid; address Lp(a), hs-CRP, adherence";
+      therapy = "Max statin + ezetimibe + PCSK9i (injectable evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra 20 mg PO daily) / bempedoic acid; address Lp(a), hs-CRP, adherence";
     } else if (risk.polyvascular || (ascvdEq && highRiskFeatures >= 1) || (risk.heFH && ascvdEq) || risk.hoFH) {
       // Multiple ASCVD events / 1 event + high-risk condition → ACC 2022 LDL <55
       // Also captures HeFH+ASCVD and HoFH (LAI Extreme A/B)
