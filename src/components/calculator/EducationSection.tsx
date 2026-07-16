@@ -369,9 +369,91 @@ export default function EducationSection() {
             <p>• Evaluate muscle symptoms</p>
             <p>• <strong>ASCVD absent:</strong> LDL &lt;100 mg/dL (&lt;2.6 mmol/L) → ezetimibe</p>
             <p>• <strong>ASCVD present:</strong> LDL &lt;70 mg/dL (&lt;1.8 mmol/L) → ezetimibe + bempedoic acid</p>
-            <p>• If goals not met → Add <strong>PCSK9 inhibitor</strong></p>
+            <p>• If goals not met → Add <strong>PCSK9 inhibitor</strong> (injectable evolocumab/alirocumab, siRNA inclisiran, or oral <strong>Lipfendra (enlicitide)</strong> — see below)<Cite n={101} source="U.S. FDA. LIPFENDRA (enlicitide decanoate) tablets — Prescribing Information. Merck & Co., Inc. Approved July 2026." /></p>
           </div>
         </div>
+
+        {/* ─── Lipfendra (enlicitide) — Oral PCSK9 Inhibitor ─── */}
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 mb-5">
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+              Lipfendra (enlicitide) — Oral PCSK9 Inhibitor
+            </p>
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">FDA 2026</span>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">
+            Brand: <strong>LIPFENDRA</strong> • Generic: <strong>enlicitide</strong> • Active ingredient: <strong>enlicitide decanoate</strong> • First-in-class oral macrocyclic peptide PCSK9 inhibitor.<Cite n={101} source="U.S. FDA. LIPFENDRA (enlicitide decanoate) tablets — Prescribing Information. Merck & Co., Inc. Approved July 2026." />
+          </p>
+
+          <div className="grid gap-3 md:grid-cols-3 mb-3">
+            <div className="rounded-md border border-border bg-background/60 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Dosing</p>
+              <ul className="text-xs text-foreground leading-relaxed list-disc list-inside space-y-1">
+                <li>20 mg orally <strong>once daily</strong></li>
+                <li>No dose titration required</li>
+                <li>No renal dose adjustment (mild–moderate CKD); not studied in ESRD/dialysis</li>
+                <li>No dose adjustment for mild hepatic impairment; avoid in severe hepatic impairment</li>
+              </ul>
+            </div>
+            <div className="rounded-md border border-border bg-background/60 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Administration</p>
+              <ul className="text-xs text-foreground leading-relaxed list-disc list-inside space-y-1">
+                <li>Take on an <strong>empty stomach</strong>, ≥30 min before or 2 h after food</li>
+                <li>Swallow whole with water — do not crush or split</li>
+                <li>Separate from bile-acid sequestrants by ≥4 h</li>
+                <li>Missed dose: take same day if remembered; skip if next dose is within 12 h</li>
+              </ul>
+            </div>
+            <div className="rounded-md border border-border bg-background/60 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Key Precautions</p>
+              <ul className="text-xs text-foreground leading-relaxed list-disc list-inside space-y-1">
+                <li>Hypersensitivity — discontinue if angioedema/serious reaction</li>
+                <li>GI intolerance (nausea, dyspepsia) most common; usually transient</li>
+                <li>Avoid in <strong>pregnancy &amp; lactation</strong> (limited data)</li>
+                <li>Monitor LFTs at baseline &amp; if symptomatic</li>
+                <li>Drug interactions: strong CYP3A/P-gp inhibitors may ↑ exposure — consider spacing</li>
+              </ul>
+            </div>
+          </div>
+
+          <p className="text-[11px] text-muted-foreground italic">
+            Efficacy: mean LDL-C reduction ≈55–60% vs placebo when added to maximally tolerated statin ± ezetimibe (CORALreef trials).<Cite n={102} source="Rosenson RS et al. Oral macrocyclic peptide PCSK9 inhibitor enlicitide (CORALreef Lipids / CORALreef HeFH). NEJM / JACC 2025–2026." /> Endorsed as an oral alternative to injectable PCSK9i where LDL-C goals are unmet or the patient is needle-averse.<Cite n={103} source="2026 AHA/ACC Multisociety Dyslipidemia Guideline — Lipid-Lowering Therapy Add-On Options." />
+          </p>
+        </div>
+
+        {/* Lipfendra vs Injectable PCSK9i — needle-averse comparison */}
+        <div className="rounded-lg border border-primary/25 bg-primary/5 p-4 mb-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+            Oral vs Injectable PCSK9 Inhibition — Choosing for the Needle-Averse Patient
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Attribute</th>
+                  <th className="text-left py-2 pr-3 font-semibold text-emerald-600 dark:text-emerald-400">Lipfendra (enlicitide)</th>
+                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Evolocumab / Alirocumab (mAb)</th>
+                  <th className="text-left py-2 font-semibold text-muted-foreground">Inclisiran (siRNA)</th>
+                </tr>
+              </thead>
+              <tbody className="text-foreground align-top">
+                <tr className="border-b border-border/50"><td className="py-2 pr-3 font-medium">Route</td><td className="py-2 pr-3"><strong>Oral tablet</strong> ✅ no needle</td><td className="py-2 pr-3">Subcutaneous injection</td><td className="py-2">Subcutaneous injection</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3 font-medium">Frequency</td><td className="py-2 pr-3">Once daily</td><td className="py-2 pr-3">Every 2 or 4 weeks</td><td className="py-2">Day 0, day 90, then every 6 months</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3 font-medium">Mechanism</td><td className="py-2 pr-3">Macrocyclic peptide — extracellular PCSK9 binding</td><td className="py-2 pr-3">Monoclonal antibody — extracellular PCSK9 binding</td><td className="py-2">Hepatic siRNA — ↓ PCSK9 synthesis</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3 font-medium">LDL-C ↓ (add-on)</td><td className="py-2 pr-3">≈55–60%</td><td className="py-2 pr-3">≈55–60%</td><td className="py-2">≈50%</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3 font-medium">CV outcomes data</td><td className="py-2 pr-3">CORALreef Outcomes ongoing</td><td className="py-2 pr-3">FOURIER / ODYSSEY OUTCOMES — proven MACE ↓</td><td className="py-2">ORION-4 ongoing</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3 font-medium">Storage</td><td className="py-2 pr-3">Room temperature</td><td className="py-2 pr-3">Refrigerated (2–8 °C)</td><td className="py-2">Refrigerated (2–8 °C)</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3 font-medium">Adherence pattern</td><td className="py-2 pr-3">Daily pill — requires daily habit</td><td className="py-2 pr-3">Patient/caregiver injection q2–4w</td><td className="py-2">Clinic-administered biannually — highest passive adherence</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2 pr-3 font-medium">Common AEs</td><td className="py-2 pr-3">GI (nausea, dyspepsia)</td><td className="py-2 pr-3">Injection-site reactions, nasopharyngitis</td><td className="py-2">Injection-site reactions</td></tr>
+                <tr><td className="py-2 pr-3 font-medium">Best fit</td><td className="py-2 pr-3"><strong>Needle-averse patients</strong>, travellers, no refrigeration access</td><td className="py-2 pr-3">Established outcomes benefit needed; HeFH/HoFH</td><td className="py-2">Adherence-challenged patients preferring clinic visits</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[11px] text-muted-foreground italic mt-2">
+            Sources: Lipfendra US FDA Prescribing Information (2026)<Cite n={101} source="U.S. FDA. LIPFENDRA (enlicitide decanoate) tablets — Prescribing Information. Merck & Co., Inc. Approved July 2026." />; FOURIER<Cite n={104} source="Sabatine MS et al. FOURIER — Evolocumab and clinical outcomes in patients with cardiovascular disease. N Engl J Med. 2017;376:1713-1722." />; ODYSSEY OUTCOMES<Cite n={105} source="Schwartz GG et al. ODYSSEY OUTCOMES — Alirocumab and cardiovascular outcomes after acute coronary syndrome. N Engl J Med. 2018;379:2097-2107." />; ORION-10/11<Cite n={106} source="Ray KK et al. Two Phase 3 Trials of Inclisiran in Patients with Elevated LDL Cholesterol. N Engl J Med. 2020;382:1507-1519." />; 2026 AHA/ACC Multisociety Dyslipidemia Guideline.<Cite n={103} source="2026 AHA/ACC Multisociety Dyslipidemia Guideline — Lipid-Lowering Therapy Add-On Options." />
+          </p>
+        </div>
+
 
         {/* Screening Recommendations */}
         <div className="mb-4">
