@@ -659,11 +659,11 @@ export default function MiniApp() {
       // Also captures HeFH+ASCVD and HoFH (LAI Extreme A/B)
       category = "Very High";
       ldlGoal = "<55 mg/dL (ACC 2022) · LAI: <50 mg/dL";
-      therapy = "High-intensity statin + ezetimibe; add PCSK9i if LDL above goal";
+      therapy = "High-intensity statin + ezetimibe; add PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra) if LDL above goal";
     } else if (ascvdEq || (risk.diabetes && risk.diabetesTOD) || (risk.ckd && (risk.ckdStage === "4" || risk.ckdStage === "5"))) {
       category = "Very High";
       ldlGoal = "<55 mg/dL (ACC 2022) · LAI: <50 mg/dL";
-      therapy = "High-intensity statin + ezetimibe; add PCSK9i if LDL above goal";
+      therapy = "High-intensity statin + ezetimibe; add PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra) if LDL above goal";
     } else if (isFinite(cac) && cac >= 300) {
       category = "Extreme";
       ldlGoal = "LAI Extreme Group A: optional ≤30 mg/dL (otherwise <50)";
