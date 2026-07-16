@@ -708,7 +708,7 @@ export default function MiniApp() {
         group: "C",
         criterion: "Recurrent ASCVD events despite holistic ASCVD risk reduction and LDL-C ≈30 mg/dL on max therapy",
         ldl: "Target LDL-C 10–15 mg/dL",
-        therapy: "Max statin + ezetimibe + PCSK9i / inclisiran ± bempedoic acid; anti-inflammatory therapy (colchicine); optimise DM/HTN; address Lp(a)",
+        therapy: "Max statin + ezetimibe + PCSK9i (evolocumab/alirocumab, inclisiran, or oral enlicitide/Lipfendra 20 mg PO daily) ± bempedoic acid; anti-inflammatory therapy (colchicine); optimise DM/HTN; address Lp(a)",
       };
     } else if (risk.polyvascular || (risk.hoFH && ascvdEq)) {
       laiExtreme = {
