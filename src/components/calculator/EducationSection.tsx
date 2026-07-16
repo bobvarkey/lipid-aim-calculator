@@ -342,7 +342,7 @@ export default function EducationSection() {
             <ol className="space-y-1.5 text-sm text-foreground leading-relaxed list-decimal list-inside">
               <li><strong>Cascade screening</strong> + complete genetic testing</li>
               <li>Add <strong>ezetimibe</strong></li>
-              <li>Add <strong>PCSK9 inhibitor</strong> if not at goal</li>
+              <li>Add <strong>PCSK9 inhibitor</strong> (injectable, inclisiran, or oral <strong>Lipfendra / enlicitide</strong>) if not at goal<Cite n={101} source="U.S. FDA. LIPFENDRA (enlicitide decanoate) tablets — Prescribing Information. Merck & Co., Inc. Approved July 2026." /></li>
             </ol>
           </div>
         </div>
