@@ -597,6 +597,22 @@ export default function MiniApp() {
   const [bpMed, setBpMed] = useState(false);
   const [onStatin, setOnStatin] = useState(false);
 
+  // ─── Auth state ──────────────────────────────────────────────────────────
+  const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => setSession(s);
+    return () => listener.subscription.unsubscribe();
+  }, []);
+  const signInWithGoogle = async () => {
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+    if (result.error) toast({ title: "Sign-in failed", description: result.error.message, variant: "destructive" });
+  };
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    toast({ title: "Signed out" });
+  };
+
   // ─── Auto-detection ─────────────────────────────────────────────────────
   const auto = useMemo(() => {
     const ldlMax = rangeMax(lipid.ldl);
