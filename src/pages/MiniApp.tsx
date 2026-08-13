@@ -7,6 +7,7 @@ import {
   Droplet,
   FlaskConical,
   Heart,
+  HelpCircle,
   Info,
   ShieldAlert,
   Sparkles,
