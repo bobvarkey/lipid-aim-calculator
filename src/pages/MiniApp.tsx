@@ -538,7 +538,8 @@ export default function MiniApp() {
     ascvd: false, polyvascular: false, recurrentAscvd: false,
     subclinical: false, heFH: false, hoFH: false, cacScore: "",
     diabetes: false, diabetesTOD: false, htn: false,
-    smoker: false, ckd: false, ckdStage: "", familyHx: false, southAsian: false,
+    smoker: false, ckd: false, ckdStage: "", familyHx: false, 
+    southAsian: undefined as any as boolean, // Forced selection
   });
   const [lipid, setLipid] = useState<LipidState>({
     ldl: { ...blankRange }, hdl: { ...blankRange }, tg: { ...blankRange },
