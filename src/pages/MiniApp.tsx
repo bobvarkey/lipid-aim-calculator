@@ -846,17 +846,24 @@ export default function MiniApp() {
               </Select>
             </div>
             <div className="col-span-2">
-              <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Ethnicity</label>
+              <label className="text-[11px] font-semibold text-muted-foreground mb-1 block flex items-center gap-1">
+                Ethnicity <span className="text-[hsl(346_77%_55%)] font-bold">*Mandatory</span>
+              </label>
               <Select
-                value={risk.southAsian ? "south_asian" : "other"}
+                value={risk.southAsian ? "south_asian" : risk.southAsian === false ? "other" : ""}
                 onValueChange={(v) => setRisk({ ...risk, southAsian: v === "south_asian" })}
               >
-                <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                <SelectTrigger className={`h-9 text-sm ${risk.southAsian === undefined ? "border-[hsl(346_77%_55%)]/50 ring-1 ring-[hsl(346_77%_55%)]/20" : ""}`}>
+                  <SelectValue placeholder="Select Ethnicity" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="other">Other / Not specified</SelectItem>
                   <SelectItem value="south_asian">South Asian (Indian / Pakistani / Bangladeshi / Sri Lankan)</SelectItem>
                 </SelectContent>
               </Select>
+              {risk.southAsian === undefined && (
+                <p className="text-[10px] text-[hsl(346_77%_55%)] mt-1 font-medium">Please select ethnicity to enable guideline-specific logic.</p>
+              )}
               {risk.southAsian && (
                 <p className="text-[10px] text-muted-foreground mt-1 leading-snug">
                   LAI 2023 applies: Asian-specific BMI/waist cutoffs · Extreme Risk Group A/B/C surfaced when applicable.
