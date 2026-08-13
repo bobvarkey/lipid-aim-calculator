@@ -1060,6 +1060,39 @@ export default function EducationSection() {
           ))}
         </div>
       </SectionCard>
+      {/* ─── FH & Cascade Pattern ─── */}
+      <SectionCard
+        title="FH & Cascade Pattern Explanation"
+        tone="primary"
+        icon={<Dna className="h-4 w-4" />}
+        defaultOpen={false}
+      >
+        <div className="space-y-4">
+          <div>
+            <h4 className="text-sm font-bold text-foreground mb-1">What is Familial Hypercholesterolemia (FH)?</h4>
+            <p className="text-sm text-foreground leading-relaxed">
+              FH is a common genetic disorder (primarily autosomal dominant) characterized by lifelong, severe elevations in LDL-C, leading to premature ASCVD. Heterozygous FH (HeFH) occurs in ~1 in 250 people.
+            </p>
+          </div>
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+            <h4 className="text-sm font-bold text-primary mb-1.5 flex items-center gap-2">
+              <Sparkles className="h-3.5 w-3.5" />
+              What is the "Cascade Pattern"?
+            </h4>
+            <p className="text-sm text-foreground leading-relaxed mb-3">
+              The <strong>cascade pattern</strong> (or family cascade) describes a multi-generational clinical signature of FH:
+            </p>
+            <ul className="text-sm text-foreground space-y-2 list-disc list-inside marker:text-primary">
+              <li><strong>Successive Generations:</strong> Vertical transmission where severe hypercholesterolemia (LDL-C ≥190 mg/dL) or premature heart disease is visible across multiple generations (e.g., child, parent, and grandparent all affected).</li>
+              <li><strong>Index-Case Trigger:</strong> When an "index case" (the first person diagnosed) is identified, systematic screening of all first-degree relatives often reveals that approximately 50% are also affected.</li>
+              <li><strong>Early Risk:</strong> Identifying this pattern triggers <strong>cascade screening</strong>, the most cost-effective way to find individuals with FH before they suffer their first cardiovascular event.</li>
+            </ul>
+          </div>
+          <p className="text-xs text-muted-foreground italic">
+            Clinical Note: The presence of a cascade pattern strengthens the diagnosis of FH even in the absence of genetic testing or physical signs like tendon xanthomas.
+          </p>
+        </div>
+      </SectionCard>
     </div>
   );
 }
