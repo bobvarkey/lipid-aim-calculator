@@ -1081,7 +1081,16 @@ export default function MiniApp() {
             <h2 className="font-display text-sm font-bold text-primary">Risk Summary</h2>
           </div>
           <div className="p-4 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            {risk.southAsian === undefined && (
+              <div className="col-span-2 rounded-lg border border-[hsl(346_77%_55%)]/30 bg-[hsl(346_77%_55%)]/[0.05] p-3 text-center">
+                <p className="text-xs font-bold text-[hsl(346_77%_45%)] flex items-center justify-center gap-2">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  Select Ethnicity to View Summary
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1">Guideline-specific targets require ethnicity classification.</p>
+              </div>
+            )}
+            <div className={`grid grid-cols-2 gap-3 transition-opacity ${risk.southAsian === undefined ? "opacity-20 pointer-events-none grayscale" : "opacity-100"}`}>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">10-Yr ASCVD</p>
                 <p className="font-display text-2xl font-bold text-primary leading-tight">
