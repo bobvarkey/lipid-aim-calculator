@@ -1103,15 +1103,28 @@ export default function MiniApp() {
                 <p className="text-sm">{summary.therapy}</p>
               </div>
               {risk.southAsian && summary.laiExtreme && (
-                <div className="col-span-2 rounded-lg border-2 border-[hsl(346_77%_55%)/0.4] bg-[hsl(346_77%_55%)/0.06] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[hsl(346_77%_45%)] flex items-center gap-1.5">
-                    <ShieldAlert className="h-3 w-3" />
-                    LAI 2023 Extreme Risk · Group {summary.laiExtreme.group}
-                  </p>
-                  <p className="text-xs mt-1.5 leading-snug"><span className="font-semibold">Criterion:</span> {summary.laiExtreme.criterion}</p>
-                  <p className="text-xs mt-1 leading-snug"><span className="font-semibold">LDL-C target:</span> {summary.laiExtreme.ldl}</p>
-                  <p className="text-xs mt-1 leading-snug"><span className="font-semibold">Therapy:</span> {summary.laiExtreme.therapy}</p>
-                  <p className="text-[10px] mt-1.5 text-muted-foreground">Shown because South Asian ethnicity is selected — LAI 2023 Consensus Statement IV.</p>
+                <div className="col-span-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">LAI 2023 Clinical Guidance</span>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
+                  <div className="rounded-xl border-2 border-[hsl(346_77%_55%)] bg-[hsl(346_77%_55%)/0.04] p-4 shadow-sm ring-1 ring-[hsl(346_77%_55%)/0.1]">
+                    <p className="text-xs font-black uppercase tracking-widest text-[hsl(346_77%_45%)] flex items-center gap-2">
+                      <ShieldAlert className="h-4 w-4" />
+                      LAI 2023 Extreme Risk · Group {summary.laiExtreme.group}
+                    </p>
+                    <div className="mt-3 space-y-2.5">
+                      <p className="text-[13px] leading-snug"><span className="font-bold text-foreground">Criterion:</span> <span className="text-muted-foreground">{summary.laiExtreme.criterion}</span></p>
+                      <p className="text-[13px] leading-snug"><span className="font-bold text-foreground">LDL-C target:</span> <span className="text-[hsl(346_77%_45%)] font-bold">{summary.laiExtreme.ldl}</span></p>
+                      <p className="text-[13px] leading-snug"><span className="font-bold text-foreground">Therapy:</span> <span className="text-muted-foreground">{summary.laiExtreme.therapy}</span></p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-[hsl(346_77%_55%)/0.1]">
+                      <p className="text-[10px] font-medium text-muted-foreground leading-tight italic">
+                        Shown because South Asian ethnicity is selected — LAI 2023 Consensus Statement IV.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
               {risk.southAsian && (() => {
