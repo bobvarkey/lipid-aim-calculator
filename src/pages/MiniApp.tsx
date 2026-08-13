@@ -1213,9 +1213,11 @@ export default function MiniApp() {
                 </div>
               )}
             </div>
-            <Button onClick={copyEmr} className="w-full gap-2 mt-2">
-              <ClipboardCopy className="h-4 w-4" /> Copy EMR Note
-            </Button>
+            {risk.southAsian !== undefined && (
+              <Button onClick={copyEmr} className="w-full gap-2 mt-2">
+                <ClipboardCopy className="h-4 w-4" /> Copy EMR Note
+              </Button>
+            )}
           </div>
         </Card>
 
