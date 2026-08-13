@@ -41,7 +41,7 @@ export const CKD_ITEMS: SubItem[] = [
 export const FH_ITEMS: SubItem[] = [
   { id: "fh_clinical", label: "Clinical heterozygous familial hypercholesterolemia", qualifier: "Definite/probable FH by Dutch Lipid Clinic Network, Simon Broome, or MEDPED criteria" },
   { id: "fh_genetic", label: "Pathogenic FH mutation", qualifier: "LDLR, APOB, PCSK9, or other validated monogenic FH variant" },
-  { id: "fh_phenotype", label: "FH phenotype with LDL-C ≥190 mg/dL", qualifier: "Severe hypercholesterolemia with tendon xanthomas, corneal arcus at young age, or compatible family cascade pattern" },
+  { id: "fh_phenotype", label: "FH phenotype with LDL-C ≥190 mg/dL", qualifier: "Severe hypercholesterolemia with tendon xanthomas, corneal arcus at young age, or compatible family cascade pattern (multiple generations affected)" },
   { id: "fh_tendon_xanthoma", label: "Tendon xanthomas", qualifier: "Cholesterol deposits in tendons (commonly Achilles or extensor tendons of the hand) — highly specific physical sign of FH" },
   { id: "fh_tuberous_xanthoma", label: "Tuberous xanthomas", qualifier: "Firm, painless nodules over extensor surfaces (elbows, knees, buttocks) — cutaneous marker of severe hypercholesterolemia" },
   { id: "fh_xanthelasma", label: "Xanthelasmata", qualifier: "Yellowish cholesterol-rich plaques on the eyelids — less specific but supportive when present at a young age" },

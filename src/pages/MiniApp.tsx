@@ -303,7 +303,7 @@ const CRITERIA: Record<string, Criterion[]> = {
   heFH: [
     { id: "hefh_clinical", label: "Clinical HeFH (DLCN ≥6 / Simon Broome definite)", qualifier: "Definite or probable heterozygous FH by validated criteria" },
     { id: "hefh_genetic", label: "Pathogenic heterozygous LDLR/APOB/PCSK9 variant", qualifier: "Confirmed monogenic FH" },
-    { id: "hefh_ldl190", label: "LDL-C ≥190 mg/dL with FH phenotype", qualifier: "Severe hypercholesterolemia with tendon xanthoma, corneal arcus <45 y, or cascade pattern" },
+    { id: "hefh_ldl190", label: "LDL-C ≥190 mg/dL with FH phenotype", qualifier: "Severe hypercholesterolemia with tendon xanthoma, corneal arcus <45 y, or cascade pattern (successive generations of severe hypercholesterolemia)" },
   ],
   hoFH: [
     { id: "hofh_clinical", label: "Clinical HoFH (LDL-C ≥400 mg/dL untreated)", qualifier: "Often >500 mg/dL; tendon/cutaneous xanthomata in childhood" },
