@@ -379,6 +379,9 @@ const CRITERIA: Record<string, Criterion[]> = {
   ],
 };
 
+const CASCADE_TOOLTIP =
+  "Cascade pattern: successive generations in a family with severe hypercholesterolemia and/or premature ASCVD, suggesting autosomal-dominant inheritance typical of familial hypercholesterolemia. Used as a clinical clue when genetic testing is unavailable.";
+
 function CriteriaList({
   items,
   details,
@@ -389,22 +392,46 @@ function CriteriaList({
   onToggle: (id: string, v: boolean) => void;
 }) {
   return (
-    <ul className="space-y-1.5">
-      {items.map((c) => (
-        <li key={c.id} className="flex gap-2 rounded-md border border-border/60 bg-background/60 px-2.5 py-2">
-          <Checkbox
-            id={c.id}
-            checked={!!details[c.id]}
-            onCheckedChange={(v) => onToggle(c.id, !!v)}
-            className="mt-0.5"
-          />
-          <label htmlFor={c.id} className="flex-1 text-xs cursor-pointer leading-snug">
-            <span className="font-semibold text-foreground">{c.label}</span>
-            <span className="block text-[11px] text-muted-foreground mt-0.5">{c.qualifier}</span>
-          </label>
-        </li>
-      ))}
-    </ul>
+    <TooltipProvider delayDuration={100}>
+      <ul className="space-y-1.5">
+        {items.map((c) => {
+          const hasCascade = /cascade pattern/i.test(c.qualifier);
+          return (
+            <li key={c.id} className="flex gap-2 rounded-md border border-border/60 bg-background/60 px-2.5 py-2">
+              <Checkbox
+                id={c.id}
+                checked={!!details[c.id]}
+                onCheckedChange={(v) => onToggle(c.id, !!v)}
+                className="mt-0.5"
+              />
+              <label htmlFor={c.id} className="flex-1 text-xs cursor-pointer leading-snug">
+                <span className="font-semibold text-foreground inline-flex items-center gap-1">
+                  {c.label}
+                  {hasCascade && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Explain cascade pattern"
+                          className="inline-flex text-muted-foreground hover:text-foreground focus:outline-none"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <HelpCircle className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-[260px]">
+                        <p className="leading-snug">{CASCADE_TOOLTIP}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </span>
+                <span className="block text-[11px] text-muted-foreground mt-0.5">{c.qualifier}</span>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+    </TooltipProvider>
   );
 }
 
