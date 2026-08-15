@@ -608,6 +608,10 @@ export default function MiniApp() {
     const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
     if (result.error) toast({ title: "Sign-in failed", description: result.error.message, variant: "destructive" });
   };
+  const signInWithApple = async () => {
+    const result = await lovable.auth.signInWithOAuth("apple", { redirect_uri: window.location.origin });
+    if (result.error) toast({ title: "Sign-in failed", description: result.error.message, variant: "destructive" });
+  };
   const signOut = async () => {
     await supabase.auth.signOut();
     toast({ title: "Signed out" });
