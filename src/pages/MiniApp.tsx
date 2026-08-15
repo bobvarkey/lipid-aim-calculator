@@ -601,7 +601,7 @@ export default function MiniApp() {
   const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => setSession(s);
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
     return () => listener.subscription.unsubscribe();
   }, []);
   const signInWithGoogle = async () => {
